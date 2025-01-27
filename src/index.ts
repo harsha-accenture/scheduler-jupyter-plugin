@@ -13,7 +13,10 @@ const plugin: JupyterFrontEndPlugin<void> = {
   description: 'A JupyterLab extension.',
   autoStart: true,
   optional: [ISettingRegistry],
-  activate: (app: JupyterFrontEnd, settingRegistry: ISettingRegistry | null) => {
+  activate: (
+    app: JupyterFrontEnd,
+    settingRegistry: ISettingRegistry | null
+  ) => {
     console.log('JupyterLab extension scheduler-jupyter-plugin is activated!');
   }
 };
