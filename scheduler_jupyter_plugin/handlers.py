@@ -28,7 +28,7 @@ from jupyter_server.utils import url_path_join
 from traitlets import Undefined, Unicode
 from traitlets.config import SingletonConfigurable
 
-from dataproc_jupyter_plugin import credentials, urls
+from scheduler_jupyter_plugin import credentials, urls
 
 
 class SchedulerPluginConfig(SingletonConfigurable):
