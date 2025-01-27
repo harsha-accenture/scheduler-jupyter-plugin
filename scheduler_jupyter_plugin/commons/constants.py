@@ -15,9 +15,6 @@
 import re
 
 
-import re
-
-
 CLOUDKMS_SERVICE_NAME = "cloudkms"
 CLOUDRESOURCEMANAGER_SERVICE_NAME = "cloudresourcemanager"
 COMPUTE_SERVICE_DEFAULT_URL = "https://compute.googleapis.com/compute/v1"
