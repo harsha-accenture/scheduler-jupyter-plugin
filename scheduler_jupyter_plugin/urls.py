@@ -13,7 +13,7 @@
 # limitations under the License.
 from google.cloud import jupyter_config
 
-from dataproc_jupyter_plugin.commons.constants import (
+from scheduler_jupyter_plugin.commons.constants import (
     CLOUDKMS_SERVICE_NAME,
     CLOUDRESOURCEMANAGER_SERVICE_NAME,
     COMPUTE_SERVICE_DEFAULT_URL,
