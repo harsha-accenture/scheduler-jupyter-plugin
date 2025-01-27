@@ -29,6 +29,12 @@ from traitlets import Undefined, Unicode
 from traitlets.config import SingletonConfigurable
 
 from scheduler_jupyter_plugin import credentials, urls
+from dataproc_jupyter_plugin import credentials, urls
+from dataproc_jupyter_plugin.controllers import (
+    airflow,
+    composer,
+    executor,
+)
 
 
 class SchedulerPluginConfig(SingletonConfigurable):
@@ -145,6 +151,18 @@ def setup_handlers(web_app):
         "configuration": ConfigHandler,
         "getGcpServiceUrls": UrlHandler,
         "log": LogHandler,
+        "composerList": composer.EnvironmentListController,
+        "dagRun": airflow.DagRunController,
+        "dagRunTask": airflow.DagRunTaskController,
+        "dagRunTaskLogs": airflow.DagRunTaskLogsController,
+        "createJobScheduler": executor.ExecutorController,
+        "dagList": airflow.DagListController,
+        "dagDelete": airflow.DagDeleteController,
+        "dagUpdate": airflow.DagUpdateController,
+        "editJobScheduler": airflow.EditDagController,
+        "importErrorsList": airflow.ImportErrorController,
+        "triggerDag": airflow.TriggerDagController,
+        "downloadOutput": executor.DownloadOutputController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)
