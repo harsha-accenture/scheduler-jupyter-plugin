@@ -1,0 +1,8 @@
+{
+  "jupyter.lab.shortcuts": [],
+  "title": "scheduler-jupyter-plugin",
+  "description": "scheduler-jupyter-plugin settings.",
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}
