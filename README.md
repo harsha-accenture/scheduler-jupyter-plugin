@@ -1,9 +1,5 @@
 # scheduler_jupyter_plugin
 
-[![Github Actions Status](https://github.com/harsha-accenture/scheduler-jupyter-plugin.git/workflows/Build/badge.svg)](https://github.com/harsha-accenture/scheduler-jupyter-plugin.git/actions/workflows/build.yml)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/harsha-accenture/scheduler-jupyter-plugin.git/main?urlpath=lab)
-
-
 A JupyterLab extension.
 
 This extension is composed of a Python package named `scheduler_jupyter_plugin`
