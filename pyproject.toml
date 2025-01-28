@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
     "jupyter_server>=2.4.0,<3",
     "google-cloud-jupyter-config>=0.0.10",
+    "aiohttp~=3.9.5",
     "google-cloud-compute",
     "google-cloud-iam",
 ]
