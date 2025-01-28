@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import { LabIcon } from '@jupyterlab/ui-components';
 import clusterIcon from '../../style/icons/cluster_icon.svg';
 import signinGoogleIcon from '../../style/icons/signin_google_icon.svg';

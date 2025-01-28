@@ -21,10 +21,7 @@ import {
   gcpServiceUrls
 } from '../utils/Const';
 import { authApi, loggedFetch } from '../utils/Config';
-import {
-  IProject
-} from '../utils/SchedulerJupyterInterfaces';
-
+import { IProject } from '../utils/SchedulerJupyterInterfaces';
 
 export const projectListAPI = async (prefix: string): Promise<string[]> => {
   const credentials = await authApi();

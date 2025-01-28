@@ -16,9 +16,7 @@
  */
 
 import { authenticatedFetch } from '../utils/Config';
-import {
-  HTTP_METHOD
-} from '../utils/Const';
+import { HTTP_METHOD } from '../utils/Const';
 
 export class DataprocService {
   static listClustersDataprocAPIService = async () => {
