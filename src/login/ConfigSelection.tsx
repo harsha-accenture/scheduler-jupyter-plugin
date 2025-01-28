@@ -22,13 +22,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import THIRD_PARTY_LICENSES from '../../third-party-licenses.txt';
 import { DynamicDropdown } from '../controls/DynamicDropdown';
 import { RegionDropdown } from '../controls/RegionDropdown';
-import { IAuthCredentials, IConfigSelectionProps, IUserInfoResponse } from '../login/LoginInterfaces';
+import {
+  IAuthCredentials,
+  IConfigSelectionProps,
+  IUserInfoResponse
+} from '../login/LoginInterfaces';
 import { LOG_LEVEL, SchedulerLoggingService } from '../services/LoggingService';
 import { projectListAPI } from '../services/ProjectService';
-import {
-  authApi,
-  loggedFetch
-} from '../utils/Config';
+import { authApi, loggedFetch } from '../utils/Config';
 import {
   API_HEADER_BEARER,
   API_HEADER_CONTENT_TYPE,
@@ -39,7 +40,6 @@ import { toastifyCustomStyle } from '../utils/CustomStyle';
 import { IconGoogleCloud } from '../utils/Icons';
 import { ConfigService } from '../services/ConfigService';
 
-
 function ConfigSelection({
   configError,
   setConfigError,
@@ -47,7 +47,6 @@ function ConfigSelection({
   launcher,
   settingRegistry
 }: IConfigSelectionProps) {
-  
   const [projectId, setProjectId] = useState('');
   const [region, setRegion] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -60,10 +59,7 @@ function ConfigSelection({
   const handleSave = async () => {
     setIsSaving(true);
     const dataToSend = { projectId, region };
-    await ConfigService.saveConfig(
-      dataToSend,
-      setIsSaving
-    )
+    await ConfigService.saveConfig(dataToSend, setIsSaving);
   };
 
   const displayUserInfo = async (credentials: IAuthCredentials | undefined) => {
@@ -118,7 +114,6 @@ function ConfigSelection({
   };
 
   useEffect(() => {
-
     authApi().then(credentials => {
       displayUserInfo(credentials);
 
@@ -161,7 +156,9 @@ function ConfigSelection({
               <div className="project-overlay">
                 <DynamicDropdown
                   value={projectId}
-                  onChange={(_, projectId : string | null) => setProjectId(projectId ?? '')}
+                  onChange={(_, projectId: string | null) =>
+                    setProjectId(projectId ?? '')
+                  }
                   fetchFunc={projectListAPI}
                   label="Project ID*"
                   // Always show the clear indicator and hide the dropdown arrow
