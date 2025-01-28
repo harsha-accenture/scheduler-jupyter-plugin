@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-
-import {
-  IAuthCredentials
-} from '../login/LoginInterfaces';
+import { IAuthCredentials } from '../login/LoginInterfaces';
 import { AuthenticationService } from '../services/AuthenticationService';
 import { SchedulerLoggingService } from '../services/LoggingService';
-import { API_HEADER_BEARER, API_HEADER_CONTENT_TYPE, HTTP_METHOD, gcpServiceUrls } from './Const';
+import {
+  API_HEADER_BEARER,
+  API_HEADER_CONTENT_TYPE,
+  HTTP_METHOD,
+  gcpServiceUrls
+} from './Const';
 
 export const authApi = async () => {
-   const authService = await AuthenticationService.authCredentialsAPI();
-   return authService;
+  const authService = await AuthenticationService.authCredentialsAPI();
+  return authService;
 };
 
 export const checkConfig = async (
@@ -33,7 +35,7 @@ export const checkConfig = async (
   setConfigError: React.Dispatch<React.SetStateAction<boolean>>,
   setLoginError: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<void> => {
-  const credentials : IAuthCredentials | undefined = await authApi();
+  const credentials: IAuthCredentials | undefined = await authApi();
   if (credentials) {
     if (credentials.access_token === '') {
       localStorage.removeItem('loginState');
@@ -50,9 +52,9 @@ export const checkConfig = async (
 };
 
 /**
-* Helper method that wraps fetch and logs the request uri and status codes to
-* jupyter server.
-*/
+ * Helper method that wraps fetch and logs the request uri and status codes to
+ * jupyter server.
+ */
 export async function loggedFetch(
   input: RequestInfo | URL,
   init?: RequestInit
