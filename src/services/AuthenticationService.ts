@@ -15,50 +15,48 @@
  * limitations under the License.
  */
 
-import { requestAPI } from "../handler/Handler";
-import { IAuthCredentials } from "../login/LoginInterfaces";
-import { LOGIN_STATE, STATUS_SUCCESS } from "../utils/Const";
-
+import { requestAPI } from '../handler/Handler';
+import { IAuthCredentials } from '../login/LoginInterfaces';
+import { LOGIN_STATE, STATUS_SUCCESS } from '../utils/Const';
 
 export class AuthenticationService {
-    static loginAPI = async (
-        setLoginState: (value: boolean) => void,
-        setLoginError: (value: boolean) => void,
-    ) => {
-        const data = await requestAPI('login', {
-            method: 'POST'
-        });;
-        if (typeof data === 'object' && data !== null) {
-            const loginStatus = (data as { login: string }).login;
-            if (loginStatus === STATUS_SUCCESS) {
-                setLoginState(true);
-                setLoginError(false);
-                localStorage.setItem('loginState', LOGIN_STATE);
-            } else {
-                setLoginState(false);
-                localStorage.removeItem('loginState');
-            }
-        }
+  static loginAPI = async (
+    setLoginState: (value: boolean) => void,
+    setLoginError: (value: boolean) => void
+  ) => {
+    const data = await requestAPI('login', {
+      method: 'POST'
+    });
+    if (typeof data === 'object' && data !== null) {
+      const loginStatus = (data as { login: string }).login;
+      if (loginStatus === STATUS_SUCCESS) {
+        setLoginState(true);
+        setLoginError(false);
+        localStorage.setItem('loginState', LOGIN_STATE);
+      } else {
+        setLoginState(false);
+        localStorage.removeItem('loginState');
+      }
     }
+  };
 
-    static authCredentialsAPI = async () => {
-        try {
-            const data = await requestAPI('credentials');
-            if (typeof data === 'object' && data !== null) {
-                const credentials: IAuthCredentials = {
-                    access_token: (data as { access_token: string }).access_token,
-                    project_id: (data as { project_id: string }).project_id,
-                    region_id: (data as { region_id: string }).region_id,
-                    config_error: (data as { config_error: number }).config_error,
-                    login_error: (data as { login_error: number }).login_error
-                };
-                return credentials;
-            } else {
-                console.error('Invalid data format.');
-            }
-        } catch (reason) {
-            console.error(`Error on GET credentials.\n${reason}`);
-        }
+  static authCredentialsAPI = async () => {
+    try {
+      const data = await requestAPI('credentials');
+      if (typeof data === 'object' && data !== null) {
+        const credentials: IAuthCredentials = {
+          access_token: (data as { access_token: string }).access_token,
+          project_id: (data as { project_id: string }).project_id,
+          region_id: (data as { region_id: string }).region_id,
+          config_error: (data as { config_error: number }).config_error,
+          login_error: (data as { login_error: number }).login_error
+        };
+        return credentials;
+      } else {
+        console.error('Invalid data format.');
+      }
+    } catch (reason) {
+      console.error(`Error on GET credentials.\n${reason}`);
     }
-
+  };
 }

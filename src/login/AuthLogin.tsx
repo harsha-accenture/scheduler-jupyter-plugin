@@ -16,9 +16,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import {
-  IconsigninGoogle
-} from '../utils/Icons'
+import { IconsigninGoogle } from '../utils/Icons';
 import ConfigSelection from './ConfigSelection';
 import { checkConfig } from '../utils/Config';
 import { SchedulerWidget } from '../controls/SchedulerWidget';
@@ -49,10 +47,7 @@ const AuthLoginComponent = ({
 
   const login = async () => {
     setIsloginDisabled(true);
-    await AuthenticationService.loginAPI(
-      setLoginState,
-      setLoginError
-    );
+    await AuthenticationService.loginAPI(setLoginState, setLoginError);
   };
 
   useEffect(() => {
@@ -69,7 +64,7 @@ const AuthLoginComponent = ({
       {configLoading && !loginState && !configError && !loginError && (
         <div className="spin-loader-main">
           <CircularProgress
-            className = "spin-loader-custom-style"
+            className="spin-loader-custom-style"
             size={18}
             aria-label="Loading Spinner"
             data-testid="loader"
