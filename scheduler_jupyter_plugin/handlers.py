@@ -108,8 +108,6 @@ class ConfigHandler(APIHandler):
         try:
             await async_run_gcloud_subcommand(f"config set project {project_id}")
             await async_run_gcloud_subcommand(f"config set dataproc/region {region}")
-            clear_gcloud_cache()
-            configure_gateway_client_url(self.config, self.log)
             self.finish({"config": ERROR_MESSAGE + "successful"})
         except subprocess.CalledProcessError as er:
             self.finish({"config": ERROR_MESSAGE + "failed"})
