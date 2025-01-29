@@ -29,6 +29,9 @@ from traitlets import Undefined, Unicode
 from traitlets.config import SingletonConfigurable
 
 from scheduler_jupyter_plugin import credentials, urls
+from scheduler_jupyter_plugin.controllers import (
+    vertex,
+)
 
 
 class SchedulerPluginConfig(SingletonConfigurable):
@@ -143,6 +146,13 @@ def setup_handlers(web_app):
         "configuration": ConfigHandler,
         "getGcpServiceUrls": UrlHandler,
         "log": LogHandler,
+        "api/vertex/listSchedules": vertex.ListSchedulesController,
+        "api/vertex/pauseSchedule": vertex.PauseScheduleController,
+        "api/vertex/resumeSchedule": vertex.ResumeScheduleController,
+        "api/vertex/deleteSchedule": vertex.DeleteScheduleController,
+        "api/vertex/triggerSchedule": vertex.TriggerScheduleController,
+        "api/vertex/updateSchedule": vertex.UpdateScheduleController,
+        "api/vertex/getSchedule": vertex.GetScheduleController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)
