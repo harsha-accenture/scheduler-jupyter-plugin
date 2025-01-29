@@ -24,7 +24,9 @@ classifiers = [
 ]
 dependencies = [
     "jupyter_server>=2.4.0,<3",
-    "google-cloud-jupyter-config>=0.0.10"
+    "google-cloud-jupyter-config>=0.0.10",
+    "aiohttp~=3.9.5",
+    "cron-descriptor>=1.4.5",
 ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 
