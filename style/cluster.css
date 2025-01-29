@@ -272,7 +272,7 @@
 
 .component-level {
   max-height: 100%;
-  font-family: 'Roboto', sans-serif;
+  font-family: Roboto, sans-serif;
   overflow: auto;
   overflow-x: hidden;
 }
