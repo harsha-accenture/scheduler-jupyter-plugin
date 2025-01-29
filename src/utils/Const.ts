@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-import { ConfigService } from '../services/ConfigService';
+import { ConfigService } from "../services/ConfigService";
 
+/* eslint @typescript-eslint/no-var-requires: "off" */
 const { version } = require('../../package.json');
 export const LOGIN_STATE = '1';
 export const STATUS_SUCCESS = 'SUCCEEDED';
@@ -27,10 +28,10 @@ export const USER_INFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 export const VERSION_DETAIL = version;
 
 export const gcpServiceUrls = (async () => {
-  return await ConfigService.gcpServiceUrlsAPI();
-})();
+    return await ConfigService.gcpServiceUrlsAPI();
+  })();
 
-export enum HTTP_METHOD {
-  GET = 'GET',
-  POST = 'POST'
-}
+  export enum HTTP_METHOD {
+    GET = 'GET',
+    POST = 'POST'
+  }
