@@ -17,7 +17,7 @@
 
 import { ToastOptions, toast } from 'react-toastify';
 
-export const toastifyCustomStyle: ToastOptions<{}> = {
+export const toastifyCustomStyle: ToastOptions = {
   hideProgressBar: true,
   autoClose: 600000,
   theme: 'dark',
