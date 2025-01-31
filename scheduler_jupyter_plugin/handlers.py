@@ -29,8 +29,7 @@ from traitlets import Undefined, Unicode
 from traitlets.config import SingletonConfigurable
 
 from scheduler_jupyter_plugin import credentials, urls
-from dataproc_jupyter_plugin import credentials, urls
-from dataproc_jupyter_plugin.controllers import (
+from scheduler_jupyter_plugin.controllers import (
     airflow,
     composer,
     executor,
