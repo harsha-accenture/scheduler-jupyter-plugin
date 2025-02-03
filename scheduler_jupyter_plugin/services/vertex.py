@@ -16,10 +16,10 @@
 import aiohttp
 from cron_descriptor import get_description
 
-from dataproc_jupyter_plugin.commons.constants import (
+from scheduler_jupyter_plugin.commons.constants import (
     CONTENT_TYPE,
 )
-from dataproc_jupyter_plugin.models.models import (
+from scheduler_jupyter_plugin.models.models import (
     DescribeUpdateVertexJob,
 )
 
