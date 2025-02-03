@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import { ToastOptions, toast } from 'react-toastify';
 import { IAuthCredentials } from '../login/LoginInterfaces';
 import { AuthenticationService } from '../services/AuthenticationService';
 import { SchedulerLoggingService } from '../services/LoggingService';
@@ -136,3 +137,61 @@ export const authenticatedFetch = async (config: {
 };
 
 export function assumeNeverHit(_: never): void {}
+
+export const toastifyCustomStyle: ToastOptions<{}> = {
+  hideProgressBar: true,
+  autoClose: 600000,
+  theme: 'dark',
+  position: toast.POSITION.BOTTOM_CENTER
+};
+
+export interface ICellProps {
+  getCellProps: () => React.TdHTMLAttributes<HTMLTableDataCellElement>;
+  value: string | any;
+  column: {
+    Header: string;
+  };
+  row: {
+    original: {
+      id: string;
+      status: string;
+    };
+  };
+  render: (value: string) => React.ReactNode;
+}
+
+export const elapsedTime = (endTime: Date, jobStartTime: Date): string => {
+  const jobEndTime = new Date(endTime);
+  const elapsedMilliseconds = jobEndTime.getTime() - jobStartTime.getTime();
+  const elapsedSeconds = Math.round(elapsedMilliseconds / 1000) % 60;
+  const elapsedMinutes = Math.floor(elapsedMilliseconds / (1000 * 60)) % 60;
+  const elapsedHours = Math.floor(elapsedMilliseconds / (1000 * 60 * 60));
+  let elapsedTimeString = '';
+  if (elapsedHours > 0) {
+    elapsedTimeString += `${elapsedHours} hr `;
+  }
+
+  if (elapsedMinutes > 0) {
+    elapsedTimeString += `${elapsedMinutes} min `;
+  }
+  if (elapsedSeconds > 0) {
+    elapsedTimeString += `${elapsedSeconds} sec `;
+  }
+  return elapsedTimeString;
+};
+
+export const jobTimeFormat = (startTime: string) => {
+  const date = new Date(startTime);
+
+  const formattedDate = date.toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true
+  });
+
+  return formattedDate;
+};

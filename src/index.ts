@@ -24,12 +24,15 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { MainAreaWidget, IThemeManager } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
-import { iconCluster } from './utils/Icons';
+import { iconCluster, iconScheduledNotebooks } from './utils/Icons';
 import { AuthLogin } from './login/AuthLogin';
 import { eventEmitter } from './utils/SignalEmitter';
 import { Notification } from '@jupyterlab/apputils';
 import { DataprocService } from './services/DataprocService';
 import { SchedulerService } from './services/SchedulerServices';
+import { NotebookScheduler } from './scheduler/notebookScheduler';
+import { TITLE_LAUNCHER_CATEGORY } from './utils/Const';
+import { NotebookButtonExtension } from './controls/NotebookButtonExtension';
 
 /**
  * Initialization data for the scheduler-jupyter-plugin extension.
@@ -63,6 +66,25 @@ const plugin: JupyterFrontEndPlugin<void> = {
         const widget = new MainAreaWidget<AuthLogin>({ content });
         widget.title.label = 'Config Setup';
         widget.title.icon = iconCluster;
+        app.shell.add(widget, 'main');
+      }
+    });
+
+    const createNotebookJobsComponentCommand = 'create-notebook-jobs-component';
+    commands.addCommand(createNotebookJobsComponentCommand, {
+      caption: 'Scheduled Jobs',
+      label: 'Scheduled Jobs',
+      icon: iconScheduledNotebooks,
+      execute: () => {
+        const content = new NotebookScheduler(
+          app as JupyterLab,
+          themeManager,
+          settingRegistry as ISettingRegistry,
+          ''
+        );
+        const widget = new MainAreaWidget<NotebookScheduler>({ content });
+        widget.title.label = 'Scheduled Jobs';
+        widget.title.icon = iconScheduledNotebooks;
         app.shell.add(widget, 'main');
       }
     });
@@ -126,6 +148,24 @@ const plugin: JupyterFrontEndPlugin<void> = {
     };
 
     await checkAllApisEnabled();
+
+    app.docRegistry.addWidgetExtension(
+      'Notebook',
+      new NotebookButtonExtension(
+        app as JupyterLab,
+        settingRegistry as ISettingRegistry,
+        launcher,
+        themeManager
+      )
+    );
+
+    if (launcher) {
+      launcher.add({
+        command: createNotebookJobsComponentCommand,
+        category: TITLE_LAUNCHER_CATEGORY,
+        rank: 4
+      });
+    }
   }
 };
 
