@@ -25,6 +25,7 @@ classifiers = [
 dependencies = [
     "jupyter_server>=2.4.0,<3",
     "google-cloud-jupyter-config>=0.0.10",
+    "pydantic~=1.10.0",
     "aiohttp~=3.9.5",
     "cron-descriptor>=1.4.5",
 ]
