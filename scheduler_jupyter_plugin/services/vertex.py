@@ -16,8 +16,6 @@
 import aiohttp
 from cron_descriptor import get_description
 
-import google.oauth2.credentials as oauth2
-
 from dataproc_jupyter_plugin.commons.constants import (
     CONTENT_TYPE,
 )
