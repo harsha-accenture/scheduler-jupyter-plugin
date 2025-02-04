@@ -27,16 +27,14 @@ import {
   RadioGroup,
   FormControlLabel,
   Typography,
-  Box,
+  Box
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Input } from '../../controls/MuiWrappedInput';
 // import { RegionDropdown } from '../../controls/RegionDropdown';
-import {
-  CORN_EXP_DOC_URL
-} from '../../utils/Const';
+import { CORN_EXP_DOC_URL } from '../../utils/Const';
 import LabelProperties from '../../jobs/LabelProperties';
 import LearnMore from '../common/LearnMore';
 import ErrorMessage from '../common/ErrorMessage';
@@ -50,8 +48,7 @@ const CreateVertexScheduler = ({
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
 }) => {
-
-  const dummyList = ["select 1", "select 2", "select 3"];
+  const dummyList = ['select 1', 'select 2', 'select 3'];
 
   return (
     <>
@@ -61,9 +58,7 @@ const CreateVertexScheduler = ({
           <Autocomplete
             className="create-scheduler-style"
             options={dummyList}
-            renderInput={params => (
-              <TextField {...params} label="Region*" />
-            )}
+            renderInput={params => <TextField {...params} label="Region*" />}
             clearIcon={false}
           />
         </div>
@@ -99,10 +94,7 @@ const CreateVertexScheduler = ({
                 className="create-scheduler-style create-scheduler-form-element-input-fl"
                 options={dummyList}
                 renderInput={params => (
-                  <TextField
-                    {...params}
-                    label="Accelerator count*"
-                  />
+                  <TextField {...params} label="Accelerator count*" />
                 )}
               />
               <ErrorMessage message="Accelerator count is required" />
@@ -160,8 +152,8 @@ const CreateVertexScheduler = ({
         <span className="tab-description tab-text-sub-cl">
           {/* Todo */}
           <span>
-            Where results are stored. Select an existing bucket or create a
-            new one.
+            Where results are stored. Select an existing bucket or create a new
+            one.
           </span>
         </span>
         <div className="execution-history-main-wrapper">
@@ -237,8 +229,8 @@ const CreateVertexScheduler = ({
               />
               <div>
                 <span className="sub-para tab-text-sub-cl">
-                  Choose a shared VPC network from the project that is
-                  different from the clusters project
+                  Choose a shared VPC network from the project that is different
+                  from the clusters project
                 </span>
                 <div className="learn-more-a-tag learn-more-url">
                   <LearnMore />
@@ -250,8 +242,7 @@ const CreateVertexScheduler = ({
                 control={<Radio size="small" />}
                 label={
                   <Typography sx={{ fontSize: 13 }}>
-                    Network shared from host project{' '}
-                    {/* Todo */}
+                    Network shared from host project {/* Todo */}
                   </Typography>
                 }
               />
@@ -415,8 +406,8 @@ const CreateVertexScheduler = ({
             <div>
               <span className="tab-description tab-text-sub-cl">
                 Schedules are specified using unix-cron format. E.g. every
-                minute: "* * * * *", every 3 hours: "0 */3 * * *", every
-                Monday at 9:00: "0 9 * * 1".
+                minute: "* * * * *", every 3 hours: "0 */3 * * *", every Monday
+                at 9:00: "0 9 * * 1".
               </span>
               <div className="learn-more-url">
                 <LearnMore path={CORN_EXP_DOC_URL} />
@@ -448,18 +439,10 @@ const CreateVertexScheduler = ({
           </>
         </div>
         <div className="save-overlay">
-          <Button
-            variant="contained"
-            aria-label={'Create Schedule'}
-          >
-            <div>
-              CREATE
-            </div>
+          <Button variant="contained" aria-label={'Create Schedule'}>
+            <div>CREATE</div>
           </Button>
-          <Button
-            variant="outlined"
-            aria-label="cancel Batch"
-          >
+          <Button variant="outlined" aria-label="cancel Batch">
             <div>CANCEL</div>
           </Button>
         </div>
