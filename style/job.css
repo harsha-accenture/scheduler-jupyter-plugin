@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);
+@import url("https://fonts.googleapis.com/css?family=Roboto");
 
 .cluster-details-value-job {
   font-style: normal;
@@ -13,7 +13,7 @@
 }
 
 .job-label-style {
-  background-color: rgba(0, 0, 0, 8);
+  background-color: rgba(0 0 0 0.08);
   padding: 0 10px;
   border-radius: 10px;
   font-weight: 400;
@@ -201,16 +201,15 @@
   font-weight: 500;
   font-size: 13px;
   line-height: 32px;
-  font-family: 'Roboto', sans-serif;
-  /* identical to box height, or 246% */
+  font-family: Roboto, sans-serif;
 
+  /* identical to box height, or 246% */
   display: flex;
   align-items: center;
   text-align: center;
   text-transform: uppercase;
 
   /* Quick Selection/Blue 700 */
-
   color: #3367d6;
 }
 
@@ -220,7 +219,7 @@
 }
 
 .job-label-style-list {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: rgba(0 0 0 0.08);
   padding: 0 10px;
   width: fit-content;
   border-radius: 10px;
@@ -233,10 +232,12 @@
   height: 100%;
   overflow: auto;
 }
+
 .scroll-comp-jobdetails {
   overflow-y: auto;
   max-height: 90vh;
 }
+
 .jobs-list-table-parent-small {
   height: 55vh;
   overflow: auto;

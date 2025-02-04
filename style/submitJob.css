@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);
+@import url("https://fonts.googleapis.com/css?family=Roboto");
 
 .submit-job-container {
   margin-left: 15px;
@@ -29,7 +29,7 @@
   background: var(--jp-layout-color0);
   color: var(--jp-ui-font-color2);
   border: none;
-  font-family: 'Roboto', sans-serif;
+  font-family: Roboto, sans-serif;
   border-radius: 4px;
 }
 
@@ -121,7 +121,7 @@
 }
 
 .react-tagsinput-input {
-  font-family: 'Roboto', sans-serif !important;
+  font-family: Roboto, sans-serif !important;
   color: var(--jp-ui-font-color0) !important;
   font-style: normal;
   font-weight: 400;
@@ -139,7 +139,7 @@
 .react-tagsinput-tag {
   border: 1px solid #d3d3d3 !important;
   display: inline-block;
-  font-family: 'Roboto', sans-serif !important;
+  font-family: Roboto, sans-serif !important;
   font-size: 13px;
   font-weight: 400;
   margin-bottom: 5px;
