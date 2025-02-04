@@ -135,9 +135,9 @@ const CreateVertexScheduler = ({
             getOptionLabel={option => option}
             renderOption={(props, option) => {
               // Custom rendering for the "Create new bucket" option
-                  <li {...props} className="custom-add-bucket">
-                    {option}
-                  </li>
+              <li {...props} className="custom-add-bucket">
+                {option}
+              </li>;
 
               return <li {...props}>{option}</li>;
             }}
