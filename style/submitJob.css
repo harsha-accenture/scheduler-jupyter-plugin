@@ -23,15 +23,16 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0px 12px;
+  padding: 0 12px;
   gap: 4px;
   height: 32px;
   background: var(--jp-layout-color0);
   color: var(--jp-ui-font-color2);
   border: none;
-  font-family: 'Roboto';
+  font-family: 'Roboto', sans-serif;
   border-radius: 4px;
 }
+
 .submit-job-message-input {
   font-style: normal;
   font-weight: 400;
@@ -51,15 +52,14 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0px 12px;
+  padding: 0 12px;
   gap: 4px;
-
   height: 32px;
   background: var(--jp-layout-color0);
   box-shadow:
-    0px 1px 5px var(--jp-shadow-umbra-color),
-    0px 2px 2px var(--jp-shadow-umbra-color),
-    0px 1px 1px var(--jp-shadow-umbra-color);
+    0 1px 5px var(--jp-shadow-umbra-color),
+    0 2px 2px var(--jp-shadow-umbra-color),
+    0 1px 1px var(--jp-shadow-umbra-color);
   border-radius: 4px;
   border-style: none;
 }
@@ -70,6 +70,7 @@
   width: 512px;
   min-height: 36px;
   outline: none;
+
   /* min-height: unset !important; */
 }
 
@@ -87,17 +88,19 @@
   line-height: 13px;
   display: flex;
   align-items: center;
-  color: #000000;
+  color: #000;
   position: absolute;
   background-color: #fff;
   top: -5px;
-  padding: 0px 3px;
+  padding: 0 3px;
   left: 7px;
   z-index: 3;
 }
+
 .disable-text {
   color: var(--jp-layout-color3) !important;
 }
+
 .select-text-overlay-label {
   position: relative;
 }
@@ -118,7 +121,7 @@
 }
 
 .react-tagsinput-input {
-  font-family: 'Roboto' !important;
+  font-family: 'Roboto', sans-serif !important;
   color: var(--jp-ui-font-color0) !important;
   font-style: normal;
   font-weight: 400;
@@ -128,7 +131,7 @@
   margin-bottom: 10px !important;
   margin-top: 10px !important;
   outline: none !important;
-  padding: 0px !important;
+  padding: 0 !important;
   width: 95% !important;
   margin-left: 15px;
 }
@@ -136,7 +139,7 @@
 .react-tagsinput-tag {
   border: 1px solid #d3d3d3 !important;
   display: inline-block;
-  font-family: 'Roboto' !important;
+  font-family: 'Roboto', sans-serif !important;
   font-size: 13px;
   font-weight: 400;
   margin-bottom: 5px;
@@ -262,7 +265,7 @@
 }
 
 /* Highlight tags input field when focus */
-.react-tagsinput--focused {
+.react-tagsinput-focused {
   border: 3px solid var(--jp-brand-color0) !important;
 }
 
@@ -283,11 +286,11 @@
   line-height: 13px;
   display: flex;
   align-items: center;
-  color: #000000;
+  color: #000;
   position: absolute;
   background-color: #fff;
   top: -7px;
-  padding: 0px 3px;
+  padding: 0 3px;
   left: 7px;
   z-index: 3;
 }

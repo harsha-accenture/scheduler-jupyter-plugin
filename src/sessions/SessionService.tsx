@@ -69,7 +69,10 @@ export class SessionService {
           }
         })
         .catch((err: Error) => {
-          SchedulerLoggingService.log('Error deleting session', LOG_LEVEL.ERROR);
+          SchedulerLoggingService.log(
+            'Error deleting session',
+            LOG_LEVEL.ERROR
+          );
           toast.error(
             `Failed to delete the session ${selectedSession} : ${err}`,
             toastifyCustomStyle

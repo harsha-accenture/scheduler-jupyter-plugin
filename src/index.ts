@@ -68,13 +68,12 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
     });
 
-     // Capture the signal
-     eventEmitter.on('schedulerConfigChange', (message: string) => {
+    // Capture the signal
+    eventEmitter.on('schedulerConfigChange', (message: string) => {
       checkAllApisEnabled();
     });
 
     const checkAllApisEnabled = async () => {
-
       const composerListResponse =
         await SchedulerService.listComposersAPICheckService();
 
@@ -135,8 +134,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
         rank: 4
       });
     }
-
-
   }
 };
 
