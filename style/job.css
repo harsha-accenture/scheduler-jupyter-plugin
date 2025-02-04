@@ -13,7 +13,7 @@
 }
 
 .job-label-style {
-  background-color: rgba(0 0 0 0.08);
+  background-color: rgba(0 0 0 8%);
   padding: 0 10px;
   border-radius: 10px;
   font-weight: 400;
@@ -219,7 +219,7 @@
 }
 
 .job-label-style-list {
-  background-color: rgba(0 0 0 0.08);
+  background-color: rgba(0 0 0 8%);
   padding: 0 10px;
   width: fit-content;
   border-radius: 10px;
