@@ -37,7 +37,7 @@ async def test_list_jobs(monkeypatch, jp_fetch):
     monkeypatch.setattr(airflow.Client, "get_airflow_uri", mock_get_airflow_uri)
     mock_composer = "mock-url"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagList",
         params={"composer": mock_composer},
     )
