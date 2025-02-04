@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import { ToastOptions, toast } from 'react-toastify';
 import { IAuthCredentials } from '../login/LoginInterfaces';
 import { AuthenticationService } from '../services/AuthenticationService';
 import { SchedulerLoggingService } from '../services/LoggingService';
@@ -24,7 +25,6 @@ import {
   HTTP_METHOD,
   gcpServiceUrls
 } from './Const';
-import { ToastOptions, toast } from 'react-toastify';
 
 export const authApi = async () => {
   const authService = await AuthenticationService.authCredentialsAPI();
@@ -65,13 +65,6 @@ export async function loggedFetch(
   SchedulerLoggingService.logFetch(input, init, resp);
   return resp;
 }
-
-export const toastifyCustomStyle: ToastOptions<Record<string, never>> = {
-  hideProgressBar: true,
-  autoClose: 600000,
-  theme: 'dark',
-  position: toast.POSITION.BOTTOM_CENTER
-};
 
 export const handleDebounce = (func: any, delay: number) => {
   let timeoutId: any;
@@ -145,21 +138,27 @@ export const authenticatedFetch = async (config: {
 
 export function assumeNeverHit(_: never): void {}
 
-export const jobTimeFormat = (startTime: string) => {
-  const date = new Date(startTime);
-
-  const formattedDate = date.toLocaleString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true
-  });
-
-  return formattedDate;
+export const toastifyCustomStyle: ToastOptions<{}> = {
+  hideProgressBar: true,
+  autoClose: 600000,
+  theme: 'dark',
+  position: toast.POSITION.BOTTOM_CENTER
 };
+
+export interface ICellProps {
+  getCellProps: () => React.TdHTMLAttributes<HTMLTableDataCellElement>;
+  value: string | any;
+  column: {
+    Header: string;
+  };
+  row: {
+    original: {
+      id: string;
+      status: string;
+    };
+  };
+  render: (value: string) => React.ReactNode;
+}
 
 export const elapsedTime = (endTime: Date, jobStartTime: Date): string => {
   const jobEndTime = new Date(endTime);
@@ -181,17 +180,18 @@ export const elapsedTime = (endTime: Date, jobStartTime: Date): string => {
   return elapsedTimeString;
 };
 
-export interface ICellProps {
-  getCellProps: () => React.TdHTMLAttributes<HTMLTableDataCellElement>;
-  value: string | any;
-  column: {
-    Header: string;
-  };
-  row: {
-    original: {
-      id: string;
-      status: string;
-    };
-  };
-  render: (value: string) => React.ReactNode;
-}
+export const jobTimeFormat = (startTime: string) => {
+  const date = new Date(startTime);
+
+  const formattedDate = date.toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true
+  });
+
+  return formattedDate;
+};
