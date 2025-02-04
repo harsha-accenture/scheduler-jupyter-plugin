@@ -119,7 +119,7 @@ async def test_download_dag_output(monkeypatch, returncode, expected_result, jp_
     mock_dag_run_id = "258"
 
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "downloadOutput",
         params={
             "composer": mock_composer_name,
@@ -141,7 +141,7 @@ async def test_invalid_composer_name(monkeypatch, jp_fetch):
     mock_dag_id = "mock-dag-id"
     mock_dag_run_id = "258"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "downloadOutput",
         params={
             "composer": mock_composer_name,
@@ -165,7 +165,7 @@ async def test_invalid_bucket_name(monkeypatch, jp_fetch):
     mock_dag_id = "mock-dag-id"
     mock_dag_run_id = "258"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "downloadOutput",
         params={
             "composer": mock_composer_name,
@@ -189,7 +189,7 @@ async def test_invalid_dag_id(monkeypatch, jp_fetch):
     mock_dag_id = "mock/dag/id"
     mock_dag_run_id = "258"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "downloadOutput",
         params={
             "composer": mock_composer_name,
@@ -213,7 +213,7 @@ async def test_invalid_dag_run_id(monkeypatch, jp_fetch):
     mock_dag_id = "mock-dag-id"
     mock_dag_run_id = "a/b/c/d"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "downloadOutput",
         params={
             "composer": mock_composer_name,

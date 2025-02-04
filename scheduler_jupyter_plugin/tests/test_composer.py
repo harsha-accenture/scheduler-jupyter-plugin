@@ -45,7 +45,7 @@ async def test_list_composer(monkeypatch, jp_fetch):
     mocks.patch_mocks(monkeypatch)
     monkeypatch.setattr(aiohttp, "ClientSession", MockClientSession)
 
-    response = await jp_fetch("dataproc-plugin", "composerList")
+    response = await jp_fetch("scheduler-plugin", "composerList")
     assert response.code == 200
     payload = json.loads(response.body)
     assert len(payload) == 2

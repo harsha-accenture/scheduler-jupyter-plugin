@@ -55,7 +55,7 @@ async def test_list_dag_with_missing_argument(monkeypatch, jp_fetch):
     mocks.patch_mocks(monkeypatch)
     monkeypatch.setattr(airflow.Client, "get_airflow_uri", mock_get_airflow_uri)
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagList",
         params={"project_id": "project_id"},
     )
@@ -73,7 +73,7 @@ async def test_list_dag_with_invalid_credentials(monkeypatch, jp_fetch):
     monkeypatch.setattr(airflow.Client, "get_airflow_uri", mock_get_airflow_uri)
     mock_composer = "mock-url"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagList",
         params={"project_id": "project_id", "composer": mock_composer},
     )
@@ -101,7 +101,7 @@ async def test_list_dag_with_invalid_credentials(monkeypatch, jp_fetch):
         mock_storage_client.bucket.return_value = mock_bucket
         monkeypatch.setattr("dagDelete.storage.Client", lambda: mock_storage_client)
         response = await jp_fetch(
-            "dataproc-plugin",
+            "scheduler-plugin",
             "dagDelete",
             method="DELETE",
             params={
@@ -146,7 +146,7 @@ async def test_update_job(monkeypatch, jp_fetch):
     mock_dag_id = "mock_dag_id"
     mock_status = "true"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagUpdate",
         params={
             "composer": mock_composer,
@@ -171,7 +171,7 @@ async def test_list_dag_run(monkeypatch, jp_fetch):
     mock_offset = "mock_offset"
     mock_end_date = "mock_end_date"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagRun",
         params={
             "composer": mock_composer,
@@ -202,7 +202,7 @@ async def test_list_dag_run_task_logs(monkeypatch, jp_fetch):
     mock_task_id = "mock_task_id"
     mock_task_try = "mock_task_try"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagRunTaskLogs",
         params={
             "composer": mock_composer,
@@ -225,7 +225,7 @@ async def test_list_dag_run_task(monkeypatch, jp_fetch):
     mock_dag_id = "mock_dag_id"
     mock_dag_run_id = "257"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagRunTask",
         params={
             "composer": mock_composer,
@@ -248,7 +248,7 @@ async def test_edit_jobs(monkeypatch, jp_fetch):
     mock_bucket_name = "mock-url"
     mock_dag_id = "mock_dag_id"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "editJobScheduler",
         params={"bucket_name": mock_bucket_name, "dag_id": mock_dag_id},
     )
@@ -261,7 +261,7 @@ async def test_list_import_errors(monkeypatch, jp_fetch):
 
     mock_composer = "mock-composer"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "importErrorsList",
         params={"composer": mock_composer},
     )
@@ -281,7 +281,7 @@ async def test_dag_trigger(monkeypatch, jp_fetch):
     mock_composer = "mock-url"
     mock_dag_id = "mock_dag_id"
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "triggerDag",
         params={"dag_id": mock_dag_id, "composer": mock_composer},
         method="POST",
@@ -304,7 +304,7 @@ async def test_invalid_composer(monkeypatch, jp_fetch):
     mock_dag_id = "mock_dag_id"
     mock_dag_run_id = 22
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagRunTask",
         params={
             "dag_id": mock_dag_id,
@@ -327,7 +327,7 @@ async def test_invalid_dag_id(monkeypatch, jp_fetch):
     mock_dag_id = "mock/dag/id"
     mock_dag_run_id = 22
     response = await jp_fetch(
-        "dataproc-plugin",
+        "scheduler-plugin",
         "dagRunTask",
         params={
             "dag_id": mock_dag_id,
