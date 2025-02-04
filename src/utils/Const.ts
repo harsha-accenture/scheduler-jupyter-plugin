@@ -18,4 +18,5 @@
 // import { ConfigService } from '../services/ConfigService';
 
 /* eslint @typescript-eslint/no-var-requires: "off" */
-export const CORN_EXP_DOC_URL = "https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules"
+export const CORN_EXP_DOC_URL =
+  'https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules';
