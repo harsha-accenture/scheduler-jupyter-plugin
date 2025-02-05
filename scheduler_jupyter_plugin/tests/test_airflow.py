@@ -46,7 +46,7 @@ async def test_list_jobs(monkeypatch, jp_fetch):
     payload = json.loads(response.body)
     assert (
         payload[0]["api_endpoint"]
-        == "https://mock_airflow_uri/api/v1/dags?tags=dataproc_jupyter_plugin"
+        == "https://mock_airflow_uri/api/v1/dags?tags=scheduler_jupyter_plugin"
     )
     assert payload[0]["headers"]["Authorization"] == f"Bearer mock-token"
 
