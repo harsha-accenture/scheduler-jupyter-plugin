@@ -68,7 +68,7 @@ export class SchedulerService {
           allClustersData
         );
       } else {
-        let transformClusterListData = allClustersData;
+        const transformClusterListData = allClustersData;
 
         const keyLabelStructure = transformClusterListData.map(
           (obj: { clusterName: string }) => obj.clusterName
@@ -135,7 +135,7 @@ export class SchedulerService {
           allSessionTemplatesData
         );
       } else {
-        let transformSessionTemplateListData = allSessionTemplatesData;
+        const transformSessionTemplateListData = allSessionTemplatesData;
 
         const keyLabelStructure = transformSessionTemplateListData.map(
           (obj: { serverlessName: string }) => obj.serverlessName
@@ -184,7 +184,7 @@ export class SchedulerService {
           setIsLoading(false);
         }
       } else {
-        let composerEnvironmentList: string[] = [];
+        const composerEnvironmentList: string[] = [];
         formattedResponse.forEach((data: IComposerAPIResponse) => {
           composerEnvironmentList.push(data.name);
         });
@@ -221,12 +221,12 @@ export class SchedulerService {
       } else {
         if (editMode) {
           toast.success(
-            `Job scheduler successfully updated`,
+            'Job scheduler successfully updated',
             toastifyCustomStyle
           );
         } else {
           toast.success(
-            `Job scheduler successfully created`,
+            'Job scheduler successfully created',
             toastifyCustomStyle
           );
         }
@@ -281,7 +281,7 @@ export class SchedulerService {
     setSelectedMode?: (value: string) => void,
     setClusterSelected?: (value: string) => void,
     setServerlessSelected?: (value: string) => void,
-    setServerlessDataSelected?: (value: {}) => void,
+    setServerlessDataSelected?: (value: Record<string, never>) => void,
     serverlessDataList?: string[],
     setServerlessDataList?: (value: string[]) => void,
     setServerlessList?: (value: string[]) => void,

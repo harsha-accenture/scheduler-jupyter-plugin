@@ -16,9 +16,9 @@
  */
 
 class EventEmitter {
-  private events: { [key: string]: Function[] } = {};
+  private events: { [key: string]: ((...args: any[]) => void)[] } = {};
 
-  on(event: string, listener: Function) {
+  on(event: string, listener: (...args: any[]) => void) {
     if (!this.events[event]) {
       this.events[event] = [];
     }

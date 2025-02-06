@@ -187,11 +187,11 @@ export class SessionService {
       const formattedResponse = await response.json();
       let transformSessionListData: React.SetStateAction<never[]> = [];
       if (formattedResponse && formattedResponse.sessions) {
-        let sessionsListNew = formattedResponse.sessions;
+        const sessionsListNew = formattedResponse.sessions;
 
         const existingSessionsData = previousSessionsList ?? [];
         // setStateAction never type issue
-        let allSessionsData: any = [
+        const allSessionsData: any = [
           ...(existingSessionsData as []),
           ...sessionsListNew
         ];

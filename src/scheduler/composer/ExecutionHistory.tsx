@@ -60,7 +60,7 @@ const ExecutionHistory = ({
   const [height, setHeight] = useState(window.innerHeight - 145);
 
   function handleUpdateHeight() {
-    let updateHeight = window.innerHeight - 145;
+    const updateHeight = window.innerHeight - 145;
     setHeight(updateHeight);
   }
 

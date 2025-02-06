@@ -82,7 +82,7 @@ const ListDagRuns = ({
   const [initialLoad, setInitialLoad] = useState(true);
 
   function handleUpdateHeight() {
-    let updateHeight = window.innerHeight - 485;
+    const updateHeight = window.innerHeight - 485;
     setListDagRunHeight(updateHeight);
   }
 
@@ -280,10 +280,10 @@ const ListDagRuns = ({
   };
   const handleSelectedDateChange = () => {
     gotoPage(0);
-    let currentDate = selectedDate
+    const currentDate = selectedDate
       ? new Date(selectedDate.toDate()).toDateString()
       : null;
-    let currentDateDagRunList: any = dagRunsList.filter((dagRun: any) => {
+    const currentDateDagRunList: any = dagRunsList.filter((dagRun: any) => {
       return dagRun.date === currentDate;
     });
     if (currentDateDagRunList.length > 0) {

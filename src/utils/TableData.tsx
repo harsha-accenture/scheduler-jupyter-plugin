@@ -36,7 +36,7 @@ function TableData({
   );
 
   function handleUpdateHeight() {
-    let updateHeight = window.innerHeight - 505;
+    const updateHeight = window.innerHeight - 505;
     setListDagRunHeight(updateHeight);
   }
 

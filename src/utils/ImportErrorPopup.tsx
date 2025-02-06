@@ -86,7 +86,9 @@ export default function ImportErrorPopup({
   const handleDelete = (filename: string) => {
     let dagId = filename.substring(filename.lastIndexOf('/') + 1);
     dagId = dagId.split('_')[1].split('.')[0];
-    if (dagId) onDelete(dagId);
+    if (dagId) {
+      onDelete(dagId)
+    };
   };
 
   return (

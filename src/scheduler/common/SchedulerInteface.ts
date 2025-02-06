@@ -21,7 +21,7 @@ export interface IPayload {
   output_formats: string[];
   parameters: string[];
   cluster_name?: string;
-  serverless_name?: {} | undefined;
+  serverless_name?: Record<string, never> | undefined;
   mode_selected: string;
   retry_count: number | undefined;
   retry_delay: number | undefined;
@@ -58,11 +58,11 @@ export interface IDagList {
 export interface IClusterAPIResponse {
   clusterName: string;
   clusterUuid: string;
-  config: {};
-  labels: {};
-  metrics: {};
+  config: Record<string, never>;
+  labels: Record<string, never>;
+  metrics: Record<string, never>;
   projectId: string;
-  status: {};
+  status: Record<string, never>;
   statusHistory: [];
 }
 
@@ -71,7 +71,7 @@ export interface IComposerAPIResponse {
   label: string;
   description: string;
   file_extensions: [];
-  metadata: {};
+  metadata: Record<string, never>;
 }
 
 export interface IDagRunList {
