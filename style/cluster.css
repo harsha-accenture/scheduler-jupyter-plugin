@@ -216,7 +216,7 @@
 }
 
 .cluster-list-table-header {
-  background: rgba(0 0 0 / 0.04);
+  background: rgba(0 0 0 / 4%);
   font-style: normal;
   font-weight: 500;
   font-size: 13px;
