@@ -26,13 +26,16 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { MainAreaWidget, IThemeManager } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
 import {
-  iconCluster
+  iconCluster,
+  iconScheduledNotebooks
 } from './utils/Icons';
 import { AuthLogin } from './login/AuthLogin';
 import { eventEmitter } from './utils/SignalEmitter';
 import { Notification } from '@jupyterlab/apputils';
-import { DataprocService } from './services/DataprocService';
 import { SchedulerService } from './services/SchedulerServices';
+import { NotebookScheduler } from './scheduler/NotebookScheduler';
+import { NotebookButtonExtension } from './controls/NotebookButtonExtension';
+import { TITLE_LAUNCHER_CATEGORY } from './utils/Const';
 
 /**
  * Initialization data for the scheduler-jupyter-plugin extension.
@@ -73,27 +76,35 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
     });
 
+    const createNotebookJobsComponentCommand = 'create-notebook-jobs-component';
+    commands.addCommand(createNotebookJobsComponentCommand, {
+      caption: 'Scheduled Jobs',
+      label: 'Scheduled Jobs',
+      icon: iconScheduledNotebooks,
+      execute: () => {
+        const content = new NotebookScheduler(
+          app as JupyterLab,
+          themeManager,
+          settingRegistry as ISettingRegistry,
+          ''
+        );
+        const widget = new MainAreaWidget<NotebookScheduler>({ content });
+        widget.title.label = 'Scheduled Jobs';
+        widget.title.icon = iconScheduledNotebooks;
+        app.shell.add(widget, 'main');
+      }
+    });
+
     // Capture the signal
     eventEmitter.on('schedulerConfigChange', (message: string) => {
       checkAllApisEnabled();
     });
 
     const checkAllApisEnabled = async () => {
-      const dataprocClusterResponse =
-        await DataprocService.listClustersDataprocAPIService();
-
       const composerListResponse =
         await SchedulerService.listComposersAPICheckService();
 
       const apiChecks = [
-        {
-          response: dataprocClusterResponse,
-          errorKey: 'error.message',
-          errorMessage: 'Cloud Dataproc API has not been used in project',
-          notificationMessage: 'The Cloud Dataproc API is not enabled.',
-          enableLink:
-            'https://console.cloud.google.com/apis/library/dataproc.googleapis.com'
-        },
         {
           response: composerListResponse,
           errorKey: 'Error fetching environments list',
@@ -133,7 +144,23 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     await checkAllApisEnabled();
 
+    app.docRegistry.addWidgetExtension(
+      'Notebook',
+      new NotebookButtonExtension(
+        app as JupyterLab,
+        settingRegistry as ISettingRegistry,
+        launcher,
+        themeManager
+      )
+    );
 
+    if (launcher) {
+      launcher.add({
+        command: createNotebookJobsComponentCommand,
+        category: TITLE_LAUNCHER_CATEGORY,
+        rank: 4
+      });
+    }
   }
 };
 
