@@ -138,7 +138,7 @@ const ListDagRuns = ({
     gotoPage,
     state: { pageIndex, pageSize }
   } = useTable(
-    //@ts-ignore react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
+    //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
     { columns, data, autoResetPage: false, initialState: { pageSize: 50 } },
     useGlobalFilter,
     usePagination

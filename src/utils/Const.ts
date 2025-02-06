@@ -16,8 +16,7 @@
  */
 
 import { ConfigService } from '../services/ConfigService';
-/* @typescript-eslint/no-var-requires */
-const { version } = require('../../package.json');
+const { version } = require('../../package.json'); // eslint-disable-line
 export const LOGIN_STATE = '1';
 export const STATUS_SUCCESS = 'SUCCEEDED';
 export const API_HEADER_BEARER = 'Bearer ';
