@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-
-import {
-  IAuthCredentials
-} from '../login/LoginInterfaces';
+import { IAuthCredentials } from '../login/LoginInterfaces';
 import { AuthenticationService } from '../services/AuthenticationService';
 import { SchedulerLoggingService } from '../services/LoggingService';
-import { API_HEADER_BEARER, API_HEADER_CONTENT_TYPE, HTTP_METHOD, gcpServiceUrls } from './Const';
+import {
+  API_HEADER_BEARER,
+  API_HEADER_CONTENT_TYPE,
+  HTTP_METHOD,
+  gcpServiceUrls
+} from './Const';
 import { ToastOptions, toast } from 'react-toastify';
 
 export const authApi = async () => {
@@ -51,9 +53,9 @@ export const checkConfig = async (
 };
 
 /**
-* Helper method that wraps fetch and logs the request uri and status codes to
-* jupyter server.
-*/
+ * Helper method that wraps fetch and logs the request uri and status codes to
+ * jupyter server.
+ */
 export async function loggedFetch(
   input: RequestInfo | URL,
   init?: RequestInit
@@ -141,7 +143,7 @@ export const authenticatedFetch = async (config: {
   return loggedFetch(requestUrl, requestOptions);
 };
 
-export function assumeNeverHit(_: never): void { }
+export function assumeNeverHit(_: never): void {}
 
 export const jobTimeFormat = (startTime: string) => {
   const date = new Date(startTime);

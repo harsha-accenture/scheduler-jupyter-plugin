@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
@@ -25,10 +24,7 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { MainAreaWidget, IThemeManager } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
-import {
-  iconCluster,
-  iconScheduledNotebooks
-} from './utils/Icons';
+import { iconCluster, iconScheduledNotebooks } from './utils/Icons';
 import { AuthLogin } from './login/AuthLogin';
 import { eventEmitter } from './utils/SignalEmitter';
 import { Notification } from '@jupyterlab/apputils';
@@ -44,22 +40,19 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'scheduler-jupyter-plugin:plugin',
   description: 'A JupyterLab extension.',
   autoStart: true,
-  optional: [
-    ISettingRegistry,
-    IThemeManager,
-    ILauncher
-  ],
+  optional: [ISettingRegistry, IThemeManager, ILauncher],
   activate: async (
     app: JupyterFrontEnd,
     settingRegistry: ISettingRegistry | null,
     themeManager: IThemeManager,
-    launcher: ILauncher,
+    launcher: ILauncher
   ) => {
     console.log('JupyterLab extension scheduler-jupyter-plugin is activated!');
 
     const { commands } = app;
 
-    const createAuthLoginComponentCommand = 'cloud-scheduler-settings:configure';
+    const createAuthLoginComponentCommand =
+      'cloud-scheduler-settings:configure';
     commands.addCommand(createAuthLoginComponentCommand, {
       label: 'Google Scheduler Settings',
       execute: () => {
@@ -112,7 +105,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           notificationMessage: 'The Cloud Composer API is not enabled.',
           enableLink:
             'https://console.cloud.google.com/apis/library/composer.googleapis.com'
-        },
+        }
       ];
 
       apiChecks.forEach(

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import { POLLING_IMPORT_ERROR } from './Const';
 
 const PollingImportErrorTimer = (
