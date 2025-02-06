@@ -14,13 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import React from 'react';
+import { iconError } from '../../utils/Icons';
 
-declare module '*.svg' {
-  const value: string;
-  export default value;
+interface IErrorMessageInterface {
+  message: string;
 }
 
-declare module '*.txt' {
-  const value: string;
-  export default value;
-}
+const ErrorMessage: React.FC<IErrorMessageInterface> = ({ message }) => {
+  return (
+    <div className="error-key-parent">
+      <iconError.react tag="div" className="logo-alignment-style" />
+      <div className="error-key-missing">{message}</div>
+    </div>
+  );
+};
+
+export default ErrorMessage;
