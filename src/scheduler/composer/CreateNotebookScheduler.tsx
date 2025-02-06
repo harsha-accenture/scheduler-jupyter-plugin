@@ -243,10 +243,10 @@ const CreateNotebookScheduler = ({
   };
 
   const handleCreateJobScheduler = async () => {
-    let outputFormats = [];
+    const outputFormats = [];
     outputFormats.push('ipynb');
 
-    let randomDagId = uuidv4();
+    const randomDagId = uuidv4();
 
     const payload = {
       input_filename: inputFileSelected,

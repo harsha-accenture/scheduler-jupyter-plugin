@@ -68,7 +68,7 @@ const NotebookJobComponent = ({
   setSelectedMode?: (value: string) => void;
   setClusterSelected?: (value: string) => void;
   setServerlessSelected?: (value: string) => void;
-  setServerlessDataSelected?: (value: {}) => void;
+  setServerlessDataSelected?: (value: Record<string, never>) => void;
   serverlessDataList?: any;
   setServerlessDataList?: (value: string[]) => void;
   setServerlessList?: (value: string[]) => void;

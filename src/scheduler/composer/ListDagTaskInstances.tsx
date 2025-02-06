@@ -65,7 +65,7 @@ const ListDagTaskInstances = ({
   const [height, setHeight] = useState(window.innerHeight - 320);
 
   function handleUpdateHeight() {
-    let updateHeight = window.innerHeight - 320;
+    const updateHeight = window.innerHeight - 320;
     setHeight(updateHeight);
   }
 

@@ -16,7 +16,7 @@
  */
 
 import { ConfigService } from '../services/ConfigService';
-
+/* @typescript-eslint/no-var-requires */
 const { version } = require('../../package.json');
 export const LOGIN_STATE = '1';
 export const STATUS_SUCCESS = 'SUCCEEDED';

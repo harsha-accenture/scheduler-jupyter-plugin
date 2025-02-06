@@ -119,7 +119,7 @@ function listNotebookScheduler({
   setSelectedMode?: (value: string) => void;
   setClusterSelected?: (value: string) => void;
   setServerlessSelected?: (value: string) => void;
-  setServerlessDataSelected?: (value: {}) => void;
+  setServerlessDataSelected?: (value: Record<string, never>) => void;
   serverlessDataList?: string[];
   setServerlessDataList?: (value: string[]) => void;
   setServerlessList?: (value: string[]) => void;
@@ -347,7 +347,7 @@ function listNotebookScheduler({
     setPageSize,
     state: { pageIndex, pageSize }
   } = useTable(
-    //@ts-ignore react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
+    //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
     { columns, data, autoResetPage: false, initialState: { pageSize: 50 } },
     usePagination
   );
@@ -484,12 +484,12 @@ function listNotebookScheduler({
     const settings = await settingRegistry.load(PLUGIN_ID);
 
     // The current value of whether or not preview features are enabled.
-    let previewEnabled = settings.get('previewEnabled').composite as boolean;
+    const previewEnabled = settings.get('previewEnabled').composite as boolean;
     setIsPreviewEnabled(previewEnabled);
   };
 
   const openEditDagNotebookFile = async () => {
-    let filePath = inputNotebookFilePath.replace('gs://', 'gs:');
+    const filePath = inputNotebookFilePath.replace('gs://', 'gs:');
     const openNotebookFile: any = await app.commands.execute(
       'docmanager:open',
       {

@@ -66,7 +66,7 @@ export async function loggedFetch(
   return resp;
 }
 
-export const toastifyCustomStyle: ToastOptions<{}> = {
+export const toastifyCustomStyle: ToastOptions<Record<string, never>> = {
   hideProgressBar: true,
   autoClose: 600000,
   theme: 'dark',

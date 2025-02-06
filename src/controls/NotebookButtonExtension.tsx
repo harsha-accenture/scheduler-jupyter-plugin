@@ -285,7 +285,7 @@ class NotebookButtonExtensionPoint implements IDisposable {
     // Get the current kernel ID and look for the kernel in the kernel API.
     const currentId = session.session?.kernel?.id;
     const runningKernels = await KernelAPI.listRunning();
-    const runningKernel = runningKernels.find(kernel => kernel.id == currentId);
+    const runningKernel = runningKernels.find(kernel => kernel.id === currentId);
 
     // Apparently metadata could exist, so casting to any for now.
     const parentResource = (runningKernel as any)?.metadata
@@ -305,7 +305,7 @@ class NotebookButtonExtensionPoint implements IDisposable {
     const matches =
       /^\/\/dataproc.googleapis.com\/projects\/(?<project>[\w\-]+)\/locations\/(?<location>[\w\-]+)\/sessions\/(?<session>[\w\-]+)/.exec(
         parentResource
-      )?.groups;
+      )?.groups; // eslint-disable-line no-use-before-define
 
     this.sessionId = matches?.['session'];
     if (!this.sessionId) {
