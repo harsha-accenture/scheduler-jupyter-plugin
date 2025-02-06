@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Roboto");
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 
 .clusters-list-overlay {
   height: 37px;
@@ -202,7 +202,6 @@
   font-weight: 400;
   font-size: 13px;
   line-height: 20px;
-
   color: var(--jp-ui-font-color2);
 }
 
@@ -217,7 +216,7 @@
 }
 
 .cluster-list-table-header {
-  background: rgba(0 0 0 4);
+  background: rgba(0, 0, 0, 4);
   font-style: normal;
   font-weight: 500;
   font-size: 13px;
