@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import { LabIcon } from '@jupyterlab/ui-components';
 import clusterIcon from '../../style/icons/cluster_icon.svg';
 import signinGoogleIcon from '../../style/icons/signin_google_icon.svg';
@@ -41,7 +40,6 @@ export const IconGoogleCloud = new LabIcon({
   name: 'launcher:google_cloud_icon',
   svgstr: googleCloudIcon
 });
-
 
 export const iconScheduledNotebooks = new LabIcon({
   name: 'launcher:scheduled-notebooks-icon',

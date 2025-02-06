@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
-
 import { useEffect, useRef, useState } from 'react';
-import { API_HEADER_BEARER, API_HEADER_CONTENT_TYPE, gcpServiceUrls } from '../utils/Const';
+import {
+  API_HEADER_BEARER,
+  API_HEADER_CONTENT_TYPE,
+  gcpServiceUrls
+} from '../utils/Const';
 import { authApi } from '../utils/Config';
-import {toastifyCustomStyle} from '../utils/CustomStyle';
+import { toastifyCustomStyle } from '../utils/CustomStyle';
 import { toast } from 'react-toastify';
 
 interface IRegions {
@@ -28,29 +31,27 @@ interface IRegions {
 
 const regionListAPI = async (projectId: string, credentials: any) => {
   const { REGION_URL } = await gcpServiceUrls;
-  if(projectId !== ''){
-  try {
-    const resp = await fetch(`${REGION_URL}/${projectId}/regions`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': API_HEADER_CONTENT_TYPE,
-        Authorization: API_HEADER_BEARER + credentials.access_token,
-      },
-    });
-   const responseResult = await resp.json()
-    if (responseResult?.error?.code)
-   {
-      throw new Error(responseResult?.error?.message);
-    }
+  if (projectId !== '') {
+    try {
+      const resp = await fetch(`${REGION_URL}/${projectId}/regions`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': API_HEADER_CONTENT_TYPE,
+          Authorization: API_HEADER_BEARER + credentials.access_token
+        }
+      });
+      const responseResult = await resp.json();
+      if (responseResult?.error?.code) {
+        throw new Error(responseResult?.error?.message);
+      }
 
-    const { items } = (responseResult) as { items: IRegions[] | undefined };
-    return items ?? [];
-  } catch (error) {
-    console.error(error);
-    throw error; 
-  }
-  }
-  else{
+      const { items } = responseResult as { items: IRegions[] | undefined };
+      return items ?? [];
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  } else {
     return [];
   }
 };
@@ -62,8 +63,8 @@ export function useRegion(projectId: string) {
   useEffect(() => {
     currentRegion.current = projectId;
     authApi()
-      .then((credentials) => regionListAPI(projectId, credentials))
-      .then((items) => {
+      .then(credentials => regionListAPI(projectId, credentials))
+      .then(items => {
         if (currentRegion.current !== projectId) {
           // The project changed while the network request was pending
           // so we should throw away these results.
@@ -71,9 +72,9 @@ export function useRegion(projectId: string) {
         }
         setRegions(items);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error);
-        toast.error(error.message,toastifyCustomStyle)
+        toast.error(error.message, toastifyCustomStyle);
       });
   }, [projectId]);
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ConfigService } from "../services/ConfigService";
+import { ConfigService } from '../services/ConfigService';
 
 const { version } = require('../../package.json');
 export const LOGIN_STATE = '1';

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import { POLLING_TIME_LIMIT } from './Const';
 
 const PollingTimer = (

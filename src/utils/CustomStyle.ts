@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-
 import { ToastOptions, toast } from 'react-toastify';
 
 export const toastifyCustomStyle: ToastOptions<{}> = {
-    hideProgressBar: true,
-    autoClose: 600000,
-    theme: 'dark',
-    position: toast.POSITION.BOTTOM_CENTER
-  };
+  hideProgressBar: true,
+  autoClose: 600000,
+  theme: 'dark',
+  position: toast.POSITION.BOTTOM_CENTER
+};
