@@ -304,7 +304,7 @@ class NotebookButtonExtensionPoint implements IDisposable {
       return;
     }
 
-    // eslint-disable-next-line $rulename
+    /* eslint-disable */
     const matches =
       /^\/\/dataproc.googleapis.com\/projects\/(?<project>[\w\-]+)\/locations\/(?<location>[\w\-]+)\/sessions\/(?<session>[\w\-]+)/.exec(
         parentResource
