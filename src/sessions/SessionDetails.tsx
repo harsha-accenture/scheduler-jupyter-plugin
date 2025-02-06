@@ -403,7 +403,7 @@ function SessionDetails({
                         <div className="session-env-details-label">{label}</div>
                         <div className="session-env-details-value">
                           {
-                            //@ts-ignore value type issue
+                            //@ts-expect-error value type issue
                             value.map((item: string) => {
                               return <div>{item}</div>;
                             })

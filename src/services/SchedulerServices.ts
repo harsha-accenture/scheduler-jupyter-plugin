@@ -413,10 +413,10 @@ export class SchedulerService {
     currentOffsetValue?: number,
     previousDagRunDataList?: object
   ) => {
-    let offset = currentOffsetValue ?? 0;
+    const offset = currentOffsetValue ?? 0;
     setIsLoading(true);
-    let start_date = startDate;
-    let end_date = endDate;
+    const start_date = startDate;
+    const end_date = endDate;
     setBlueListDates([]);
     setGreyListDates([]);
     setOrangeListDates([]);
@@ -478,7 +478,7 @@ export class SchedulerService {
           allDagRunsListData
         );
       } else {
-        let transformDagRunListData = allDagRunsListData;
+        const transformDagRunListData = allDagRunsListData;
 
         if (transformDagRunListData.length > 0) {
           // Group by date first, then by status
@@ -502,12 +502,12 @@ export class SchedulerService {
             {}
           );
 
-          let blueList: string[] = [];
-          let greyList: string[] = [];
-          let orangeList: string[] = [];
-          let redList: string[] = [];
-          let greenList: string[] = [];
-          let darkGreenList: string[] = [];
+          const blueList: string[] = [];
+          const greyList: string[] = [];
+          const orangeList: string[] = [];
+          const redList: string[] = [];
+          const greenList: string[] = [];
+          const darkGreenList: string[] = [];
 
           Object.keys(groupedDataByDateStatus).forEach(dateValue => {
             if (groupedDataByDateStatus[dateValue].running) {
