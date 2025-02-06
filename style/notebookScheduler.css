@@ -181,7 +181,7 @@
 }
 
 .accordion-row-parent-header {
-  background-color: rgba(0 0 0 4);
+  background-color: rgba(0 0 0 / 0.04);
   font-style: normal;
   font-weight: 500;
   font-size: 13px;
@@ -204,7 +204,7 @@
 }
 
 .accordion-vertex-row-parent-header {
-  background-color: rgba(0 0 0 4);
+  background-color: rgba(0 0 0 / 0.04);
   font-style: normal;
   font-weight: 500;
   font-size: 13px;
