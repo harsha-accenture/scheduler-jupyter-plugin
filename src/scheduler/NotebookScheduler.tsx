@@ -21,7 +21,7 @@ import { INotebookModel } from '@jupyterlab/notebook';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { IThemeManager } from '@jupyterlab/apputils';
 import { JupyterLab } from '@jupyterlab/application';
-import { DataprocWidget } from '../controls/DataprocWidget';
+import { SchedulerWidget } from '../controls/SchedulerWidget';
 import { iconLeftArrow } from '../utils/Icons';
 import { Input } from '../controls/MuiWrappedInput';
 import CreateNotebookScheduler from './composer/CreateNotebookScheduler';
@@ -144,7 +144,7 @@ const NotebookSchedulerComponent = ({
   );
 };
 
-export class NotebookScheduler extends DataprocWidget {
+export class NotebookScheduler extends SchedulerWidget {
   app: JupyterLab;
   context: DocumentRegistry.IContext<INotebookModel> | string;
   settingRegistry: ISettingRegistry;
