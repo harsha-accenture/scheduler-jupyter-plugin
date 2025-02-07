@@ -33,6 +33,7 @@ from scheduler_jupyter_plugin.controllers import (
     airflow,
     composer,
     executor,
+    dataproc,
 )
 
 
@@ -160,6 +161,8 @@ def setup_handlers(web_app):
         "importErrorsList": airflow.ImportErrorController,
         "triggerDag": airflow.TriggerDagController,
         "downloadOutput": executor.DownloadOutputController,
+        "clusterList": dataproc.ClusterListController,
+        "runtimeList": dataproc.RuntimeController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)
