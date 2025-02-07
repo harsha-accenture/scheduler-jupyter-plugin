@@ -33,11 +33,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Input } from '../../controls/MuiWrappedInput';
-// import { RegionDropdown } from '../../controls/RegionDropdown';
 import { CORN_EXP_DOC_URL } from '../../utils/Const';
-import LabelProperties from '../../jobs/LabelProperties';
 import LearnMore from '../common/LearnMore';
 import ErrorMessage from '../common/ErrorMessage';
+import { iconError, iconDelete, iconPlus } from '../../utils/Icons';
 
 const CreateVertexScheduler = ({
   themeManager,
@@ -54,7 +53,6 @@ const CreateVertexScheduler = ({
     <>
       <div className="submit-job-container">
         <div className="region-overlay create-scheduler-form-element">
-          {/* Todo Region component */}
           <Autocomplete
             className="create-scheduler-style"
             options={dummyList}
@@ -122,12 +120,7 @@ const CreateVertexScheduler = ({
                 label="Cloud Storage Bucket*"
                 InputProps={{
                   ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {/* TODO */}
-                      {params.InputProps.endAdornment}
-                    </>
-                  )
+                  endAdornment: <>{params.InputProps.endAdornment}</>
                 }}
               />
             )}
@@ -146,7 +139,6 @@ const CreateVertexScheduler = ({
         <ErrorMessage message="Cloud storage bucket is required" />
 
         <span className="tab-description tab-text-sub-cl">
-          {/* Todo */}
           <span>
             Where results are stored. Select an existing bucket or create a new
             one.
@@ -175,7 +167,58 @@ const CreateVertexScheduler = ({
         <div className="create-job-scheduler-title sub-title-heading ">
           Parameters
         </div>
-        <LabelProperties />
+        {/* labelProperties */}
+        <div className="job-label-edit-parent">
+          <div className="job-label-edit-row">
+            <div className="key-message-wrapper">
+              <div className="select-text-overlay-label">
+                <Input sx={{ margin: 0 }} className="edit-input-style" />
+              </div>
+
+              <div role="alert" className="error-key-parent">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">key is required</div>
+              </div>
+              <div className="error-key-parent">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">
+                  Only hyphens (-), underscores (_), lowercase characters, and
+                  numbers are allowed. Keys must start with a lowercase
+                  character. International characters are allowed.
+                </div>
+              </div>
+              <div className="error-key-parent">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">
+                  The key is already present
+                </div>
+              </div>
+            </div>
+            <div className="key-message-wrapper">
+              <div className="select-text-overlay-label">
+                <Input sx={{ margin: 0 }} className="edit-input-style" />
+              </div>
+              <div className="error-key-parent">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">
+                  Only hyphens (-), underscores (_), lowercase characters, and
+                  numbers are allowed. International characters are allowed.
+                </div>
+              </div>
+            </div>
+
+            <div role="button" className="labels-delete-icon">
+              <iconDelete.react tag="div" className="logo-alignment-style" />
+            </div>
+          </div>
+          <button className="job-add-property-button">
+            <iconPlus.react
+              tag="div"
+              className="icon-black logo-alignment-style job-edit-text"
+            />
+            <span className="job-edit-text">ADD PARAMETER</span>
+          </button>
+        </div>
 
         <div className="create-scheduler-form-element panel-margin">
           <Autocomplete
@@ -238,7 +281,7 @@ const CreateVertexScheduler = ({
                 control={<Radio size="small" />}
                 label={
                   <Typography sx={{ fontSize: 13 }}>
-                    Network shared from host project {/* Todo */}
+                    Network shared from host project
                   </Typography>
                 }
               />

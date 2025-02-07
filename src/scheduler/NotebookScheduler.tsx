@@ -26,6 +26,14 @@ import { iconLeftArrow } from '../utils/Icons';
 import { Input } from '../controls/MuiWrappedInput';
 import CreateNotebookScheduler from './composer/CreateNotebookScheduler';
 import ErrorMessage from './common/ErrorMessage';
+import {
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Typography
+} from '@mui/material';
+import CreateVertexScheduler from './vertex/CreateVertexScheduler';
 
 const NotebookSchedulerComponent = ({
   themeManager,
@@ -48,6 +56,7 @@ const NotebookSchedulerComponent = ({
     useState<boolean>(true);
   const [createCompleted, setCreateCompleted] =
     context !== '' ? useState(false) : useState(true);
+  const [notebookSelector, setNotebookSelector] = useState<string>('vertex');
 
   useEffect(() => {
     if (context !== '') {
@@ -75,6 +84,13 @@ const NotebookSchedulerComponent = ({
     } else {
       setCreateCompleted(true);
     }
+  };
+
+  const handleSchedulerModeChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = (event.target as HTMLInputElement).value;
+    setNotebookSelector(newValue);
   };
 
   return (
@@ -122,24 +138,57 @@ const NotebookSchedulerComponent = ({
         </div>
       </div>
 
-      <CreateNotebookScheduler
-        themeManager={themeManager}
-        app={app}
-        context={context}
-        settingRegistry={settingRegistry}
-        createCompleted={createCompleted}
-        setCreateCompleted={setCreateCompleted}
-        jobNameSelected={jobNameSelected}
-        setJobNameSelected={setJobNameSelected}
-        inputFileSelected={inputFileSelected}
-        setInputFileSelected={setInputFileSelected}
-        editMode={editMode}
-        setEditMode={setEditMode}
-        jobNameValidation={jobNameValidation}
-        jobNameSpecialValidation={jobNameSpecialValidation}
-        jobNameUniqueValidation={jobNameUniqueValidation}
-        setJobNameUniqueValidation={setJobNameUniqueValidation}
-      />
+      <div className="create-scheduler-form-element sub-para">
+        <FormControl>
+          <RadioGroup
+            className="schedule-radio-btn"
+            aria-labelledby="demo-controlled-radio-buttons-group"
+            name="controlled-radio-buttons-group"
+            value={notebookSelector}
+            onChange={handleSchedulerModeChange}
+          >
+            <FormControlLabel
+              value="vertex"
+              className="create-scheduler-label-style"
+              control={<Radio size="small" />}
+              label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
+            />
+            <FormControlLabel
+              value="composer"
+              className="create-scheduler-label-style"
+              control={<Radio size="small" />}
+              label={<Typography sx={{ fontSize: 13 }}>Composer</Typography>}
+            />
+          </RadioGroup>
+        </FormControl>
+      </div>
+
+      {notebookSelector === 'composer' ? (
+        <CreateNotebookScheduler
+          themeManager={themeManager}
+          app={app}
+          context={context}
+          settingRegistry={settingRegistry}
+          createCompleted={createCompleted}
+          setCreateCompleted={setCreateCompleted}
+          jobNameSelected={jobNameSelected}
+          setJobNameSelected={setJobNameSelected}
+          inputFileSelected={inputFileSelected}
+          setInputFileSelected={setInputFileSelected}
+          editMode={editMode}
+          setEditMode={setEditMode}
+          jobNameValidation={jobNameValidation}
+          jobNameSpecialValidation={jobNameSpecialValidation}
+          jobNameUniqueValidation={jobNameUniqueValidation}
+          setJobNameUniqueValidation={setJobNameUniqueValidation}
+        />
+      ) : (
+        <CreateVertexScheduler
+          themeManager={themeManager}
+          app={app}
+          settingRegistry={settingRegistry}
+        />
+      )}
     </div>
   );
 };

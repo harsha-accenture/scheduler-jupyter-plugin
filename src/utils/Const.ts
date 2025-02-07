@@ -78,3 +78,6 @@ export const VIEW_LOGS_CLUSTER_URL =
 
 export const VIEW_LOGS_SESSION_URL =
   'https://console.cloud.google.com/logs/query;query=resource.type="cloud_dataproc_session"';
+
+export const CORN_EXP_DOC_URL =
+  'https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules';
