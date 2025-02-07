@@ -16,7 +16,7 @@
  */
 
 import React, { useState } from 'react';
-import { DataprocWidget } from '../../controls/DataprocWidget';
+import { SchedulerWidget } from '../../controls/SchedulerWidget';
 import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
 import ListNotebookScheduler from './ListNotebookScheduler';
@@ -154,7 +154,7 @@ const NotebookJobComponent = ({
   );
 };
 
-export class NotebookJobs extends DataprocWidget {
+export class NotebookJobs extends SchedulerWidget {
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
 

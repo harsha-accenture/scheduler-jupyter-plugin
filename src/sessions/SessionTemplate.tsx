@@ -18,7 +18,7 @@
 import React, { useEffect, useState } from 'react';
 import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
-import { DataprocWidget } from '../controls/DataprocWidget';
+import { SchedulerWidget } from '../controls/SchedulerWidget';
 import { ILauncher } from '@jupyterlab/launcher';
 import SessionDetails from './SessionDetails';
 
@@ -50,7 +50,7 @@ const SessionTemplateComponent = ({
   );
 };
 
-export class SessionTemplate extends DataprocWidget {
+export class SessionTemplate extends SchedulerWidget {
   app: JupyterLab;
   launcher: ILauncher;
   sessionId: string;

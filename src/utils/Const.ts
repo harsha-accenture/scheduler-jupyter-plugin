@@ -33,7 +33,7 @@ export enum HTTP_METHOD {
   GET = 'GET',
   POST = 'POST'
 }
-export const DEFAULT_LABEL_DETAIL = 'client:bigquery-jupyter-plugin';
+export const DEFAULT_LABEL_DETAIL = 'client:scheduler-jupyter-plugin';
 export const POLLING_TIME_LIMIT = 10000;
 export const POLLING_IMPORT_ERROR = 30000;
 export const TITLE_LAUNCHER_CATEGORY = 'Google Cloud Resources';
