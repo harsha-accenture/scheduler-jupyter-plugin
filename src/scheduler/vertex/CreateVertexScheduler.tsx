@@ -36,7 +36,11 @@ import { Input } from '../../controls/MuiWrappedInput';
 import { CORN_EXP_DOC_URL } from '../../utils/Const';
 import LearnMore from '../common/LearnMore';
 import ErrorMessage from '../common/ErrorMessage';
-import { iconError, iconDelete, iconPlus } from '../../utils/Icons';
+import {
+  iconError,
+  iconDelete,
+  iconPlus
+} from '../../utils/Icons';
 
 const CreateVertexScheduler = ({
   themeManager,
@@ -120,7 +124,11 @@ const CreateVertexScheduler = ({
                 label="Cloud Storage Bucket*"
                 InputProps={{
                   ...params.InputProps,
-                  endAdornment: <>{params.InputProps.endAdornment}</>
+                  endAdornment: (
+                    <>
+                      {params.InputProps.endAdornment}
+                    </>
+                  )
                 }}
               />
             )}
@@ -172,23 +180,36 @@ const CreateVertexScheduler = ({
           <div className="job-label-edit-row">
             <div className="key-message-wrapper">
               <div className="select-text-overlay-label">
-                <Input sx={{ margin: 0 }} className="edit-input-style" />
+                <Input
+                  sx={{ margin: 0 }}
+                  className='edit-input-style'
+                />
               </div>
 
               <div role="alert" className="error-key-parent">
-                <iconError.react tag="div" className="logo-alignment-style" />
+                <iconError.react
+                  tag="div"
+                  className="logo-alignment-style"
+                />
                 <div className="error-key-missing">key is required</div>
               </div>
               <div className="error-key-parent">
-                <iconError.react tag="div" className="logo-alignment-style" />
+                <iconError.react
+                  tag="div"
+                  className="logo-alignment-style"
+                />
                 <div className="error-key-missing">
-                  Only hyphens (-), underscores (_), lowercase characters, and
-                  numbers are allowed. Keys must start with a lowercase
-                  character. International characters are allowed.
+                  Only hyphens (-), underscores (_), lowercase
+                  characters, and numbers are allowed. Keys must start
+                  with a lowercase character. International characters
+                  are allowed.
                 </div>
               </div>
               <div className="error-key-parent">
-                <iconError.react tag="div" className="logo-alignment-style" />
+                <iconError.react
+                  tag="div"
+                  className="logo-alignment-style"
+                />
                 <div className="error-key-missing">
                   The key is already present
                 </div>
@@ -196,29 +217,48 @@ const CreateVertexScheduler = ({
             </div>
             <div className="key-message-wrapper">
               <div className="select-text-overlay-label">
-                <Input sx={{ margin: 0 }} className="edit-input-style" />
+                <Input
+                  sx={{ margin: 0 }}
+                  className='edit-input-style'
+                />
               </div>
               <div className="error-key-parent">
-                <iconError.react tag="div" className="logo-alignment-style" />
+                <iconError.react
+                  tag="div"
+                  className="logo-alignment-style"
+                />
                 <div className="error-key-missing">
-                  Only hyphens (-), underscores (_), lowercase characters, and
-                  numbers are allowed. International characters are allowed.
+                  Only hyphens (-), underscores (_), lowercase
+                  characters, and numbers are allowed. International
+                  characters are allowed.
                 </div>
               </div>
             </div>
 
-            <div role="button" className="labels-delete-icon">
-              <iconDelete.react tag="div" className="logo-alignment-style" />
+            <div
+              role="button"
+              className='labels-delete-icon'
+            >
+              <iconDelete.react
+                tag="div"
+                className="logo-alignment-style"
+              />
             </div>
           </div>
-          <button className="job-add-property-button">
+          <button className='job-add-property-button'>
             <iconPlus.react
               tag="div"
               className="icon-black logo-alignment-style job-edit-text"
             />
-            <span className="job-edit-text">ADD PARAMETER</span>
+            <span
+              className='job-edit-text'
+            >
+              ADD PARAMETER
+            </span>
+
           </button>
         </div>
+
 
         <div className="create-scheduler-form-element panel-margin">
           <Autocomplete
@@ -237,7 +277,6 @@ const CreateVertexScheduler = ({
                   alignItems: 'flex-start'
                 }}
               >
-                {/* Todo */}
               </Box>
             )}
           />
