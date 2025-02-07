@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 
 .signin-google-icon {
   align-items: center;
@@ -35,7 +35,7 @@
 .settings-separator {
   border-bottom: 1px solid var(--jp-layout-color3);
   width: 100%;
-  height: 0px;
+  height: 0;
   margin-left: 5px;
 }
 
@@ -129,7 +129,7 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  padding: 32px 0px 0px;
+  padding: 32px 0 0;
   gap: 12px;
   height: 64px;
 }
@@ -186,12 +186,12 @@
 
 .user-overlay {
   display: flex;
-  padding: 30px 30px;
+  padding: 30px;
 }
 
 .google-footer {
   width: 344px;
-  height: 0px;
+  height: 0;
   border: 1px solid #e1e3e1;
   text-align: center;
 }
@@ -275,7 +275,7 @@
 
 .settings-component {
   margin-left: 40px;
-  font-family: 'Roboto';
+  font-family: Roboto, sans-serif;
 }
 
 .expand-icon {
@@ -285,6 +285,7 @@
 .runtime-title-part {
   margin-bottom: 5px;
 }
+
 .footer-divider {
   margin: 0 5px;
 }

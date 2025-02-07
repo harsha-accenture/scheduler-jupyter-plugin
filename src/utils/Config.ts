@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
-
-import {
-  IAuthCredentials
-} from '../login/LoginInterfaces';
+import { IAuthCredentials } from '../login/LoginInterfaces';
 import { AuthenticationService } from '../services/AuthenticationService';
 import { SchedulerLoggingService } from '../services/LoggingService';
-import { API_HEADER_BEARER, API_HEADER_CONTENT_TYPE, HTTP_METHOD, gcpServiceUrls } from './Const';
+import {
+  API_HEADER_BEARER,
+  API_HEADER_CONTENT_TYPE,
+  HTTP_METHOD,
+  gcpServiceUrls
+} from './Const';
+import { ToastOptions, toast } from 'react-toastify';
 
 export const authApi = async () => {
-   const authService = await AuthenticationService.authCredentialsAPI();
-   return authService;
+  const authService = await AuthenticationService.authCredentialsAPI();
+  return authService;
 };
 
 export const checkConfig = async (
@@ -33,7 +36,7 @@ export const checkConfig = async (
   setConfigError: React.Dispatch<React.SetStateAction<boolean>>,
   setLoginError: React.Dispatch<React.SetStateAction<boolean>>
 ): Promise<void> => {
-  const credentials : IAuthCredentials | undefined = await authApi();
+  const credentials: IAuthCredentials | undefined = await authApi();
   if (credentials) {
     if (credentials.access_token === '') {
       localStorage.removeItem('loginState');
@@ -50,9 +53,9 @@ export const checkConfig = async (
 };
 
 /**
-* Helper method that wraps fetch and logs the request uri and status codes to
-* jupyter server.
-*/
+ * Helper method that wraps fetch and logs the request uri and status codes to
+ * jupyter server.
+ */
 export async function loggedFetch(
   input: RequestInfo | URL,
   init?: RequestInit
@@ -62,6 +65,13 @@ export async function loggedFetch(
   SchedulerLoggingService.logFetch(input, init, resp);
   return resp;
 }
+
+export const toastifyCustomStyle: ToastOptions<Record<string, never>> = {
+  hideProgressBar: true,
+  autoClose: 600000,
+  theme: 'dark',
+  position: toast.POSITION.BOTTOM_CENTER
+};
 
 export const handleDebounce = (func: any, delay: number) => {
   let timeoutId: any;
@@ -134,3 +144,54 @@ export const authenticatedFetch = async (config: {
 };
 
 export function assumeNeverHit(_: never): void {}
+
+export const jobTimeFormat = (startTime: string) => {
+  const date = new Date(startTime);
+
+  const formattedDate = date.toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true
+  });
+
+  return formattedDate;
+};
+
+export const elapsedTime = (endTime: Date, jobStartTime: Date): string => {
+  const jobEndTime = new Date(endTime);
+  const elapsedMilliseconds = jobEndTime.getTime() - jobStartTime.getTime();
+  const elapsedSeconds = Math.round(elapsedMilliseconds / 1000) % 60;
+  const elapsedMinutes = Math.floor(elapsedMilliseconds / (1000 * 60)) % 60;
+  const elapsedHours = Math.floor(elapsedMilliseconds / (1000 * 60 * 60));
+  let elapsedTimeString = '';
+  if (elapsedHours > 0) {
+    elapsedTimeString += `${elapsedHours} hr `;
+  }
+
+  if (elapsedMinutes > 0) {
+    elapsedTimeString += `${elapsedMinutes} min `;
+  }
+  if (elapsedSeconds > 0) {
+    elapsedTimeString += `${elapsedSeconds} sec `;
+  }
+  return elapsedTimeString;
+};
+
+export interface ICellProps {
+  getCellProps: () => React.TdHTMLAttributes<HTMLTableDataCellElement>;
+  value: string | any;
+  column: {
+    Header: string;
+  };
+  row: {
+    original: {
+      id: string;
+      status: string;
+    };
+  };
+  render: (value: string) => React.ReactNode;
+}

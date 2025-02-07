@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
@@ -25,14 +24,14 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { MainAreaWidget, IThemeManager } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
-import {
-  iconCluster
-} from './utils/Icons';
+import { iconCluster, iconScheduledNotebooks } from './utils/Icons';
 import { AuthLogin } from './login/AuthLogin';
 import { eventEmitter } from './utils/SignalEmitter';
 import { Notification } from '@jupyterlab/apputils';
-import { DataprocService } from './services/DataprocService';
 import { SchedulerService } from './services/SchedulerServices';
+import { NotebookScheduler } from './scheduler/NotebookScheduler';
+import { NotebookButtonExtension } from './controls/NotebookButtonExtension';
+import { TITLE_LAUNCHER_CATEGORY } from './utils/Const';
 
 /**
  * Initialization data for the scheduler-jupyter-plugin extension.
@@ -41,22 +40,19 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'scheduler-jupyter-plugin:plugin',
   description: 'A JupyterLab extension.',
   autoStart: true,
-  optional: [
-    ISettingRegistry,
-    IThemeManager,
-    ILauncher
-  ],
+  optional: [ISettingRegistry, IThemeManager, ILauncher],
   activate: async (
     app: JupyterFrontEnd,
     settingRegistry: ISettingRegistry | null,
     themeManager: IThemeManager,
-    launcher: ILauncher,
+    launcher: ILauncher
   ) => {
     console.log('JupyterLab extension scheduler-jupyter-plugin is activated!');
 
     const { commands } = app;
 
-    const createAuthLoginComponentCommand = 'cloud-scheduler-settings:configure';
+    const createAuthLoginComponentCommand =
+      'cloud-scheduler-settings:configure';
     commands.addCommand(createAuthLoginComponentCommand, {
       label: 'Google Scheduler Settings',
       execute: () => {
@@ -73,27 +69,35 @@ const plugin: JupyterFrontEndPlugin<void> = {
       }
     });
 
+    const createNotebookJobsComponentCommand = 'create-notebook-jobs-component';
+    commands.addCommand(createNotebookJobsComponentCommand, {
+      caption: 'Scheduled Jobs',
+      label: 'Scheduled Jobs',
+      icon: iconScheduledNotebooks,
+      execute: () => {
+        const content = new NotebookScheduler(
+          app as JupyterLab,
+          themeManager,
+          settingRegistry as ISettingRegistry,
+          ''
+        );
+        const widget = new MainAreaWidget<NotebookScheduler>({ content });
+        widget.title.label = 'Scheduled Jobs';
+        widget.title.icon = iconScheduledNotebooks;
+        app.shell.add(widget, 'main');
+      }
+    });
+
     // Capture the signal
     eventEmitter.on('schedulerConfigChange', (message: string) => {
       checkAllApisEnabled();
     });
 
     const checkAllApisEnabled = async () => {
-      const dataprocClusterResponse =
-        await DataprocService.listClustersDataprocAPIService();
-
       const composerListResponse =
         await SchedulerService.listComposersAPICheckService();
 
       const apiChecks = [
-        {
-          response: dataprocClusterResponse,
-          errorKey: 'error.message',
-          errorMessage: 'Cloud Dataproc API has not been used in project',
-          notificationMessage: 'The Cloud Dataproc API is not enabled.',
-          enableLink:
-            'https://console.cloud.google.com/apis/library/dataproc.googleapis.com'
-        },
         {
           response: composerListResponse,
           errorKey: 'Error fetching environments list',
@@ -101,7 +105,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           notificationMessage: 'The Cloud Composer API is not enabled.',
           enableLink:
             'https://console.cloud.google.com/apis/library/composer.googleapis.com'
-        },
+        }
       ];
 
       apiChecks.forEach(
@@ -133,7 +137,23 @@ const plugin: JupyterFrontEndPlugin<void> = {
 
     await checkAllApisEnabled();
 
+    app.docRegistry.addWidgetExtension(
+      'Notebook',
+      new NotebookButtonExtension(
+        app as JupyterLab,
+        settingRegistry as ISettingRegistry,
+        launcher,
+        themeManager
+      )
+    );
 
+    if (launcher) {
+      launcher.add({
+        command: createNotebookJobsComponentCommand,
+        category: TITLE_LAUNCHER_CATEGORY,
+        rank: 4
+      });
+    }
   }
 };
 
