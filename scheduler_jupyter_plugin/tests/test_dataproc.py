@@ -14,7 +14,7 @@
 
 import json
 
-from dataproc_jupyter_plugin.tests import mocks
+from scheduler_jupyter_plugin.tests import mocks
 
 
 async def test_list_clusters(monkeypatch, jp_fetch):
