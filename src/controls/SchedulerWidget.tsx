@@ -107,7 +107,7 @@ export abstract class SchedulerWidget extends ReactWidget {
 
   /**
    * @param themeManager Need thememanager to listen to theme changes
-   *   and to retrieve current theme properties.
+   *   and to retrieve current theme properties. 
    */
   constructor(protected themeManager: IThemeManager) {
     super();
