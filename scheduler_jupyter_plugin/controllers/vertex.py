@@ -38,6 +38,38 @@ class UIConfigController(APIHandler):
         except Exception as e:
             self.log.exception(f"Error fetching ui config: {str(e)}")
             self.finish({"error": str(e)})
+            
+            
+class VertexScheduleCreateController(APIHandler):
+    @tornado.web.authenticated
+    async def post(self):
+        try:
+            input_data = self.get_json_body()
+            async with aiohttp.ClientSession() as client_session:
+                client = vertex.Client(
+                    await credentials.get_cached(), self.log, client_session
+                )
+                result = await client.create_job_schedule(input_data)
+                self.finish(json.dumps(result))
+        except Exception as e:
+            self.log.exception(f"Error creating job schedule: {str(e)}")
+            self.finish({"error": str(e)})
+
+
+class BucketCreateController(APIHandler):
+    @tornado.web.authenticated
+    async def post(self):
+        try:
+            input_data = self.get_json_body()
+            async with aiohttp.ClientSession() as client_session:
+                client = vertex.Client(
+                    await credentials.get_cached(), self.log, client_session
+                )
+                result = await client.create_new_bucket(input_data)
+                self.finish(json.dumps(result))
+        except Exception as e:
+            self.log.exception(f"Error creating a new bucket: {str(e)}")
+            self.finish({"error": str(e)})
 
 
 class ScheduleListController(APIHandler):
@@ -146,7 +178,6 @@ class ScheduleUpdateController(APIHandler):
                 client = vertex.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-
                 resp = await client.update_schedule(region_id, schedule_id, input_data)
                 self.finish(json.dumps(resp))
         except Exception as e:
@@ -165,7 +196,6 @@ class ScheduleGetController(APIHandler):
                 client = vertex.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-
                 resp = await client.get_schedule(region_id, schedule_id)
                 self.finish(json.dumps(resp))
         except Exception as e:
