@@ -30,6 +30,10 @@ from traitlets.config import SingletonConfigurable
 
 from scheduler_jupyter_plugin import credentials, urls
 from scheduler_jupyter_plugin.controllers import (
+    airflow,
+    composer,
+    executor,
+    dataproc,
     vertex,
 )
 
@@ -146,6 +150,20 @@ def setup_handlers(web_app):
         "configuration": ConfigHandler,
         "getGcpServiceUrls": UrlHandler,
         "log": LogHandler,
+        "composerList": composer.EnvironmentListController,
+        "dagRun": airflow.DagRunController,
+        "dagRunTask": airflow.DagRunTaskController,
+        "dagRunTaskLogs": airflow.DagRunTaskLogsController,
+        "createJobScheduler": executor.ExecutorController,
+        "dagList": airflow.DagListController,
+        "dagDelete": airflow.DagDeleteController,
+        "dagUpdate": airflow.DagUpdateController,
+        "editJobScheduler": airflow.EditDagController,
+        "importErrorsList": airflow.ImportErrorController,
+        "triggerDag": airflow.TriggerDagController,
+        "downloadOutput": executor.DownloadOutputController,
+        "clusterList": dataproc.ClusterListController,
+        "runtimeList": dataproc.RuntimeController,
         "api/vertex/createJobScheduler": vertex.VertexScheduleCreateController,
         "api/storage/createNewBucket": vertex.BucketCreateController,
     }
