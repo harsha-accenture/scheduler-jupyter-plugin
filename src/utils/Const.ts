@@ -81,3 +81,12 @@ export const VIEW_LOGS_SESSION_URL =
 
 export const CORN_EXP_DOC_URL =
   'https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules';
+export const DISK_TYPE_VALUE = [
+  'pd-standard (Persistent Disk Standard',
+  'pd-ssd (Persistent Disk Solid state Drive)',
+  'pd-standard (Persistent Disk Hard Disk Drive)',
+  'pd-balanced (Balanced Persistent Disk)',
+  'pd-extreme (Extreme Persistent Disk)'
+];
+export type internalScheduleMode = 'cronFormat' | 'userFriendly';
+export const KERNEL_VALUE = ['python3', 'pytorch', 'tensorflow'];
