@@ -30,6 +30,7 @@ GCS = "gs://"
 PACKAGE_NAME = "scheduler_jupyter_plugin"
 WRAPPER_PAPPERMILL_FILE = "wrapper_papermill.py"
 TAGS = "scheduler_jupyter_plugin"
+VERTEX_STORAGE_BUCKET = "vertex-schedules"
 
 # Composer environment name restrictions are documented here:
 #  https://cloud.google.com/composer/docs/reference/rest/v1/projects.locations.environments#resource:-environment
