@@ -22,6 +22,24 @@ from scheduler_jupyter_plugin import credentials
 from scheduler_jupyter_plugin.services import vertex
 
 
+class UIConfigController(APIHandler):
+    @tornado.web.authenticated
+    async def get(self):
+        """Returns available ui config"""
+        try:
+            region_id = self.get_argument("region_id")
+            async with aiohttp.ClientSession() as client_session:
+                client = vertex.Client(
+                    await credentials.get_cached(), self.log, client_session
+                )
+
+                configs = await client.list_uiconfig(region_id)
+                self.finish(json.dumps(configs))
+        except Exception as e:
+            self.log.exception(f"Error fetching ui config: {str(e)}")
+            self.finish({"error": str(e)})
+
+
 class ScheduleListController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
@@ -33,7 +51,6 @@ class ScheduleListController(APIHandler):
                 client = vertex.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-
                 schedules = await client.list_schedules(region_id, next_page_token)
                 self.finish(json.dumps(schedules))
         except Exception as e:

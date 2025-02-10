@@ -18,6 +18,48 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel
 
 
+class ComposerEnvironment(BaseModel):
+    """Defines a runtime context where job
+    execution will happen. For example, conda
+    environment.
+    """
+
+    name: str
+    label: str
+    description: str
+    file_extensions: List[str]  # Supported input file types
+    metadata: Optional[Dict[str, str]]  # Optional metadata
+
+    def __str__(self):
+        return self.json()
+
+
+class DescribeJob(BaseModel):
+    input_filename: str = None
+    composer_environment_name: str = None
+    output_formats: Optional[List[str]] = None
+    parameters: Optional[List[str]] = None
+    selected_mode: str = None
+    serverless_name: object = None
+    cluster_name: str = None
+    mode_selected: str = None
+    schedule_value: str = None
+    retry_count: int = 2
+    retry_delay: int = 5
+    email_failure: bool = False
+    email_delay: bool = False
+    email: Optional[List[str]] = None
+    name: str = None
+    dag_id: str = None
+    stop_cluster: bool = False
+    time_zone: str = None
+    email_success: bool = False
+
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
+      
+  
 class DescribeUpdateVertexJob(BaseModel):
     input_filename: str = None
     display_name: str = None
@@ -39,7 +81,7 @@ class DescribeUpdateVertexJob(BaseModel):
     gcs_notebook_source: str = None
     disk_type: Optional[str] = None
     disk_size: Optional[str] = None
-
+      
     @classmethod
     def from_dict(cls, data):
         return cls(**data)
