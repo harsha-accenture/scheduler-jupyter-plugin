@@ -36,6 +36,7 @@ from scheduler_jupyter_plugin.controllers import (
     dataproc,
     executor,
     iam,
+    logEntries,
     storage,
     vertex,
 )
@@ -184,6 +185,9 @@ def setup_handlers(web_app):
         "api/vertex/getSchedule": vertex.ScheduleGetController,
         "api/vertex/createJobScheduler": vertex.VertexScheduleCreateController,
         "api/storage/createNewBucket": vertex.BucketCreateController,
+        "api/logEntries/listEntries": logEntries.LogEntiresListContoller,
+        "api/vertex/listNotebookExecutionJobs": vertex.NotebookExecutionJobListController,
+        "api/storage/downloadOutput": storage.DownloadOutputController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)
