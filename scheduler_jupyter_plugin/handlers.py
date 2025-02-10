@@ -146,8 +146,8 @@ def setup_handlers(web_app):
         "configuration": ConfigHandler,
         "getGcpServiceUrls": UrlHandler,
         "log": LogHandler,
-        "api/vertex/createJobScheduler": vertex.CreateVertexScheduleController,
-        "api/storage/createNewBucket": vertex.CreateBucketController,
+        "api/vertex/createJobScheduler": vertex.VertexScheduleCreateController,
+        "api/storage/createNewBucket": vertex.BucketCreateController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)

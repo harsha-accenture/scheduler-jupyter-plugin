@@ -22,7 +22,7 @@ from scheduler_jupyter_plugin import credentials
 from scheduler_jupyter_plugin.services import vertex
 
 
-class CreateVertexScheduleController(APIHandler):
+class VertexScheduleCreateController(APIHandler):
     @tornado.web.authenticated
     async def post(self):
         try:
@@ -38,7 +38,7 @@ class CreateVertexScheduleController(APIHandler):
             self.finish({"error": str(e)})
 
 
-class CreateBucketController(APIHandler):
+class BucketCreateController(APIHandler):
     @tornado.web.authenticated
     async def post(self):
         try:
