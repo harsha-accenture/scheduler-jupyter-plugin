@@ -32,6 +32,7 @@ dependencies = [
     "pydantic~=1.10.0",
     "google-cloud-compute",
     "google-cloud-iam",
+    "cron-descriptor>=1.4.5",
 ]
 dynamic = ["version", "description", "authors", "urls", "keywords"]
 
