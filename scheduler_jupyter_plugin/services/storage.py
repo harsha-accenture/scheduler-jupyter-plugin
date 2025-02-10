@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import os
 from google.cloud import storage
 import google.oauth2.credentials as oauth2
@@ -51,3 +52,17 @@ class Client:
         except Exception as error:
             self.log.exception(f"Error downloading output notebook file: {str(error)}")
             return {"error": str(error)}
+
+    async def list_bucket(self):
+        try:
+            cloud_storage_buckets = []
+            credentials = oauth2.Credentials(self._access_token)
+            storage_client = storage.Client(credentials=credentials)
+            buckets = storage_client.list_buckets()
+            for bucket in buckets:
+                cloud_storage_buckets.append(bucket.name)
+            return cloud_storage_buckets
+
+        except Exception as e:
+            self.log.exception(f"Error fetching cloud storage buckets: {str(e)}")
+            return {"Error fetching cloud storage buckets": str(e)}
