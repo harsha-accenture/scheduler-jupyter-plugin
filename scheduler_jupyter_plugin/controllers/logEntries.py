@@ -22,7 +22,7 @@ from scheduler_jupyter_plugin import credentials
 from scheduler_jupyter_plugin.services import logEntries
 
 
-class ListEntriesController(APIHandler):
+class LogEntiresListContoller(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         """Returns log entries"""

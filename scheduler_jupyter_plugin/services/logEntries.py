@@ -15,10 +15,6 @@
 from google.cloud import logging
 import google.oauth2.credentials as oauth2
 
-from scheduler_jupyter_plugin.commons.constants import (
-    CONTENT_TYPE,
-)
-
 
 class Client:
     def __init__(self, credentials, log):
@@ -33,12 +29,6 @@ class Client:
         self._access_token = credentials["access_token"]
         self.project_id = credentials["project_id"]
         self.region_id = credentials["region_id"]
-
-    def create_headers(self):
-        return {
-            "Content-Type": CONTENT_TYPE,
-            "Authorization": f"Bearer {self._access_token}",
-        }
 
     async def list_log_entries(self, filter_query=None):
         try:

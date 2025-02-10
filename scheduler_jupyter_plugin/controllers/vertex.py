@@ -22,7 +22,7 @@ from scheduler_jupyter_plugin import credentials
 from scheduler_jupyter_plugin.services import vertex
 
 
-class ListNotebookExecutionJobsController(APIHandler):
+class NotebookExecutionJobListController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         """Returns list of notebook execution jobs"""

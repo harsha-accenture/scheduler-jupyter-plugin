@@ -148,8 +148,8 @@ def setup_handlers(web_app):
         "configuration": ConfigHandler,
         "getGcpServiceUrls": UrlHandler,
         "log": LogHandler,
-        "api/logEntries/listEntries": logEntries.ListEntriesController,
-        "api/vertex/listNotebookExecutionJobs": vertex.ListNotebookExecutionJobsController,
+        "api/logEntries/listEntries": logEntries.LogEntiresListContoller,
+        "api/vertex/listNotebookExecutionJobs": vertex.NotebookExecutionJobListController,
         "api/storage/downloadOutput": storage.DownloadOutputController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
