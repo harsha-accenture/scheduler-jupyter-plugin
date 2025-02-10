@@ -36,7 +36,7 @@ from scheduler_jupyter_plugin.controllers import (
     dataproc,
     executor,
     iam,
-    logEntries
+    logEntries,
     storage,
     vertex,
 )
