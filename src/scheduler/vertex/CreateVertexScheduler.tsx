@@ -207,7 +207,7 @@ const CreateVertexScheduler = ({
    * @param {React.ChangeEvent<HTMLInputElement>} e - The change event triggered by the input field.
    */
   const handleDiskSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const re = /^[1-9][0-9]*$/;
+    const re = /^[1-9][0-9]*$/; // Checks whether value starts with [1-9] and all occurence should be a number [0-9]
     if (e.target.value === '' || re.test(e.target.value)) {
       setDiskSize(e.target.value);
     }
