@@ -32,8 +32,11 @@ from scheduler_jupyter_plugin import credentials, urls
 from scheduler_jupyter_plugin.controllers import (
     airflow,
     composer,
-    executor,
+    compute,
     dataproc,
+    executor,
+    iam,
+    storage,
     vertex,
 )
 
@@ -164,6 +167,14 @@ def setup_handlers(web_app):
         "downloadOutput": executor.DownloadOutputController,
         "clusterList": dataproc.ClusterListController,
         "runtimeList": dataproc.RuntimeController,
+        "api/vertex/uiConfig": vertex.UIConfigController,
+        "api/compute/region": compute.RegionController,
+        "api/compute/network": compute.NetworkController,
+        "api/compute/subNetwork": compute.SubNetworkController,
+        "api/compute/sharedNetwork": compute.SharedNetworkController,
+        "api/storage/listBucket": storage.CloudStorageController,
+        "api/iam/listServiceAccount": iam.ServiceAccountController,
+        "api/compute/getXpnHost": compute.GetXpnHostController,
         "api/vertex/createJobScheduler": vertex.VertexScheduleCreateController,
         "api/storage/createNewBucket": vertex.BucketCreateController,
     }
