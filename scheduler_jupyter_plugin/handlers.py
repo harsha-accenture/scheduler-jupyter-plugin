@@ -146,13 +146,13 @@ def setup_handlers(web_app):
         "configuration": ConfigHandler,
         "getGcpServiceUrls": UrlHandler,
         "log": LogHandler,
-        "api/vertex/listSchedules": vertex.ListSchedulesController,
-        "api/vertex/pauseSchedule": vertex.PauseScheduleController,
-        "api/vertex/resumeSchedule": vertex.ResumeScheduleController,
-        "api/vertex/deleteSchedule": vertex.DeleteScheduleController,
-        "api/vertex/triggerSchedule": vertex.TriggerScheduleController,
-        "api/vertex/updateSchedule": vertex.UpdateScheduleController,
-        "api/vertex/getSchedule": vertex.GetScheduleController,
+        "api/vertex/listSchedules": vertex.ScheduleListController,
+        "api/vertex/pauseSchedule": vertex.SchedulePauseController,
+        "api/vertex/resumeSchedule": vertex.ScheduleResumeController,
+        "api/vertex/deleteSchedule": vertex.ScheduleDeleteController,
+        "api/vertex/triggerSchedule": vertex.ScheduleTriggerController,
+        "api/vertex/updateSchedule": vertex.ScheduleUpdateController,
+        "api/vertex/getSchedule": vertex.ScheduleGetController,
     }
     handlers = [(full_path(name), handler) for name, handler in handlersMap.items()]
     web_app.add_handlers(host_pattern, handlers)

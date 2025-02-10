@@ -22,7 +22,7 @@ from scheduler_jupyter_plugin import credentials
 from scheduler_jupyter_plugin.services import vertex
 
 
-class ListSchedulesController(APIHandler):
+class ScheduleListController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         """Returns available schedules"""
@@ -41,7 +41,7 @@ class ListSchedulesController(APIHandler):
             self.finish({"error": str(e)})
 
 
-class PauseScheduleController(APIHandler):
+class SchedulePauseController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         """Pauses the schedule"""
@@ -60,7 +60,7 @@ class PauseScheduleController(APIHandler):
             self.finish({"error": str(e)})
 
 
-class ResumeScheduleController(APIHandler):
+class ScheduleResumeController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         """Resumes the paused schedule"""
@@ -79,7 +79,7 @@ class ResumeScheduleController(APIHandler):
             self.finish({"error": str(e)})
 
 
-class DeleteScheduleController(APIHandler):
+class ScheduleDeleteController(APIHandler):
     @tornado.web.authenticated
     async def delete(self):
         """Deletes the schedule"""
@@ -98,7 +98,7 @@ class DeleteScheduleController(APIHandler):
             self.finish({"error": str(e)})
 
 
-class TriggerScheduleController(APIHandler):
+class ScheduleTriggerController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         """Trigger the schedule"""
@@ -117,7 +117,7 @@ class TriggerScheduleController(APIHandler):
             self.finish({"error": str(e)})
 
 
-class UpdateScheduleController(APIHandler):
+class ScheduleUpdateController(APIHandler):
     @tornado.web.authenticated
     async def post(self):
         """Updates the schedule"""
@@ -137,7 +137,7 @@ class UpdateScheduleController(APIHandler):
             self.finish({"error": str(e)})
 
 
-class GetScheduleController(APIHandler):
+class ScheduleGetController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         """Get the schedule"""
