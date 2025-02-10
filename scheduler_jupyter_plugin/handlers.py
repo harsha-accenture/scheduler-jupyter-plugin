@@ -175,6 +175,13 @@ def setup_handlers(web_app):
         "api/storage/listBucket": storage.CloudStorageController,
         "api/iam/listServiceAccount": iam.ServiceAccountController,
         "api/compute/getXpnHost": compute.GetXpnHostController,
+        "api/vertex/listSchedules": vertex.ScheduleListController,
+        "api/vertex/pauseSchedule": vertex.SchedulePauseController,
+        "api/vertex/resumeSchedule": vertex.ScheduleResumeController,
+        "api/vertex/deleteSchedule": vertex.ScheduleDeleteController,
+        "api/vertex/triggerSchedule": vertex.ScheduleTriggerController,
+        "api/vertex/updateSchedule": vertex.ScheduleUpdateController,
+        "api/vertex/getSchedule": vertex.ScheduleGetController,
         "api/vertex/createJobScheduler": vertex.VertexScheduleCreateController,
         "api/storage/createNewBucket": vertex.BucketCreateController,
     }
