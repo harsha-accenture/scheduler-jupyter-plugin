@@ -19,7 +19,7 @@ import React, { useState, useEffect } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationView } from '../../utils/PaginationView';
-import { VertexCellProps } from '../../utils/Config';
+import { IVertexCellProps } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { CircularProgress, Button } from '@mui/material';
 import DeletePopup from '../../utils/DeletePopup';
@@ -461,7 +461,7 @@ function ListVertexScheduler({
     );
   };
 
-  const tableDataCondition = (cell: VertexCellProps) => {
+  const tableDataCondition = (cell: IVertexCellProps) => {
     if (cell.column.Header === 'Actions') {
       return (
         <td {...cell.getCellProps()} className="clusters-table-data">
