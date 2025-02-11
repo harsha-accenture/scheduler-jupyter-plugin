@@ -448,19 +448,3 @@
 .text-icon {
   line-height: 2;
 }
-
-.status-icon-list {
-  padding-top: 5px;
-}
-
-.list-icon-action {
-  padding-right: 5px;
-}
-
-.list-status {
-  display: flex;
-}
-
-.list-status-text {
-  padding: 5px;
-}
