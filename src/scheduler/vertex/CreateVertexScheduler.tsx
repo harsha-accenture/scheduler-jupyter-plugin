@@ -260,8 +260,8 @@ const CreateVertexScheduler = ({
     value:
       | { displayName: string; email: string }
       | ((
-        prevState: { displayName: string; email: string } | null
-      ) => { displayName: string; email: string } | null)
+          prevState: { displayName: string; email: string } | null
+        ) => { displayName: string; email: string } | null)
       | null
   ) => {
     setServiceAccountSelected(value);
@@ -662,8 +662,18 @@ const CreateVertexScheduler = ({
       cloud_storage_bucket: `gs://${cloudStorage}`,
       parameters: parameterDetailUpdated,
       service_account: serviceAccountSelected?.email,
-      network: networkSelected === "networkInThisProject" ? (editMode ? primaryNetworkSelected?.link : primaryNetworkSelected?.link.split('/v1/')[1]) : sharedNetworkSelected?.network.split('/v1/')[1],
-      subnetwork: networkSelected === "networkInThisProject" ? (editMode ? subNetworkSelected?.link : subNetworkSelected?.link.split('/v1/')[1]) : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
+      network:
+        networkSelected === 'networkInThisProject'
+          ? editMode
+            ? primaryNetworkSelected?.link
+            : primaryNetworkSelected?.link.split('/v1/')[1]
+          : sharedNetworkSelected?.network.split('/v1/')[1],
+      subnetwork:
+        networkSelected === 'networkInThisProject'
+          ? editMode
+            ? subNetworkSelected?.link
+            : subNetworkSelected?.link.split('/v1/')[1]
+          : sharedNetworkSelected?.subnetwork.split('/v1/')[1],
       start_time: startDate,
       end_time: endDate,
       disk_type: diskTypeSelected,
@@ -757,641 +767,629 @@ const CreateVertexScheduler = ({
   }, []);
   return (
     <>
-      {
-        createCompleted ? (
-          <VertexScheduleJobs
-            app={app}
-            themeManager={themeManager}
-            settingRegistry={settingRegistry}
-            setJobId={setJobId}
-            setCreateCompleted={setCreateCompleted}
-            setInputFileSelected={setInputFileSelected}
-            region={region}
-            setRegion={setRegion}
-            setMachineTypeSelected={setMachineTypeSelected}
-            setAcceleratedCount={setAcceleratedCount}
-            setAcceleratorType={setAcceleratorType}
-            setKernelSelected={setKernelSelected}
-            setCloudStorage={setCloudStorage}
-            setDiskTypeSelected={setDiskTypeSelected}
-            setDiskSize={setDiskSize}
-            setParameterDetail={setParameterDetail}
-            setParameterDetailUpdated={setParameterDetailUpdated}
-            setServiceAccountSelected={setServiceAccountSelected}
-            setPrimaryNetworkSelected={setPrimaryNetworkSelected}
-            setSubNetworkSelected={setSubNetworkSelected}
-            setSubNetworkList={setSubNetworkList}
-            setSharedNetworkSelected={setSharedNetworkSelected}
-            setScheduleMode={setScheduleMode}
-            setScheduleField={setScheduleField}
-            setStartDate={setStartDate}
-            setEndDate={setEndDate}
-            setMaxRuns={setMaxRuns}
-            setEditMode={setEditMode}
-            setJobNameSelected={setJobNameSelected}
-            setGcsPath={setGcsPath}
-          />
-        ) : (
-          <div className="submit-job-container">
-            <div className="region-overlay create-scheduler-form-element">
-              <RegionDropdown
-                projectId={projectId}
-                region={region}
-                onRegionChange={region => handleRegionChange(region)}
-              />
-            </div >
-            {!region && <ErrorMessage message="Region is required" />
-            }
-            <div className="create-scheduler-form-element">
-              <Autocomplete
-                className="create-scheduler-style"
-                options={
-                  machineTypeList && machineTypeList.map(item => item.machineType)
-                }
-                value={machineTypeSelected}
-                onChange={(_event, val) => handleMachineType(val)}
-                renderInput={params => (
-                  <TextField {...params} label="Machine type*" />
-                )}
-                clearIcon={false}
-                loading={machineTypeLoading}
-              />
-            </div>
-
-            {
-              !machineTypeSelected && (
-                <ErrorMessage message="Machine type is required" />
-              )
-            }
-
-            {
-              machineTypeList.length > 0 &&
-              machineTypeList.map(item => {
-                if (
-                  ('acceleratorConfigs' in item &&
-                    item.machineType === machineTypeSelected &&
-                    item.acceleratorConfigs !== null) ||
-                  ('acceleratorConfigs' in item &&
-                    machineTypeSelected &&
-                    item.machineType.split(' ')[0] === machineTypeSelected &&
-                    item.acceleratorConfigs !== null)
-                ) {
-                  return (
-                    <div className="execution-history-main-wrapper">
-                      <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
-                        <Autocomplete
-                          className="create-scheduler-style create-scheduler-form-element-input-fl"
-                          options={getAcceleratedType(item.acceleratorConfigs)}
-                          value={acceleratorType}
-                          onChange={(_event, val) => handleAccelerationType(val)}
-                          renderInput={params => (
-                            <TextField {...params} label="Accelerator type*" />
-                          )}
-                        />
-                        {!acceleratorType && (
-                          <ErrorMessage message="Accelerator type is required" />
-                        )}
-                      </div>
-
-                      {item?.acceleratorConfigs?.map(
-                        (element: {
-                          allowedCounts: number[];
-                          acceleratorType: string;
-                        }) => {
-                          return (
-                            <>
-                              {element.acceleratorType === acceleratorType ? (
-                                <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
-                                  <Autocomplete
-                                    className="create-scheduler-style create-scheduler-form-element-input-fl"
-                                    options={element.allowedCounts.map(item =>
-                                      item.toString()
-                                    )}
-                                    value={acceleratedCount}
-                                    onChange={(_event, val) =>
-                                      handleAcceleratorCount(val)
-                                    }
-                                    renderInput={params => (
-                                      <TextField
-                                        {...params}
-                                        label="Accelerator count*"
-                                      />
-                                    )}
-                                  />
-                                  {!acceleratedCount && (
-                                    <ErrorMessage message="Accelerator count is required" />
-                                  )}
-                                </div>
-                              ) : null}
-                            </>
-                          );
-                        }
-                      )}
-                    </div>
-                  );
-                }
-              })
-            }
-
-            <div className="create-scheduler-form-element">
-              <Autocomplete
-                className="create-scheduler-style"
-                options={KERNEL_VALUE}
-                value={kernelSelected}
-                onChange={(_event, val) => handleKernel(val)}
-                renderInput={params => <TextField {...params} label="Kernel*" />}
-                clearIcon={false}
-              />
-            </div>
-            {!kernelSelected && <ErrorMessage message="Kernel is required" />}
-
-            <div className="create-scheduler-form-element">
-              <Autocomplete
-                className="create-scheduler-style"
-                options={cloudStorageList}
-                value={cloudStorage}
-                onChange={(_event, val) => handleCloudStorageSelected(val)}
-                onInputChange={handleSearchChange}
-                filterOptions={filterOptions}
-                renderInput={params => (
-                  <TextField
-                    {...params}
-                    label="Cloud Storage Bucket*"
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {isCreatingNewBucket ? (
-                            <CircularProgress
-                              aria-label="Loading Spinner"
-                              data-testid="loader"
-                              size={18}
-                            />
-                          ) : null}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }}
-                  />
-                )}
-                clearIcon={false}
-                loading={cloudStorageLoading}
-                getOptionLabel={option => option}
-                renderOption={(props, option) => {
-                  // Custom rendering for the "Create new bucket" option
-                  if (option === 'Create and Select') {
-                    return (
-                      <li {...props} className="custom-add-bucket">
-                        {option}
-                      </li>
-                    );
-                  }
-
-                  return <li {...props}>{option}</li>;
-                }}
-              />
-            </div>
-            {
-              !cloudStorage && (
-                <ErrorMessage message="Cloud storage bucket is required" />
-              )
-            }
-
-            <span className="tab-description tab-text-sub-cl">
-              {bucketError && bucketError !== '' ? (
-                <span className="error-message">{bucketError}</span>
-              ) : (
-                <span>
-                  Where results are stored. Select an existing bucket or create a
-                  new one.
-                </span>
-              )}
-            </span>
-            <div className="execution-history-main-wrapper">
-              <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
-                <Autocomplete
-                  className="create-scheduler-style create-scheduler-form-element-input-fl"
-                  options={DISK_TYPE_VALUE}
-                  value={diskTypeSelected}
-                  onChange={(_event, val) => handleDiskType(val)}
-                  renderInput={params => (
-                    <TextField {...params} label="Disk Type" />
-                  )}
-                  onBlur={() => handleDefaultDiskType()}
-                  clearIcon={false}
-                />
-              </div>
-              <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
-                <Input
-                  className="create-scheduler-style create-scheduler-form-element-input-fl"
-                  value={diskSize}
-                  onChange={e => handleDiskSize(e)}
-                  onBlur={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    handleDefaultDiskSize(e)
-                  }
-                  type="number"
-                  placeholder=""
-                  Label="Disk Size (in GB)"
-                />
-              </div>
-            </div>
-            <div className="create-job-scheduler-title sub-title-heading ">
-              Parameters
-            </div>
-
-            <LabelProperties
-              labelDetail={parameterDetail}
-              setLabelDetail={setParameterDetail}
-              labelDetailUpdated={parameterDetailUpdated}
-              setLabelDetailUpdated={setParameterDetailUpdated}
-              buttonText="ADD PARAMETER"
-              keyValidation={keyValidation}
-              setKeyValidation={setKeyValidation}
-              valueValidation={valueValidation}
-              setValueValidation={setValueValidation}
-              duplicateKeyError={duplicateKeyError}
-              setDuplicateKeyError={setDuplicateKeyError}
+      {createCompleted ? (
+        <VertexScheduleJobs
+          app={app}
+          themeManager={themeManager}
+          settingRegistry={settingRegistry}
+          setJobId={setJobId}
+          setCreateCompleted={setCreateCompleted}
+          setInputFileSelected={setInputFileSelected}
+          region={region}
+          setRegion={setRegion}
+          setMachineTypeSelected={setMachineTypeSelected}
+          setAcceleratedCount={setAcceleratedCount}
+          setAcceleratorType={setAcceleratorType}
+          setKernelSelected={setKernelSelected}
+          setCloudStorage={setCloudStorage}
+          setDiskTypeSelected={setDiskTypeSelected}
+          setDiskSize={setDiskSize}
+          setParameterDetail={setParameterDetail}
+          setParameterDetailUpdated={setParameterDetailUpdated}
+          setServiceAccountSelected={setServiceAccountSelected}
+          setPrimaryNetworkSelected={setPrimaryNetworkSelected}
+          setSubNetworkSelected={setSubNetworkSelected}
+          setSubNetworkList={setSubNetworkList}
+          setSharedNetworkSelected={setSharedNetworkSelected}
+          setScheduleMode={setScheduleMode}
+          setScheduleField={setScheduleField}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+          setMaxRuns={setMaxRuns}
+          setEditMode={setEditMode}
+          setJobNameSelected={setJobNameSelected}
+          setGcsPath={setGcsPath}
+        />
+      ) : (
+        <div className="submit-job-container">
+          <div className="region-overlay create-scheduler-form-element">
+            <RegionDropdown
+              projectId={projectId}
+              region={region}
+              onRegionChange={region => handleRegionChange(region)}
             />
+          </div>
+          {!region && <ErrorMessage message="Region is required" />}
+          <div className="create-scheduler-form-element">
+            <Autocomplete
+              className="create-scheduler-style"
+              options={
+                machineTypeList && machineTypeList.map(item => item.machineType)
+              }
+              value={machineTypeSelected}
+              onChange={(_event, val) => handleMachineType(val)}
+              renderInput={params => (
+                <TextField {...params} label="Machine type*" />
+              )}
+              clearIcon={false}
+              loading={machineTypeLoading}
+            />
+          </div>
 
-            <div className="create-scheduler-form-element panel-margin">
-              <Autocomplete
-                className="create-scheduler-style-trigger"
-                options={serviceAccountList}
-                getOptionLabel={option => option.displayName}
-                value={
-                  serviceAccountList.find(
-                    option => option.email === serviceAccountSelected?.email
-                  ) || null
-                }
-                clearIcon={false}
-                loading={serviceAccountLoading}
-                onChange={(_event, val) => handleServiceAccountChange(val)}
-                renderInput={params => (
-                  <TextField {...params} label="Service account*" />
-                )}
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    {...props}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'flex-start'
-                    }}
-                  >
-                    <Typography variant="body1">{option.displayName}</Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {option.email}
-                    </Typography>
-                  </Box>
-                )}
-              />
-            </div>
-            {
-              !serviceAccountSelected && (
-                <ErrorMessage message="Service account is required" />
-              )
-            }
+          {!machineTypeSelected && (
+            <ErrorMessage message="Machine type is required" />
+          )}
 
-            <div className="create-job-scheduler-text-para create-job-scheduler-sub-title">
-              Network Configuration
-            </div>
-
-            <p>Establishes connectivity for VM instances in the cluster</p>
-
-            <div className="create-scheduler-form-element panel-margin">
-              <FormControl>
-                <RadioGroup
-                  aria-labelledby="demo-controlled-radio-buttons-group"
-                  name="controlled-radio-buttons-group"
-                  value={networkSelected}
-                  onChange={handleNetworkSelection}
-                >
-                  <FormControlLabel
-                    value="networkInThisProject"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Network in this project
-                      </Typography>
-                    }
-                  />
-                  <div>
-                    <span className="sub-para tab-text-sub-cl">
-                      Choose a shared VPC network from the project that is different
-                      from the clusters project
-                    </span>
-                    <div className="learn-more-a-tag learn-more-url">
-                      <LearnMore />
-                    </div>
-                  </div>
-                  <FormControlLabel
-                    value="networkShared"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Network shared from host project
-                        {`${Object.keys(hostProject).length !== 0 ? `"${hostProject}"` : ''}`}
-                      </Typography>
-                    }
-                  />
-                  <span className="sub-para tab-text-sub-cl">
-                    Choose a shared VPC network from the project that is different
-                    from the clusters project
-                  </span>
-                  <div className="learn-more-a-tag learn-more-url">
-                    <LearnMore />
-                  </div>
-                </RadioGroup>
-              </FormControl>
-            </div>
-
-            {/* Network in this project  */}
-            {
-              networkSelected === 'networkInThisProject' ? (
-                <>
+          {machineTypeList.length > 0 &&
+            machineTypeList.map(item => {
+              if (
+                ('acceleratorConfigs' in item &&
+                  item.machineType === machineTypeSelected &&
+                  item.acceleratorConfigs !== null) ||
+                ('acceleratorConfigs' in item &&
+                  machineTypeSelected &&
+                  item.machineType.split(' ')[0] === machineTypeSelected &&
+                  item.acceleratorConfigs !== null)
+              ) {
+                return (
                   <div className="execution-history-main-wrapper">
                     <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
                       <Autocomplete
                         className="create-scheduler-style create-scheduler-form-element-input-fl"
-                        options={primaryNetworkList}
-                        getOptionLabel={option => option.name}
-                        value={
-                          primaryNetworkList.find(
-                            option => option.name === primaryNetworkSelected?.name
-                          ) || null
-                        }
-                        onChange={(_event, val) => handlePrimaryNetwork(val)}
+                        options={getAcceleratedType(item.acceleratorConfigs)}
+                        value={acceleratorType}
+                        onChange={(_event, val) => handleAccelerationType(val)}
                         renderInput={params => (
-                          <TextField {...params} label="Primary network*" />
+                          <TextField {...params} label="Accelerator type*" />
                         )}
-                        clearIcon={false}
-                        loading={primaryNetworkLoading}
                       />
-                      {!primaryNetworkSelected && (
-                        <ErrorMessage message="Primary network is required" />
+                      {!acceleratorType && (
+                        <ErrorMessage message="Accelerator type is required" />
                       )}
                     </div>
-                    <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
-                      <Autocomplete
-                        className="create-scheduler-style create-scheduler-form-element-input-fl"
-                        options={subNetworkList}
-                        getOptionLabel={option => option.name}
-                        value={
-                          subNetworkList.find(
-                            option => option.name === subNetworkSelected?.name
-                          ) || null
-                        }
-                        onChange={(_event, val) => handleSubNetwork(val)}
-                        renderInput={params => (
-                          <TextField {...params} label="Sub network*" />
-                        )}
-                        clearIcon={false}
-                        loading={subNetworkLoading}
-                      />
-                      {!subNetworkSelected && (
-                        <ErrorMessage message="Sub network is required" />
-                      )}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Network shared from host project */}
-                  <div className="create-scheduler-form-element">
-                    <Autocomplete
-                      className="create-scheduler-style"
-                      options={sharedNetworkList}
-                      getOptionLabel={option => option.name}
-                      value={
-                        sharedNetworkList.find(
-                          option => option.name === sharedNetworkSelected?.name
-                        ) || null
+
+                    {item?.acceleratorConfigs?.map(
+                      (element: {
+                        allowedCounts: number[];
+                        acceleratorType: string;
+                      }) => {
+                        return (
+                          <>
+                            {element.acceleratorType === acceleratorType ? (
+                              <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
+                                <Autocomplete
+                                  className="create-scheduler-style create-scheduler-form-element-input-fl"
+                                  options={element.allowedCounts.map(item =>
+                                    item.toString()
+                                  )}
+                                  value={acceleratedCount}
+                                  onChange={(_event, val) =>
+                                    handleAcceleratorCount(val)
+                                  }
+                                  renderInput={params => (
+                                    <TextField
+                                      {...params}
+                                      label="Accelerator count*"
+                                    />
+                                  )}
+                                />
+                                {!acceleratedCount && (
+                                  <ErrorMessage message="Accelerator count is required" />
+                                )}
+                              </div>
+                            ) : null}
+                          </>
+                        );
                       }
-                      onChange={(_event, val) => handleSharedNetwork(val)}
-                      renderInput={params => (
-                        <TextField {...params} label="Shared subnetwork*" />
-                      )}
-                      clearIcon={false}
-                      loading={sharedNetworkLoading}
-                      disabled={Object.keys(hostProject).length === 0}
-                    />
-                  </div>
-                  {Object.keys(hostProject).length === 0 && (
-                    <ErrorMessage message="No shared subnetworks are available in this region." />
-                  )}
-                </>
-              )
-            }
-            <div className="create-scheduler-label">Schedule</div>
-            <div className="create-scheduler-form-element">
-              <FormControl>
-                <RadioGroup
-                  aria-labelledby="demo-controlled-radio-buttons-group"
-                  name="controlled-radio-buttons-group"
-                  value={scheduleMode}
-                  onChange={handleSchedulerModeChange}
-                >
-                  <FormControlLabel
-                    value="runNow"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    label={<Typography sx={{ fontSize: 13 }}>Run now</Typography>}
-                  />
-                  <FormControlLabel
-                    value="runSchedule"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Run on a schedule
-                      </Typography>
-                    }
-                  />
-                </RadioGroup>
-              </FormControl>
-            </div>
-            <div className="schedule-child-section">
-              {scheduleMode === 'runSchedule' && (
-                <div className="create-scheduler-radio-element">
-                  <FormControl>
-                    <RadioGroup
-                      aria-labelledby="demo-controlled-radio-buttons-group"
-                      name="controlled-radio-buttons-group"
-                      value={internalScheduleMode}
-                      onChange={handleInternalSchedulerModeChange}
-                    >
-                      <FormControlLabel
-                        value="cronFormat"
-                        className="create-scheduler-label-style"
-                        control={<Radio size="small" />}
-                        label={
-                          <Typography sx={{ fontSize: 13 }}>
-                            Use UNIX cron format
-                          </Typography>
-                        }
-                      />
-                      <FormControlLabel
-                        value="userFriendly"
-                        className="create-scheduler-label-style"
-                        control={<Radio size="small" />}
-                        label={
-                          <Typography sx={{ fontSize: 13 }}>
-                            Use user-friendly scheduler
-                          </Typography>
-                        }
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                </div>
-              )}
-              {scheduleMode === 'runSchedule' && (
-                <div className="execution-history-main-wrapper">
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
-                      <DateTimePicker
-                        className="create-scheduler-style create-scheduler-form-element-input-fl"
-                        label="Start Date"
-                        value={startDate}
-                        onChange={newValue => handleStartDate(newValue)}
-                        slots={{
-                          openPickerIcon: CalendarMonthIcon
-                        }}
-                        slotProps={{
-                          actionBar: {
-                            actions: ['clear']
-                          },
-                          tabs: {
-                            hidden: true
-                          },
-                          textField: {
-                            error: false
-                          }
-                        }}
-                        disablePast
-                        closeOnSelect={true}
-                      />
-                    </div>
-                    <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
-                      <DateTimePicker
-                        className="create-scheduler-style create-scheduler-form-element-input-fl"
-                        label="End Date"
-                        value={endDate}
-                        onChange={newValue => handleEndDate(newValue)}
-                        slots={{
-                          openPickerIcon: CalendarMonthIcon
-                        }}
-                        slotProps={{
-                          actionBar: {
-                            actions: ['clear']
-                          },
-                          field: { clearable: true },
-                          tabs: {
-                            hidden: true
-                          },
-                          textField: {
-                            error: false
-                          }
-                        }}
-                        disablePast
-                        closeOnSelect={true}
-                      />
-                      {endDateError && (
-                        <ErrorMessage message="End date should be greater than Start date" />
-                      )}
-                    </div>
-                  </LocalizationProvider>
-                </div>
-              )}
-              {scheduleMode === 'runSchedule' &&
-                internalScheduleMode === 'cronFormat' && (
-                  <div className="create-scheduler-form-element schedule-input-field">
-                    <Input
-                      className="create-scheduler-style"
-                      value={scheduleField}
-                      onChange={e => handleSchedule(e)}
-                      type="text"
-                      placeholder=""
-                      Label="Schedule*"
-                    />
-                    {scheduleField === '' && (
-                      <ErrorMessage message="Schedule field is required" />
                     )}
-                    <div>
-                      <span className="tab-description tab-text-sub-cl">
-                        Schedules are specified using unix-cron format. E.g. every
-                        minute: "* * * * *", every 3 hours: "0 */3 * * *", every
-                        Monday at 9:00: "0 9 * * 1".
-                      </span>
-                      <div className="learn-more-url">
-                        <LearnMore path={CORN_EXP_DOC_URL} />
-                      </div>
+                  </div>
+                );
+              }
+            })}
+
+          <div className="create-scheduler-form-element">
+            <Autocomplete
+              className="create-scheduler-style"
+              options={KERNEL_VALUE}
+              value={kernelSelected}
+              onChange={(_event, val) => handleKernel(val)}
+              renderInput={params => <TextField {...params} label="Kernel*" />}
+              clearIcon={false}
+            />
+          </div>
+          {!kernelSelected && <ErrorMessage message="Kernel is required" />}
+
+          <div className="create-scheduler-form-element">
+            <Autocomplete
+              className="create-scheduler-style"
+              options={cloudStorageList}
+              value={cloudStorage}
+              onChange={(_event, val) => handleCloudStorageSelected(val)}
+              onInputChange={handleSearchChange}
+              filterOptions={filterOptions}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  label="Cloud Storage Bucket*"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isCreatingNewBucket ? (
+                          <CircularProgress
+                            aria-label="Loading Spinner"
+                            data-testid="loader"
+                            size={18}
+                          />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    )
+                  }}
+                />
+              )}
+              clearIcon={false}
+              loading={cloudStorageLoading}
+              getOptionLabel={option => option}
+              renderOption={(props, option) => {
+                // Custom rendering for the "Create new bucket" option
+                if (option === 'Create and Select') {
+                  return (
+                    <li {...props} className="custom-add-bucket">
+                      {option}
+                    </li>
+                  );
+                }
+
+                return <li {...props}>{option}</li>;
+              }}
+            />
+          </div>
+          {!cloudStorage && (
+            <ErrorMessage message="Cloud storage bucket is required" />
+          )}
+
+          <span className="tab-description tab-text-sub-cl">
+            {bucketError && bucketError !== '' ? (
+              <span className="error-message">{bucketError}</span>
+            ) : (
+              <span>
+                Where results are stored. Select an existing bucket or create a
+                new one.
+              </span>
+            )}
+          </span>
+          <div className="execution-history-main-wrapper">
+            <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+              <Autocomplete
+                className="create-scheduler-style create-scheduler-form-element-input-fl"
+                options={DISK_TYPE_VALUE}
+                value={diskTypeSelected}
+                onChange={(_event, val) => handleDiskType(val)}
+                renderInput={params => (
+                  <TextField {...params} label="Disk Type" />
+                )}
+                onBlur={() => handleDefaultDiskType()}
+                clearIcon={false}
+              />
+            </div>
+            <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+              <Input
+                className="create-scheduler-style create-scheduler-form-element-input-fl"
+                value={diskSize}
+                onChange={e => handleDiskSize(e)}
+                onBlur={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleDefaultDiskSize(e)
+                }
+                type="number"
+                placeholder=""
+                Label="Disk Size (in GB)"
+              />
+            </div>
+          </div>
+          <div className="create-job-scheduler-title sub-title-heading ">
+            Parameters
+          </div>
+
+          <LabelProperties
+            labelDetail={parameterDetail}
+            setLabelDetail={setParameterDetail}
+            labelDetailUpdated={parameterDetailUpdated}
+            setLabelDetailUpdated={setParameterDetailUpdated}
+            buttonText="ADD PARAMETER"
+            keyValidation={keyValidation}
+            setKeyValidation={setKeyValidation}
+            valueValidation={valueValidation}
+            setValueValidation={setValueValidation}
+            duplicateKeyError={duplicateKeyError}
+            setDuplicateKeyError={setDuplicateKeyError}
+          />
+
+          <div className="create-scheduler-form-element panel-margin">
+            <Autocomplete
+              className="create-scheduler-style-trigger"
+              options={serviceAccountList}
+              getOptionLabel={option => option.displayName}
+              value={
+                serviceAccountList.find(
+                  option => option.email === serviceAccountSelected?.email
+                ) || null
+              }
+              clearIcon={false}
+              loading={serviceAccountLoading}
+              onChange={(_event, val) => handleServiceAccountChange(val)}
+              renderInput={params => (
+                <TextField {...params} label="Service account*" />
+              )}
+              renderOption={(props, option) => (
+                <Box
+                  component="li"
+                  {...props}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start'
+                  }}
+                >
+                  <Typography variant="body1">{option.displayName}</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {option.email}
+                  </Typography>
+                </Box>
+              )}
+            />
+          </div>
+          {!serviceAccountSelected && (
+            <ErrorMessage message="Service account is required" />
+          )}
+
+          <div className="create-job-scheduler-text-para create-job-scheduler-sub-title">
+            Network Configuration
+          </div>
+
+          <p>Establishes connectivity for VM instances in the cluster</p>
+
+          <div className="create-scheduler-form-element panel-margin">
+            <FormControl>
+              <RadioGroup
+                aria-labelledby="demo-controlled-radio-buttons-group"
+                name="controlled-radio-buttons-group"
+                value={networkSelected}
+                onChange={handleNetworkSelection}
+              >
+                <FormControlLabel
+                  value="networkInThisProject"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>
+                      Network in this project
+                    </Typography>
+                  }
+                />
+                <div>
+                  <span className="sub-para tab-text-sub-cl">
+                    Choose a shared VPC network from the project that is
+                    different from the clusters project
+                  </span>
+                  <div className="learn-more-a-tag learn-more-url">
+                    <LearnMore />
+                  </div>
+                </div>
+                <FormControlLabel
+                  value="networkShared"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>
+                      Network shared from host project
+                      {`${Object.keys(hostProject).length !== 0 ? `"${hostProject}"` : ''}`}
+                    </Typography>
+                  }
+                />
+                <span className="sub-para tab-text-sub-cl">
+                  Choose a shared VPC network from the project that is different
+                  from the clusters project
+                </span>
+                <div className="learn-more-a-tag learn-more-url">
+                  <LearnMore />
+                </div>
+              </RadioGroup>
+            </FormControl>
+          </div>
+
+          {/* Network in this project  */}
+          {networkSelected === 'networkInThisProject' ? (
+            <>
+              <div className="execution-history-main-wrapper">
+                <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                  <Autocomplete
+                    className="create-scheduler-style create-scheduler-form-element-input-fl"
+                    options={primaryNetworkList}
+                    getOptionLabel={option => option.name}
+                    value={
+                      primaryNetworkList.find(
+                        option => option.name === primaryNetworkSelected?.name
+                      ) || null
+                    }
+                    onChange={(_event, val) => handlePrimaryNetwork(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Primary network*" />
+                    )}
+                    clearIcon={false}
+                    loading={primaryNetworkLoading}
+                  />
+                  {!primaryNetworkSelected && (
+                    <ErrorMessage message="Primary network is required" />
+                  )}
+                </div>
+                <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
+                  <Autocomplete
+                    className="create-scheduler-style create-scheduler-form-element-input-fl"
+                    options={subNetworkList}
+                    getOptionLabel={option => option.name}
+                    value={
+                      subNetworkList.find(
+                        option => option.name === subNetworkSelected?.name
+                      ) || null
+                    }
+                    onChange={(_event, val) => handleSubNetwork(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Sub network*" />
+                    )}
+                    clearIcon={false}
+                    loading={subNetworkLoading}
+                  />
+                  {!subNetworkSelected && (
+                    <ErrorMessage message="Sub network is required" />
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Network shared from host project */}
+              <div className="create-scheduler-form-element">
+                <Autocomplete
+                  className="create-scheduler-style"
+                  options={sharedNetworkList}
+                  getOptionLabel={option => option.name}
+                  value={
+                    sharedNetworkList.find(
+                      option => option.name === sharedNetworkSelected?.name
+                    ) || null
+                  }
+                  onChange={(_event, val) => handleSharedNetwork(val)}
+                  renderInput={params => (
+                    <TextField {...params} label="Shared subnetwork*" />
+                  )}
+                  clearIcon={false}
+                  loading={sharedNetworkLoading}
+                  disabled={Object.keys(hostProject).length === 0}
+                />
+              </div>
+              {Object.keys(hostProject).length === 0 && (
+                <ErrorMessage message="No shared subnetworks are available in this region." />
+              )}
+            </>
+          )}
+          <div className="create-scheduler-label">Schedule</div>
+          <div className="create-scheduler-form-element">
+            <FormControl>
+              <RadioGroup
+                aria-labelledby="demo-controlled-radio-buttons-group"
+                name="controlled-radio-buttons-group"
+                value={scheduleMode}
+                onChange={handleSchedulerModeChange}
+              >
+                <FormControlLabel
+                  value="runNow"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  label={<Typography sx={{ fontSize: 13 }}>Run now</Typography>}
+                />
+                <FormControlLabel
+                  value="runSchedule"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>
+                      Run on a schedule
+                    </Typography>
+                  }
+                />
+              </RadioGroup>
+            </FormControl>
+          </div>
+          <div className="schedule-child-section">
+            {scheduleMode === 'runSchedule' && (
+              <div className="create-scheduler-radio-element">
+                <FormControl>
+                  <RadioGroup
+                    aria-labelledby="demo-controlled-radio-buttons-group"
+                    name="controlled-radio-buttons-group"
+                    value={internalScheduleMode}
+                    onChange={handleInternalSchedulerModeChange}
+                  >
+                    <FormControlLabel
+                      value="cronFormat"
+                      className="create-scheduler-label-style"
+                      control={<Radio size="small" />}
+                      label={
+                        <Typography sx={{ fontSize: 13 }}>
+                          Use UNIX cron format
+                        </Typography>
+                      }
+                    />
+                    <FormControlLabel
+                      value="userFriendly"
+                      className="create-scheduler-label-style"
+                      control={<Radio size="small" />}
+                      label={
+                        <Typography sx={{ fontSize: 13 }}>
+                          Use user-friendly scheduler
+                        </Typography>
+                      }
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </div>
+            )}
+            {scheduleMode === 'runSchedule' && (
+              <div className="execution-history-main-wrapper">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                    <DateTimePicker
+                      className="create-scheduler-style create-scheduler-form-element-input-fl"
+                      label="Start Date"
+                      value={startDate}
+                      onChange={newValue => handleStartDate(newValue)}
+                      slots={{
+                        openPickerIcon: CalendarMonthIcon
+                      }}
+                      slotProps={{
+                        actionBar: {
+                          actions: ['clear']
+                        },
+                        tabs: {
+                          hidden: true
+                        },
+                        textField: {
+                          error: false
+                        }
+                      }}
+                      disablePast
+                      closeOnSelect={true}
+                    />
+                  </div>
+                  <div className="create-scheduler-form-element create-scheduler-form-element-input-fl create-pr">
+                    <DateTimePicker
+                      className="create-scheduler-style create-scheduler-form-element-input-fl"
+                      label="End Date"
+                      value={endDate}
+                      onChange={newValue => handleEndDate(newValue)}
+                      slots={{
+                        openPickerIcon: CalendarMonthIcon
+                      }}
+                      slotProps={{
+                        actionBar: {
+                          actions: ['clear']
+                        },
+                        field: { clearable: true },
+                        tabs: {
+                          hidden: true
+                        },
+                        textField: {
+                          error: false
+                        }
+                      }}
+                      disablePast
+                      closeOnSelect={true}
+                    />
+                    {endDateError && (
+                      <ErrorMessage message="End date should be greater than Start date" />
+                    )}
+                  </div>
+                </LocalizationProvider>
+              </div>
+            )}
+            {scheduleMode === 'runSchedule' &&
+              internalScheduleMode === 'cronFormat' && (
+                <div className="create-scheduler-form-element schedule-input-field">
+                  <Input
+                    className="create-scheduler-style"
+                    value={scheduleField}
+                    onChange={e => handleSchedule(e)}
+                    type="text"
+                    placeholder=""
+                    Label="Schedule*"
+                  />
+                  {scheduleField === '' && (
+                    <ErrorMessage message="Schedule field is required" />
+                  )}
+                  <div>
+                    <span className="tab-description tab-text-sub-cl">
+                      Schedules are specified using unix-cron format. E.g. every
+                      minute: "* * * * *", every 3 hours: "0 */3 * * *", every
+                      Monday at 9:00: "0 9 * * 1".
+                    </span>
+                    <div className="learn-more-url">
+                      <LearnMore path={CORN_EXP_DOC_URL} />
                     </div>
                   </div>
-                )}
-              {scheduleMode === 'runSchedule' &&
-                internalScheduleMode === 'userFriendly' && (
-                  <div className="create-scheduler-form-element">
-                    <Cron value={scheduleValue} setValue={setScheduleValue} />
-                  </div>
-                )}
-              {scheduleMode === 'runSchedule' && (
-                <>
-                  <div className="create-scheduler-form-element">
-                    <Autocomplete
-                      className="create-scheduler-style"
-                      options={timezones}
-                      value={timeZoneSelected}
-                      onChange={(_event, val) => handleTimeZoneSelected(val)}
-                      renderInput={params => (
-                        <TextField {...params} label="Time Zone*" />
-                      )}
-                      clearIcon={false}
-                    />
-                  </div>
-                  <div className="create-scheduler-form-element">
-                    <Input
-                      className="create-scheduler-style"
-                      value={maxRuns}
-                      onChange={e => handleMaxRuns(e)}
-                      type="number"
-                      placeholder=""
-                      Label="Max runs"
-                    />
-                  </div>
-                </>
+                </div>
               )}
-            </div>
-            <div className="save-overlay">
-              <Button
-                onClick={() => handleCreateJobScheduler()}
-                variant="contained"
-                aria-label={editMode ? ' Update Schedule' : 'Create Schedule'}
-                disabled={isSaveDisabled()}
-              >
-                <div>{editMode
+            {scheduleMode === 'runSchedule' &&
+              internalScheduleMode === 'userFriendly' && (
+                <div className="create-scheduler-form-element">
+                  <Cron value={scheduleValue} setValue={setScheduleValue} />
+                </div>
+              )}
+            {scheduleMode === 'runSchedule' && (
+              <>
+                <div className="create-scheduler-form-element">
+                  <Autocomplete
+                    className="create-scheduler-style"
+                    options={timezones}
+                    value={timeZoneSelected}
+                    onChange={(_event, val) => handleTimeZoneSelected(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Time Zone*" />
+                    )}
+                    clearIcon={false}
+                  />
+                </div>
+                <div className="create-scheduler-form-element">
+                  <Input
+                    className="create-scheduler-style"
+                    value={maxRuns}
+                    onChange={e => handleMaxRuns(e)}
+                    type="number"
+                    placeholder=""
+                    Label="Max runs"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <div className="save-overlay">
+            <Button
+              onClick={() => handleCreateJobScheduler()}
+              variant="contained"
+              aria-label={editMode ? ' Update Schedule' : 'Create Schedule'}
+              disabled={isSaveDisabled()}
+            >
+              <div>
+                {editMode
                   ? creatingVertexScheduler
                     ? 'UPDATING'
                     : 'UPDATE'
                   : creatingVertexScheduler
                     ? 'CREATING'
-                    : 'CREATE'}</div>
-              </Button>
-              <Button
-                variant="outlined"
-                aria-label="cancel Batch"
-                disabled={creatingVertexScheduler}
-                onClick={!creatingVertexScheduler ? handleCancel : undefined}
-              >
-                <div>CANCEL</div>
-              </Button>
-            </div>
-          </div >
-        )
-      }
-
+                    : 'CREATE'}
+              </div>
+            </Button>
+            <Button
+              variant="outlined"
+              aria-label="cancel Batch"
+              disabled={creatingVertexScheduler}
+              onClick={!creatingVertexScheduler ? handleCancel : undefined}
+            >
+              <div>CANCEL</div>
+            </Button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

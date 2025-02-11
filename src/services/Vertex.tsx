@@ -218,7 +218,10 @@ export class VertexServices {
         setResumeLoading('');
       } else {
         setResumeLoading('');
-        SchedulerLoggingService.log('Error in resume schedule', LOG_LEVEL.ERROR);
+        SchedulerLoggingService.log(
+          'Error in resume schedule',
+          LOG_LEVEL.ERROR
+        );
         toast.error('Failed to resume schedule');
       }
     } catch (error) {
@@ -501,5 +504,4 @@ export class VertexServices {
       );
     }
   };
-
 }

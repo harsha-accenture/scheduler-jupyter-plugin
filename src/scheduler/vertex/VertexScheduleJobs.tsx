@@ -92,7 +92,6 @@ const VertexScheduleJobs = ({
   setJobNameSelected?: (value: string) => void;
   setGcsPath: (value: string) => void;
 }): React.JSX.Element => {
-
   return (
     <>
       <ListVertexScheduler
