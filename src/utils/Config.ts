@@ -196,7 +196,7 @@ export interface ICellProps {
   render: (value: string) => React.ReactNode;
 }
 
-export interface VertexCellProps {
+export interface IVertexCellProps {
   getCellProps: () => React.TdHTMLAttributes<HTMLTableDataCellElement>;
   value: string | any;
   column: {
