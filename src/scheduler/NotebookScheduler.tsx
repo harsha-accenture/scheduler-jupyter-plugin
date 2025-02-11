@@ -96,60 +96,62 @@ const NotebookSchedulerComponent = ({
 
   return (
     <div className="component-level">
-      {
-        !createCompleted ?
-          <>
-            <div className="cluster-details-header">
-              <div role="button" className="back-arrow-icon" onClick={handleCancel}>
-                <iconLeftArrow.react
-                  tag="div"
-                  className="icon-white logo-alignment-style"
-                />
-              </div>
-              <div className="create-job-scheduler-title">
-                {editMode ? 'Update A Scheduled Job' : 'Create A Scheduled Job'}
-              </div>
+      {!createCompleted ? (
+        <>
+          <div className="cluster-details-header">
+            <div
+              role="button"
+              className="back-arrow-icon"
+              onClick={handleCancel}
+            >
+              <iconLeftArrow.react
+                tag="div"
+                className="icon-white logo-alignment-style"
+              />
             </div>
-            <div className="common-fields">
-              <div className="create-scheduler-form-element">
-                <Input
-                  className="create-scheduler-style"
-                  value={jobNameSelected}
-                  onChange={e => handleJobNameChange(e)}
-                  type="text"
-                  placeholder=""
-                  Label="Job name*"
-                  disabled={editMode}
-                />
-              </div>
-              {jobNameSelected === '' && !editMode && (
-                <ErrorMessage message="Job name is required" />
-              )}
-              {jobNameSpecialValidation && jobNameValidation && !editMode && (
-                <ErrorMessage message="Name must contain only letters, numbers, hyphens, and underscores" />
-              )}
-              {!jobNameUniqueValidation && !editMode && (
-                <ErrorMessage message="Job name must be unique for the selected environment" />
-              )}
+            <div className="create-job-scheduler-title">
+              {editMode ? 'Update A Scheduled Job' : 'Create A Scheduled Job'}
+            </div>
+          </div>
+          <div className="common-fields">
+            <div className="create-scheduler-form-element">
+              <Input
+                className="create-scheduler-style"
+                value={jobNameSelected}
+                onChange={e => handleJobNameChange(e)}
+                type="text"
+                placeholder=""
+                Label="Job name*"
+                disabled={editMode}
+              />
+            </div>
+            {jobNameSelected === '' && !editMode && (
+              <ErrorMessage message="Job name is required" />
+            )}
+            {jobNameSpecialValidation && jobNameValidation && !editMode && (
+              <ErrorMessage message="Name must contain only letters, numbers, hyphens, and underscores" />
+            )}
+            {!jobNameUniqueValidation && !editMode && (
+              <ErrorMessage message="Job name must be unique for the selected environment" />
+            )}
 
-              <div className="create-scheduler-form-element-input-file">
-                <Input
-                  className="create-scheduler-style"
-                  value={inputFileSelected}
-                  Label="Input file*"
-                  disabled={true}
-                />
-              </div>
+            <div className="create-scheduler-form-element-input-file">
+              <Input
+                className="create-scheduler-style"
+                value={inputFileSelected}
+                Label="Input file*"
+                disabled={true}
+              />
             </div>
-          </> :
-          (
-            executionPageFlag && (
-              <div className="clusters-list-overlay" role="tab">
-                <div className="cluster-details-title">Scheduled Jobs</div>
-              </div>
-            )
-          )
-      }
+          </div>
+        </>
+      ) : (
+        executionPageFlag && (
+          <div className="clusters-list-overlay" role="tab">
+            <div className="cluster-details-title">Scheduled Jobs</div>
+          </div>
+        )
+      )}
 
       <div className="create-scheduler-form-element sub-para">
         <FormControl>

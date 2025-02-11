@@ -119,7 +119,8 @@ function ListVertexScheduler({
   const [editDagLoading, setEditDagLoading] = useState('');
   const [triggerLoading, setTriggerLoading] = useState('');
   const [resumeLoading, setResumeLoading] = useState('');
-  const [inputNotebookFilePath, setInputNotebookFilePath] = useState<string>('');
+  const [inputNotebookFilePath, setInputNotebookFilePath] =
+    useState<string>('');
   const [editNotebookLoading, setEditNotebookLoading] = useState<string>('');
   const [deletingSchedule, setDeletingSchedule] = useState<boolean>(false);
   const [projectId, setProjectId] = useState<string>('');
@@ -150,23 +151,19 @@ function ListVertexScheduler({
   );
 
   /**
-  * Get list of schedules
-  */
+   * Get list of schedules
+   */
   const listDagInfoAPI = async () => {
     setIsLoading(true);
-    await VertexServices.listVertexSchedules(
-      setDagList,
-      region,
-      setIsLoading
-    );
+    await VertexServices.listVertexSchedules(setDagList, region, setIsLoading);
   };
 
   /**
-  * Handle resume and pause 
-  * @param {string} scheduleId unique ID for schedule
-  * @param {string} is_status_paused modfied status of schedule
-  * @param {string} displayName name of schedule
-  */
+   * Handle resume and pause
+   * @param {string} scheduleId unique ID for schedule
+   * @param {string} is_status_paused modfied status of schedule
+   * @param {string} displayName name of schedule
+   */
   const handleUpdateScheduler = async (
     scheduleId: string,
     is_status_paused: string,
@@ -194,36 +191,44 @@ function ListVertexScheduler({
   };
 
   /**
-  * Trigger a job immediately
-  * @param {React.ChangeEvent<HTMLInputElement>} e - event triggered by the trigger button.
-  * @param {string} displayName name of schedule
-  */
-  const handleTriggerSchedule = async (event: React.MouseEvent, displayName: string) => {
+   * Trigger a job immediately
+   * @param {React.ChangeEvent<HTMLInputElement>} e - event triggered by the trigger button.
+   * @param {string} displayName name of schedule
+   */
+  const handleTriggerSchedule = async (
+    event: React.MouseEvent,
+    displayName: string
+  ) => {
     const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
     if (scheduleId !== null) {
-      await VertexServices.triggerSchedule(region, scheduleId, displayName, setTriggerLoading);
+      await VertexServices.triggerSchedule(
+        region,
+        scheduleId,
+        displayName,
+        setTriggerLoading
+      );
     }
   };
 
   /**
-  * Delete pop up
-  * @param {string} schedule_id Id of schedule
-  * @param {string} displayName name of schedule
-  */
+   * Delete pop up
+   * @param {string} schedule_id Id of schedule
+   * @param {string} displayName name of schedule
+   */
   const handleDeletePopUp = (schedule_id: string, displayName: string) => {
     setUniqueScheduleId(schedule_id);
-    setScheduleDisplayName(displayName)
+    setScheduleDisplayName(displayName);
     setDeletePopupOpen(true);
   };
 
   /**
-  * Cancel delete pop up
-  */
+   * Cancel delete pop up
+   */
   const handleCancelDelete = () => {
     setDeletePopupOpen(false);
   };
 
-  /** 
+  /**
    * Handles the deletion of a scheduler by invoking the API service to delete it.
    */
   const handleDeleteScheduler = async () => {
@@ -240,9 +245,9 @@ function ListVertexScheduler({
   };
 
   /**
-  * Handles the editing of a vertex by triggering the editVertexSchedulerService.
-  * @param {React.ChangeEvent<HTMLInputElement>} event - event triggered by the edit vertex button.
-  */
+   * Handles the editing of a vertex by triggering the editVertexSchedulerService.
+   * @param {React.ChangeEvent<HTMLInputElement>} event - event triggered by the edit vertex button.
+   */
   const handleEditVertex = async (event: React.MouseEvent) => {
     const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
     if (scheduleId !== null) {
@@ -250,19 +255,22 @@ function ListVertexScheduler({
         scheduleId,
         region,
         setInputNotebookFilePath,
-        setEditNotebookLoading,
+        setEditNotebookLoading
       );
     }
   };
 
   /**
-  * Edit job
-  * @param {React.ChangeEvent<HTMLInputElement>} e - event triggered by the edit job button.
-  */
-  const handleEditJob = async (event: React.MouseEvent, displayName: string) => {
+   * Edit job
+   * @param {React.ChangeEvent<HTMLInputElement>} e - event triggered by the edit job button.
+   */
+  const handleEditJob = async (
+    event: React.MouseEvent,
+    displayName: string
+  ) => {
     const job_id = event.currentTarget.getAttribute('data-jobid');
     if (job_id) {
-      setJobId(job_id)
+      setJobId(job_id);
     }
     if (job_id !== null) {
       await VertexServices.editVertexSJobService(
@@ -328,32 +336,44 @@ function ListVertexScheduler({
               data-testid="loader"
             />
           </div>
-        ) :
+        ) : (
           <div
             role="button"
             className="icon-buttons-style"
-            title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
+            title={
+              is_status_paused === 'COMPLETED'
+                ? 'Completed'
+                : is_status_paused === 'PAUSED'
+                  ? 'Resume'
+                  : 'Pause'
+            }
             onClick={e => {
-              is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
+              is_status_paused !== 'COMPLETED' &&
+                handleUpdateScheduler(
+                  data.name,
+                  is_status_paused,
+                  data.displayName
+                );
             }}
           >
-            {is_status_paused === 'COMPLETED' ? <iconPlay.react
-              tag="div"
-              className="icon-buttons-style-disable disable-complete-btn"
-            /> : (
-              is_status_paused === 'PAUSED' ?
-                (<iconPlay.react
-                  tag="div"
-                  className="icon-white logo-alignment-style"
-                />
-                ) : (
-                  <iconPause.react
-                    tag="div"
-                    className="icon-white logo-alignment-style"
-                  />
-                ))}
+            {is_status_paused === 'COMPLETED' ? (
+              <iconPlay.react
+                tag="div"
+                className="icon-buttons-style-disable disable-complete-btn"
+              />
+            ) : is_status_paused === 'PAUSED' ? (
+              <iconPlay.react
+                tag="div"
+                className="icon-white logo-alignment-style"
+              />
+            ) : (
+              <iconPause.react
+                tag="div"
+                className="icon-white logo-alignment-style"
+              />
+            )}
           </div>
-        }
+        )}
         {data.name === triggerLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
@@ -362,11 +382,11 @@ function ListVertexScheduler({
               data-testid="loader"
             />
           </div>
-        ) :
-          (<div
+        ) : (
+          <div
             role="button"
-            className='icon-buttons-style'
-            title='Trigger the job'
+            className="icon-buttons-style"
+            title="Trigger the job"
             data-scheduleId={data.name}
             onClick={e => handleTriggerSchedule(e, data.displayName)}
           >
@@ -374,12 +394,14 @@ function ListVertexScheduler({
               tag="div"
               className="icon-white logo-alignment-style"
             />
-          </div>)
-        }
-        {is_status_paused === "COMPLETED" ? <iconEditNotebook.react
-          tag="div"
-          className="icon-buttons-style-disable"
-        /> : (data.name === editDagLoading ? (
+          </div>
+        )}
+        {is_status_paused === 'COMPLETED' ? (
+          <iconEditNotebook.react
+            tag="div"
+            className="icon-buttons-style-disable"
+          />
+        ) : data.name === editDagLoading ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -400,9 +422,9 @@ function ListVertexScheduler({
               className="icon-white logo-alignment-style"
             />
           </div>
-        ))}
-        {
-          isPreviewEnabled && (data.name === editNotebookLoading ? (
+        )}
+        {isPreviewEnabled &&
+          (data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
               <CircularProgress
                 size={18}
@@ -448,90 +470,124 @@ function ListVertexScheduler({
       );
     } else if (cell.column.Header === 'Job Name') {
       return (
-        <td
-          {...cell.getCellProps()}
-          className="clusters-table-data"
-        >
+        <td {...cell.getCellProps()} className="clusters-table-data">
           {cell.value}
         </td>
       );
     } else {
-      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED';
+      const alignIcon =
+        cell.row.original.status === 'ACTIVE' ||
+        cell.row.original.status === 'PAUSED' ||
+        cell.row.original.status === 'COMPLETED';
 
       let pauseTitle = '';
 
-      if(cell.row.original.status === 'ACTIVE' && cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse === "OK") {
-        pauseTitle =  "ACTIVE";
+      if (
+        cell.row.original.status === 'ACTIVE' &&
+        cell.row.original.lastScheduledRunResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse === 'OK'
+      ) {
+        pauseTitle = 'ACTIVE';
       }
 
-      if(cell.row.original.status === 'PAUSED' && cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse === "OK") {
-        pauseTitle =  "PAUSED";
+      if (
+        cell.row.original.status === 'PAUSED' &&
+        cell.row.original.lastScheduledRunResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse === 'OK'
+      ) {
+        pauseTitle = 'PAUSED';
       }
 
       return (
-        <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
-          {
-            cell.column.Header === 'Status' ?
-              <>
-                <div className='execution-history-main-wrapper'>
-                  {cell.row.original.lastScheduledRunResponse === null ? 
-                    (cell.row.original.status === 'ACTIVE' ? 
-                      <iconActive.react
-                          tag="div"
-                          title='ACTIVE'
-                          className="icon-white logo-alignment-style success_icon icon-size-status"
-                        />  
-                        :
-                        <iconListPause.react
-                          tag="div"
-                          title='PAUSE'
-                          className="icon-white logo-alignment-style success_icon icon-size"
-                        />
-                      )
-                  : 
-                  (cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse ? (cell.row.original.status === 'COMPLETED' ? (cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? <div>
-                    <iconSuccess.react
-                      tag="div"
-                      title='Done !'
-                      className="icon-white logo-alignment-style success_icon icon-size icon-completed"
-                    />
-                  </div> :
-                    <div>
-                      <iconListComplete.react
-                        tag="div"
-                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
-                        className="icon-white logo-alignment-style success_icon icon-size-status"
-                      />
-                    </div>)
-                    : (cell.row.original.status === 'ACTIVE' ?
-                      <iconActive.react
-                        tag="div"
-                        title={pauseTitle}
-                        className="icon-white logo-alignment-style success_icon icon-size-status"
-                      /> :
-                      <iconListPause.react
-                        tag="div"
-                        title={pauseTitle}
-                        className="icon-white logo-alignment-style success_icon icon-size"
-                      />
-                    ))
-                    :
-                    <div>
-                      <iconFailed.react
-                        tag="div"
-                        title={!cell.row.original.lastScheduledRunResponse ? 'Not started' : cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
-                        className="icon-white logo-alignment-style success_icon icon-size"
-                      />
-                    </div>)}
-                  <div className={alignIcon ? 'text-icon' : ''}>{cell.render('Cell')}</div>
-                </div>
-
-              </>
-              :
-              <>{cell.render('Cell')}</>
+        <td
+          {...cell.getCellProps()}
+          className={
+            cell.column.Header === 'Schedule'
+              ? 'clusters-table-data table-cell-width'
+              : 'clusters-table-data'
           }
-
-        </td >
+        >
+          {cell.column.Header === 'Status' ? (
+            <>
+              <div className="execution-history-main-wrapper">
+                {cell.row.original.lastScheduledRunResponse === null ? (
+                  cell.row.original.status === 'ACTIVE' ? (
+                    <iconActive.react
+                      tag="div"
+                      title="ACTIVE"
+                      className="icon-white logo-alignment-style success_icon icon-size-status"
+                    />
+                  ) : (
+                    <iconListPause.react
+                      tag="div"
+                      title="PAUSE"
+                      className="icon-white logo-alignment-style success_icon icon-size"
+                    />
+                  )
+                ) : cell.row.original.lastScheduledRunResponse &&
+                  cell.row.original.lastScheduledRunResponse.runResponse ? (
+                  cell.row.original.status === 'COMPLETED' ? (
+                    cell.row.original.lastScheduledRunResponse.runResponse ===
+                    'OK' ? (
+                      <div>
+                        <iconSuccess.react
+                          tag="div"
+                          title="Done !"
+                          className="icon-white logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <iconListComplete.react
+                          tag="div"
+                          title={
+                            cell.row.original.lastScheduledRunResponse &&
+                            cell.row.original.lastScheduledRunResponse
+                              .runResponse
+                          }
+                          className="icon-white logo-alignment-style success_icon icon-size-status"
+                        />
+                      </div>
+                    )
+                  ) : cell.row.original.status === 'ACTIVE' ? (
+                    <iconActive.react
+                      tag="div"
+                      title={pauseTitle}
+                      className="icon-white logo-alignment-style success_icon icon-size-status"
+                    />
+                  ) : (
+                    <iconListPause.react
+                      tag="div"
+                      title={pauseTitle}
+                      className="icon-white logo-alignment-style success_icon icon-size"
+                    />
+                  )
+                ) : (
+                  <div>
+                    <iconFailed.react
+                      tag="div"
+                      title={
+                        !cell.row.original.lastScheduledRunResponse
+                          ? 'Not started'
+                          : cell.row.original.lastScheduledRunResponse &&
+                            cell.row.original.lastScheduledRunResponse
+                              .runResponse
+                      }
+                      className="icon-white logo-alignment-style success_icon icon-size"
+                    />
+                  </div>
+                )}
+                <div className={alignIcon ? 'text-icon' : ''}>
+                  {cell.render('Cell')}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>{cell.render('Cell')}</>
+          )}
+        </td>
       );
     }
   };
@@ -544,11 +600,11 @@ function ListVertexScheduler({
     setIsPreviewEnabled(previewEnabled);
   };
 
-   /**
-  * Opens edit notebook
-  */
+  /**
+   * Opens edit notebook
+   */
   const openEditDagNotebookFile = async () => {
-    console.log("inputNotebookFilePath", inputNotebookFilePath);
+    console.log('inputNotebookFilePath', inputNotebookFilePath);
     let filePath = inputNotebookFilePath.replace('gs://', 'gs:');
     const openNotebookFile = await app.commands.execute('docmanager:open', {
       path: filePath
@@ -567,8 +623,8 @@ function ListVertexScheduler({
 
   useEffect(() => {
     checkPreviewEnabled();
-    window.scrollTo(0, 0)
-  }, [])
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     if (region !== '') {
@@ -579,17 +635,16 @@ function ListVertexScheduler({
 
   useEffect(() => {
     authApi()
-      .then((credentials) => {
+      .then(credentials => {
         if (credentials && credentials?.region_id && credentials.project_id) {
           setRegion(credentials.region_id);
           setProjectId(credentials.project_id);
         }
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error);
       });
-  }, [projectId])
-
+  }, [projectId]);
 
   return (
     <div>
@@ -600,9 +655,9 @@ function ListVertexScheduler({
             region={region}
             onRegionChange={region => setRegion(region)}
           />
-          {
-            !isLoading && !region && <ErrorMessage message="Region is required" />
-          }
+          {!isLoading && !region && (
+            <ErrorMessage message="Region is required" />
+          )}
         </div>
         <div className="btn-refresh">
           <Button
@@ -616,7 +671,7 @@ function ListVertexScheduler({
           </Button>
         </div>
       </div>
-      
+
       {dagList.length > 0 ? (
         <>
           <div className="notebook-templates-list-table-parent">
