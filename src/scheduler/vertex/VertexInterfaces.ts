@@ -47,3 +47,22 @@ export interface ICreatePayload {
   end_time: dayjs.Dayjs | null;
   gcs_notebook_source?: string;
 }
+export interface IDagList {
+  displayName: string;
+  schedule: string;
+  status: string;
+}
+export interface IUpdateSchedulerAPIResponse {
+  status: number;
+  error: string;
+}
+export interface ITriggerSchedule {
+  metedata: object;
+  name: string;
+}
+export interface IDeleteSchedulerAPIResponse {
+  done: boolean;
+  metadata: object;
+  name: string;
+  response: object;
+}

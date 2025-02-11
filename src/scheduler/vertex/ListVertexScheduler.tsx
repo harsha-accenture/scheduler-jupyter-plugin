@@ -15,191 +15,664 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import { Autocomplete, Button, TextField } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { useTable, usePagination } from 'react-table';
+import TableData from '../../utils/TableData';
+import { PaginationView } from '../../utils/PaginationView';
+import { VertexCellProps } from '../../utils/Config';
+import { JupyterFrontEnd } from '@jupyterlab/application';
+import { CircularProgress, Button } from '@mui/material';
+import DeletePopup from '../../utils/DeletePopup';
+import { PLUGIN_ID, scheduleMode } from '../../utils/Const';
+import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { RegionDropdown } from '../../controls/RegionDropdown';
+import { authApi } from '../../utils/Config';
+import {
+  iconActive,
+  iconDelete,
+  iconEditDag,
+  iconEditNotebook,
+  iconFailed,
+  iconListComplete,
+  iconListPause,
+  iconPause,
+  iconPlay,
+  iconSuccess,
+  iconTrigger
+} from '../../utils/Icons';
+import { VertexServices } from '../../services/Vertex';
+import { IDagList } from './VertexInterfaces';
+import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
 
-function ListVertexScheduler() {
-  const dummyList = ['select 1', 'select 2', 'select 3'];
+function ListVertexScheduler({
+  region,
+  setRegion,
+  app,
+  setJobId,
+  settingRegistry,
+  setCreateCompleted,
+  setInputFileSelected,
+  setMachineTypeSelected,
+  setAcceleratedCount,
+  setAcceleratorType,
+  setKernelSelected,
+  setCloudStorage,
+  setDiskTypeSelected,
+  setDiskSize,
+  setParameterDetail,
+  setParameterDetailUpdated,
+  setServiceAccountSelected,
+  setPrimaryNetworkSelected,
+  setSubNetworkSelected,
+  setSubNetworkList,
+  setSharedNetworkSelected,
+  setScheduleMode,
+  setScheduleField,
+  setStartDate,
+  setEndDate,
+  setMaxRuns,
+  setEditMode,
+  setJobNameSelected,
+  setGcsPath
+}: {
+  region: string;
+  setRegion: (value: string) => void;
+  app: JupyterFrontEnd;
+  setJobId: (value: string) => void;
+  settingRegistry: ISettingRegistry;
+  setCreateCompleted: (value: boolean) => void;
+  setInputFileSelected: (value: string) => void;
+  setMachineTypeSelected: (value: string | null) => void;
+  setAcceleratedCount: (value: string | null) => void;
+  setAcceleratorType: (value: string | null) => void;
+  setKernelSelected: (value: string | null) => void;
+  setCloudStorage: (value: string | null) => void;
+  setDiskTypeSelected: (value: string | null) => void;
+  setDiskSize: (value: string) => void;
+  setParameterDetail: (value: string[]) => void;
+  setParameterDetailUpdated: (value: string[]) => void;
+  setServiceAccountSelected: (
+    value: { displayName: string; email: string } | null
+  ) => void;
+  setPrimaryNetworkSelected: (
+    value: { name: string; link: string } | null
+  ) => void;
+  setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setSubNetworkList: (value: { name: string; link: string }[]) => void;
+  setSharedNetworkSelected: (
+    value: { name: string; network: string; subnetwork: string } | null
+  ) => void;
+  setScheduleMode: (value: scheduleMode) => void;
+  setScheduleField: (value: string) => void;
+  setStartDate: (value: dayjs.Dayjs | null) => void;
+  setEndDate: (value: dayjs.Dayjs | null) => void;
+  setMaxRuns: (value: string) => void;
+  setEditMode: (value: boolean) => void;
+  setJobNameSelected: (value: string) => void;
+  setGcsPath: (value: string) => void;
+}) {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [dagList, setDagList] = useState<IDagList[]>([]);
+  const data = dagList;
+  const [deletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
+  const [editDagLoading, setEditDagLoading] = useState('');
+  const [triggerLoading, setTriggerLoading] = useState('');
+  const [resumeLoading, setResumeLoading] = useState('');
+  const [inputNotebookFilePath, setInputNotebookFilePath] = useState<string>('');
+  const [editNotebookLoading, setEditNotebookLoading] = useState<string>('');
+  const [deletingSchedule, setDeletingSchedule] = useState<boolean>(false);
+  const [projectId, setProjectId] = useState<string>('');
+  const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
+  const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
+  const [isPreviewEnabled, setIsPreviewEnabled] = useState<boolean>(false);
+
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Job Name',
+        accessor: 'displayName'
+      },
+      {
+        Header: 'Schedule',
+        accessor: 'schedule'
+      },
+      {
+        Header: 'Status',
+        accessor: 'status'
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions'
+      }
+    ],
+    []
+  );
+
+  /**
+  * Get list of schedules
+  */
+  const listDagInfoAPI = async () => {
+    setIsLoading(true);
+    await VertexServices.listVertexSchedules(
+      setDagList,
+      region,
+      setIsLoading
+    );
+  };
+
+  /**
+  * Handle resume and pause 
+  * @param {string} scheduleId unique ID for schedule
+  * @param {string} is_status_paused modfied status of schedule
+  * @param {string} displayName name of schedule
+  */
+  const handleUpdateScheduler = async (
+    scheduleId: string,
+    is_status_paused: string,
+    displayName: string
+  ) => {
+    if (is_status_paused === 'ACTIVE') {
+      await VertexServices.handleUpdateSchedulerPauseAPIService(
+        scheduleId,
+        region,
+        setDagList,
+        setIsLoading,
+        displayName,
+        setResumeLoading
+      );
+    } else {
+      await VertexServices.handleUpdateSchedulerResumeAPIService(
+        scheduleId,
+        region,
+        setDagList,
+        setIsLoading,
+        displayName,
+        setResumeLoading
+      );
+    }
+  };
+
+  /**
+  * Trigger a job immediately
+  * @param {React.ChangeEvent<HTMLInputElement>} e - event triggered by the trigger button.
+  * @param {string} displayName name of schedule
+  */
+  const handleTriggerSchedule = async (event: React.MouseEvent, displayName: string) => {
+    const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
+    if (scheduleId !== null) {
+      await VertexServices.triggerSchedule(region, scheduleId, displayName, setTriggerLoading);
+    }
+  };
+
+  /**
+  * Delete pop up
+  * @param {string} schedule_id Id of schedule
+  * @param {string} displayName name of schedule
+  */
+  const handleDeletePopUp = (schedule_id: string, displayName: string) => {
+    setUniqueScheduleId(schedule_id);
+    setScheduleDisplayName(displayName)
+    setDeletePopupOpen(true);
+  };
+
+  /**
+  * Cancel delete pop up
+  */
+  const handleCancelDelete = () => {
+    setDeletePopupOpen(false);
+  };
+
+  /** 
+   * Handles the deletion of a scheduler by invoking the API service to delete it.
+   */
+  const handleDeleteScheduler = async () => {
+    setDeletingSchedule(true);
+    await VertexServices.handleDeleteSchedulerAPIService(
+      region,
+      uniqueScheduleId,
+      scheduleDisplayName,
+      setDagList,
+      setIsLoading
+    );
+    setDeletePopupOpen(false);
+    setDeletingSchedule(false);
+  };
+
+  /**
+  * Handles the editing of a vertex by triggering the editVertexSchedulerService.
+  * @param {React.ChangeEvent<HTMLInputElement>} event - event triggered by the edit vertex button.
+  */
+  const handleEditVertex = async (event: React.MouseEvent) => {
+    const scheduleId = event.currentTarget.getAttribute('data-scheduleId');
+    if (scheduleId !== null) {
+      await VertexServices.editVertexSchedulerService(
+        scheduleId,
+        region,
+        setInputNotebookFilePath,
+        setEditNotebookLoading,
+      );
+    }
+  };
+
+  /**
+  * Edit job
+  * @param {React.ChangeEvent<HTMLInputElement>} e - event triggered by the edit job button.
+  */
+  const handleEditJob = async (event: React.MouseEvent, displayName: string) => {
+    const job_id = event.currentTarget.getAttribute('data-jobid');
+    if (job_id) {
+      setJobId(job_id)
+    }
+    if (job_id !== null) {
+      await VertexServices.editVertexSJobService(
+        job_id,
+        region,
+        setEditDagLoading,
+        setCreateCompleted,
+        setInputFileSelected,
+        setRegion,
+        setMachineTypeSelected,
+        setAcceleratedCount,
+        setAcceleratorType,
+        setKernelSelected,
+        setCloudStorage,
+        setDiskTypeSelected,
+        setDiskSize,
+        setParameterDetail,
+        setParameterDetailUpdated,
+        setServiceAccountSelected,
+        setPrimaryNetworkSelected,
+        setSubNetworkSelected,
+        setSubNetworkList,
+        setScheduleMode,
+        setScheduleField,
+        setStartDate,
+        setEndDate,
+        setMaxRuns,
+        setEditMode,
+        setJobNameSelected,
+        setGcsPath
+      );
+    }
+  };
+
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    page,
+    canPreviousPage,
+    canNextPage,
+    nextPage,
+    previousPage,
+    setPageSize,
+    state: { pageIndex, pageSize }
+  } = useTable(
+    //@ts-ignore react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
+    { columns, data, autoResetPage: false, initialState: { pageSize: 100 } },
+    usePagination
+  );
+
+  const renderActions = (data: any) => {
+    const is_status_paused = data.status;
+    return (
+      <div className="actions-icon-btn">
+        {data.name === resumeLoading ? (
+          <div className="icon-buttons-style">
+            <CircularProgress
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        ) :
+          <div
+            role="button"
+            className="icon-buttons-style"
+            title={is_status_paused === "COMPLETED" ? "Completed" : (is_status_paused === "PAUSED" ? 'Resume' : 'Pause')}
+            onClick={e => {
+              is_status_paused !== "COMPLETED" && handleUpdateScheduler(data.name, is_status_paused, data.displayName)
+            }}
+          >
+            {is_status_paused === 'COMPLETED' ? <iconPlay.react
+              tag="div"
+              className="icon-buttons-style-disable disable-complete-btn"
+            /> : (
+              is_status_paused === 'PAUSED' ?
+                (<iconPlay.react
+                  tag="div"
+                  className="icon-white logo-alignment-style"
+                />
+                ) : (
+                  <iconPause.react
+                    tag="div"
+                    className="icon-white logo-alignment-style"
+                  />
+                ))}
+          </div>
+        }
+        {data.name === triggerLoading ? (
+          <div className="icon-buttons-style">
+            <CircularProgress
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        ) :
+          (<div
+            role="button"
+            className='icon-buttons-style'
+            title='Trigger the job'
+            data-scheduleId={data.name}
+            onClick={e => handleTriggerSchedule(e, data.displayName)}
+          >
+            <iconTrigger.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          </div>)
+        }
+        {is_status_paused === "COMPLETED" ? <iconEditNotebook.react
+          tag="div"
+          className="icon-buttons-style-disable"
+        /> : (data.name === editDagLoading ? (
+          <div className="icon-buttons-style">
+            <CircularProgress
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div>
+        ) : (
+          <div
+            role="button"
+            className="icon-buttons-style"
+            title="Edit Schedule"
+            data-jobid={data.name}
+            onClick={e => handleEditJob(e, data.displayName)}
+          >
+            <iconEditNotebook.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          </div>
+        ))}
+        {
+          isPreviewEnabled && (data.name === editNotebookLoading ? (
+            <div className="icon-buttons-style">
+              <CircularProgress
+                size={18}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            </div>
+          ) : (
+            <div
+              role="button"
+              className="icon-buttons-style"
+              title="Edit Notebook"
+              data-scheduleId={data.name}
+              onClick={e => handleEditVertex(e)}
+            >
+              <iconEditDag.react
+                tag="div"
+                className="icon-white logo-alignment-style"
+              />
+            </div>
+          ))}
+        <div
+          role="button"
+          className="icon-buttons-style"
+          title="Delete"
+          onClick={() => handleDeletePopUp(data.name, data.displayName)}
+        >
+          <iconDelete.react
+            tag="div"
+            className="icon-white logo-alignment-style"
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const tableDataCondition = (cell: VertexCellProps) => {
+    if (cell.column.Header === 'Actions') {
+      return (
+        <td {...cell.getCellProps()} className="clusters-table-data">
+          {renderActions(cell.row.original)}
+        </td>
+      );
+    } else if (cell.column.Header === 'Job Name') {
+      return (
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data"
+        >
+          {cell.value}
+        </td>
+      );
+    } else {
+      const alignIcon = cell.row.original.status === 'ACTIVE' || cell.row.original.status === 'PAUSED' || cell.row.original.status === 'COMPLETED';
+
+      let pauseTitle = '';
+
+      if(cell.row.original.status === 'ACTIVE' && cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse === "OK") {
+        pauseTitle =  "ACTIVE";
+      }
+
+      if(cell.row.original.status === 'PAUSED' && cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse && cell.row.original.lastScheduledRunResponse.runResponse === "OK") {
+        pauseTitle =  "PAUSED";
+      }
+
+      return (
+        <td {...cell.getCellProps()} className={cell.column.Header === 'Schedule' ? "clusters-table-data table-cell-width" : "clusters-table-data"}>
+          {
+            cell.column.Header === 'Status' ?
+              <>
+                <div className='execution-history-main-wrapper'>
+                  {cell.row.original.lastScheduledRunResponse === null ? 
+                    (cell.row.original.status === 'ACTIVE' ? 
+                      <iconActive.react
+                          tag="div"
+                          title='ACTIVE'
+                          className="icon-white logo-alignment-style success_icon icon-size-status"
+                        />  
+                        :
+                        <iconListPause.react
+                          tag="div"
+                          title='PAUSE'
+                          className="icon-white logo-alignment-style success_icon icon-size"
+                        />
+                      )
+                  : 
+                  (cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse ? (cell.row.original.status === 'COMPLETED' ? (cell.row.original.lastScheduledRunResponse.runResponse === 'OK' ? <div>
+                    <iconSuccess.react
+                      tag="div"
+                      title='Done !'
+                      className="icon-white logo-alignment-style success_icon icon-size icon-completed"
+                    />
+                  </div> :
+                    <div>
+                      <iconListComplete.react
+                        tag="div"
+                        title={cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
+                        className="icon-white logo-alignment-style success_icon icon-size-status"
+                      />
+                    </div>)
+                    : (cell.row.original.status === 'ACTIVE' ?
+                      <iconActive.react
+                        tag="div"
+                        title={pauseTitle}
+                        className="icon-white logo-alignment-style success_icon icon-size-status"
+                      /> :
+                      <iconListPause.react
+                        tag="div"
+                        title={pauseTitle}
+                        className="icon-white logo-alignment-style success_icon icon-size"
+                      />
+                    ))
+                    :
+                    <div>
+                      <iconFailed.react
+                        tag="div"
+                        title={!cell.row.original.lastScheduledRunResponse ? 'Not started' : cell.row.original.lastScheduledRunResponse && cell.row.original.lastScheduledRunResponse.runResponse}
+                        className="icon-white logo-alignment-style success_icon icon-size"
+                      />
+                    </div>)}
+                  <div className={alignIcon ? 'text-icon' : ''}>{cell.render('Cell')}</div>
+                </div>
+
+              </>
+              :
+              <>{cell.render('Cell')}</>
+          }
+
+        </td >
+      );
+    }
+  };
+
+  const checkPreviewEnabled = async () => {
+    const settings = await settingRegistry.load(PLUGIN_ID);
+
+    // The current value of whether or not preview features are enabled.
+    let previewEnabled = settings.get('previewEnabled').composite as boolean;
+    setIsPreviewEnabled(previewEnabled);
+  };
+
+   /**
+  * Opens edit notebook
+  */
+  const openEditDagNotebookFile = async () => {
+    console.log("inputNotebookFilePath", inputNotebookFilePath);
+    let filePath = inputNotebookFilePath.replace('gs://', 'gs:');
+    const openNotebookFile = await app.commands.execute('docmanager:open', {
+      path: filePath
+    });
+    setInputNotebookFilePath('');
+    if (openNotebookFile) {
+      setEditNotebookLoading('');
+    }
+  };
+
+  useEffect(() => {
+    if (inputNotebookFilePath !== '') {
+      openEditDagNotebookFile();
+    }
+  }, [inputNotebookFilePath]);
+
+  useEffect(() => {
+    checkPreviewEnabled();
+    window.scrollTo(0, 0)
+  }, [])
+
+  useEffect(() => {
+    if (region !== '') {
+      setIsLoading(true);
+      listDagInfoAPI();
+    }
+  }, [region]);
+
+  useEffect(() => {
+    authApi()
+      .then((credentials) => {
+        if (credentials && credentials?.region_id && credentials.project_id) {
+          setRegion(credentials.region_id);
+          setProjectId(credentials.project_id);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, [projectId])
+
+
   return (
     <div>
-      <div className="create-job-scheduler-title">Scheduled Jobs</div>
       <div className="select-text-overlay-scheduler">
         <div className="region-overlay create-scheduler-form-element content-pd-space ">
-          <Autocomplete
-            className="create-scheduler-style"
-            options={dummyList}
-            renderInput={params => <TextField {...params} label="Region*" />}
-            clearIcon={false}
+          <RegionDropdown
+            projectId={projectId}
+            region={region}
+            onRegionChange={region => setRegion(region)}
           />
-          <ErrorMessage message="Region is required" />
+          {
+            !isLoading && !region && <ErrorMessage message="Region is required" />
+          }
         </div>
         <div className="btn-refresh">
           <Button
+            disabled={isLoading}
             className="btn-refresh-text"
             variant="outlined"
             aria-label="cancel Batch"
+            onClick={listDagInfoAPI}
           >
             <div>REFRESH</div>
           </Button>
         </div>
       </div>
-
-      <div className="notebook-templates-list-table-parent">
-        <table className="clusters-list-table">
-          <thead className="scroll-fix-header">
-            <tr className="cluster-list-table-header">
-              <th className="clusters-table-header">Job Name</th>
-              <th className="clusters-table-header">Schedule</th>
-              <th className="clusters-table-header">Status</th>
-              <th className="clusters-table-header">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="clusters-table-body">
-            <tr className="cluster-list-data-parent">
-              <td className="clusters-table-data">test_12</td>
-              <td className="clusters-table-data">Run once</td>
-              <td className="clusters-table-data">
-                <div className="list-status">
-                  <div className="status-icon-list">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <g clip-path="url(#clip0_6021_51380)">
-                        <path
-                          fill-rule="evenodd"
-                          clip-rule="evenodd"
-                          d="M9 1.5C4.86 1.5 1.5 4.86 1.5 9C1.5 13.14 4.86 16.5 9 16.5C13.14 16.5 16.5 13.14 16.5 9C16.5 4.86 13.14 1.5 9 1.5ZM7.5 12.75L3.75 9L4.8075 7.9425L7.5 10.6275L13.1925 4.935L14.25 6L7.5 12.75Z"
-                          fill="#188038"
-                        />
-                      </g>
-                      <defs>
-                        <clipPath id="clip0_6021_51380">
-                          <rect width="18" height="18" fill="white" />
-                        </clipPath>
-                      </defs>
-                    </svg>
-                  </div>
-                  <div className="list-status-text ">Completed</div>
-                </div>
-              </td>
-              <td className="clusters-table-data">
-                <span className="list-icon-action">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clip-path="url(#clip0_6142_27145)">
-                      <path
-                        d="M7.2 12.15L12.15 9L7.2 5.85V12.15ZM9 16.2C8.0125 16.2 7.08125 16.0125 6.20625 15.6375C5.33125 15.2625 4.5625 14.75 3.9 14.1C3.25 13.4375 2.7375 12.6687 2.3625 11.7937C1.9875 10.9187 1.8 9.9875 1.8 9C1.8 8 1.9875 7.06875 2.3625 6.20625C2.7375 5.33125 3.25 4.56875 3.9 3.91875C4.5625 3.25625 5.33125 2.7375 6.20625 2.3625C7.08125 1.9875 8.0125 1.8 9 1.8C10 1.8 10.9313 1.9875 11.7938 2.3625C12.6688 2.7375 13.4313 3.25625 14.0813 3.91875C14.7438 4.56875 15.2625 5.33125 15.6375 6.20625C16.0125 7.06875 16.2 8 16.2 9C16.2 9.9875 16.0125 10.9187 15.6375 11.7937C15.2625 12.6687 14.7438 13.4375 14.0813 14.1C13.4313 14.75 12.6688 15.2625 11.7938 15.6375C10.9313 16.0125 10 16.2 9 16.2ZM9 14.85C10.625 14.85 12.0063 14.2812 13.1438 13.1437C14.2813 12.0062 14.85 10.625 14.85 9C14.85 7.375 14.2813 5.99375 13.1438 4.85625C12.0063 3.71875 10.625 3.15 9 3.15C7.375 3.15 5.99375 3.71875 4.85625 4.85625C3.71875 5.99375 3.15 7.375 3.15 9C3.15 10.625 3.71875 12.0062 4.85625 13.1437C5.99375 14.2812 7.375 14.85 9 14.85Z"
-                        fill="#616161"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_6142_27145">
-                        <rect width="18" height="18" fill="white" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </span>
-                <span className="list-icon-action">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clip-path="url(#clip0_6142_27150)">
-                      <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M16 9C16 7.83973 15.7177 6.7454 15.2181 5.78193L13.7026 7.29737C13.8951 7.8288 14 8.40215 14 9C14 11.7614 11.7614 14 9 14C6.23857 14 4 11.7614 4 9C4 6.23857 6.23857 4 9 4V9L12.5355 5.46446L13 5L13.9497 4.05025C12.683 2.7835 10.933 2 9 2C5.134 2 2 5.134 2 9C2 12.866 5.134 16 9 16C12.866 16 16 12.866 16 9Z"
-                        fill="#616161"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_6142_27150">
-                        <rect width="18" height="18" fill="white" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </span>
-                <span className="list-icon-action">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clip-path="url(#clip0_6111_27097)">
-                      <path
-                        d="M4.05 16.2C3.675 16.2 3.35625 16.0687 3.09375 15.8062C2.83125 15.5437 2.7 15.225 2.7 14.85V4.95C2.7 4.5875 2.83125 4.275 3.09375 4.0125C3.36875 3.7375 3.6875 3.6 4.05 3.6H5.4V1.8H6.75V3.6H11.25V1.8H12.6V3.6H13.95C14.3125 3.6 14.625 3.7375 14.8875 4.0125C15.1625 4.275 15.3 4.5875 15.3 4.95V9H13.95V8.1H4.05V14.85H9.45V16.2H4.05ZM4.05 6.75H13.95V4.95H4.05V6.75ZM4.05 6.75V4.95V6.75ZM10.8 16.2V14.0812L14.7375 10.1625C14.825 10.075 14.925 10.0125 15.0375 9.975C15.15 9.925 15.2625 9.9 15.375 9.9C15.4875 9.9 15.6 9.925 15.7125 9.975C15.825 10.0125 15.925 10.075 16.0125 10.1625L16.8375 11.0062C16.925 11.0937 16.9875 11.1937 17.025 11.3062C17.075 11.4187 17.1 11.5312 17.1 11.6437C17.1 11.7562 17.075 11.8687 17.025 11.9812C16.9875 12.0937 16.925 12.1937 16.8375 12.2812L12.9188 16.2H10.8ZM16.2 11.6437L15.3563 10.8L16.2 11.6437ZM11.7 15.3H12.5438L14.7 13.1437L14.2875 12.7125L13.875 12.3L11.7 14.4562V15.3ZM14.2875 12.7125L13.875 12.3L14.7 13.1437L14.2875 12.7125Z"
-                        fill="#616161"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_6111_27097">
-                        <rect width="18" height="18" fill="white" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </span>
-                <span className="list-icon-action">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clip-path="url(#clip0_6111_27086)">
-                      <path
-                        d="M4.05 13.95H5.00625L12.0375 6.91875L11.0813 5.9625L4.05 12.9937V13.95ZM2.7 15.3V12.4312L12.0375 3.09375C12.175 2.95625 12.325 2.85625 12.4875 2.79375C12.65 2.73125 12.8188 2.7 12.9938 2.7C13.1688 2.7 13.3375 2.73125 13.5 2.79375C13.6625 2.85625 13.8125 2.95625 13.95 3.09375L14.9063 4.05C15.0438 4.1875 15.1438 4.3375 15.2063 4.5C15.2688 4.6625 15.3 4.83125 15.3 5.00625C15.3 5.18125 15.2688 5.35 15.2063 5.5125C15.1438 5.675 15.0438 5.825 14.9063 5.9625L5.56875 15.3H2.7ZM13.95 5.00625L12.9938 4.05L13.95 5.00625ZM11.55 6.45L11.0813 5.9625L12.0375 6.91875L11.55 6.45Z"
-                        fill="#616161"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_6111_27086">
-                        <rect width="18" height="18" fill="white" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </span>
-                <span>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g clip-path="url(#clip0_6111_27079)">
-                      <path
-                        d="M5.85 15.3C5.475 15.3 5.15625 15.1687 4.89375 14.9062C4.63125 14.6437 4.5 14.325 4.5 13.95V4.95H3.6V3.6H7.2V2.7H10.8V3.6H14.4V4.95H13.5V13.95C13.5 14.325 13.3688 14.6437 13.1063 14.9062C12.8438 15.1687 12.525 15.3 12.15 15.3H5.85ZM12.15 4.95H5.85V13.95H12.15V4.95ZM7.2 12.6H8.55V6.3H7.2V12.6ZM9.45 12.6H10.8V6.3H9.45V12.6ZM5.85 4.95V13.95V4.95Z"
-                        fill="#616161"
-                      />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_6111_27079">
-                        <rect width="18" height="18" fill="white" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      
+      {dagList.length > 0 ? (
+        <>
+          <div className="notebook-templates-list-table-parent">
+            <TableData
+              getTableProps={getTableProps}
+              headerGroups={headerGroups}
+              getTableBodyProps={getTableBodyProps}
+              isLoading={isLoading}
+              rows={rows}
+              page={page}
+              prepareRow={prepareRow}
+              tableDataCondition={tableDataCondition}
+              fromPage="Vertex schedulers"
+            />
+            {dagList.length > 100 && (
+              <PaginationView
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                pageIndex={pageIndex}
+                allData={dagList}
+                previousPage={previousPage}
+                nextPage={nextPage}
+                canPreviousPage={canPreviousPage}
+                canNextPage={canNextPage}
+                scheduleSelected="vertex"
+              />
+            )}
+            {deletePopupOpen && (
+              <DeletePopup
+                onCancel={() => handleCancelDelete()}
+                onDelete={() => handleDeleteScheduler()}
+                deletePopupOpen={deletePopupOpen}
+                DeleteMsg={`This will delete ${scheduleDisplayName} and cannot be undone.`}
+                deletingSchedule={deletingSchedule}
+              />
+            )}
+          </div>
+        </>
+      ) : (
+        <div>
+          {isLoading && (
+            <div className="spin-loader-main">
+              <CircularProgress
+                className="spin-loader-custom-style"
+                size={18}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+              Loading Vertex Schedules
+            </div>
+          )}
+          {!isLoading && (
+            <div className="no-data-style">No rows to display</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
