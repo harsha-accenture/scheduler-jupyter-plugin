@@ -270,7 +270,7 @@ export class VertexServices {
     setIsLoading: (value: boolean) => void
   ) => {
     try {
-      const serviceURL = `api/vertex/deleteSchedule`;
+      const serviceURL = 'api/vertex/deleteSchedule';
       const deleteResponse: IDeleteSchedulerAPIResponse = await requestAPI(
         serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`,
         { method: 'DELETE' }
@@ -305,12 +305,14 @@ export class VertexServices {
   ) => {
     setEditNotebookLoading(scheduleId);
     try {
-      const serviceURL = `api/vertex/getSchedule`;
+      const serviceURL = 'api/vertex/getSchedule';
       const formattedResponse: any = await requestAPI(
         serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
       );
       if (
-        formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty(
+        Object.prototype.hasOwnProperty.call(
+          formattedResponse.createNotebookExecutionJobRequest
+            .notebookExecutionJob,
           'gcsNotebookSource'
         )
       ) {
@@ -320,7 +322,7 @@ export class VertexServices {
         );
       } else {
         setEditNotebookLoading('');
-        toast.error(`File path not found`, toastifyCustomStyle);
+        toast.error('File path not found', toastifyCustomStyle);
       }
     } catch (reason) {
       setEditNotebookLoading('');
@@ -368,7 +370,7 @@ export class VertexServices {
   ) => {
     setEditDagLoading(job_id);
     try {
-      const serviceURL = `api/vertex/getSchedule`;
+      const serviceURL = 'api/vertex/getSchedule';
       const formattedResponse: any = await requestAPI(
         serviceURL + `?region_id=${region}&schedule_id=${job_id}`
       );
@@ -426,7 +428,9 @@ export class VertexServices {
 
         // Parameters
         if (
-          formattedResponse.createNotebookExecutionJobRequest.notebookExecutionJob.hasOwnProperty(
+          Object.prototype.hasOwnProperty.call(
+            formattedResponse.createNotebookExecutionJobRequest
+              .notebookExecutionJob,
             'labels'
           )
         ) {
@@ -494,7 +498,7 @@ export class VertexServices {
         setEditMode(true);
       } else {
         setEditDagLoading('');
-        toast.error(`File path not found`, toastifyCustomStyle);
+        toast.error('File path not found', toastifyCustomStyle);
       }
     } catch (reason) {
       setEditDagLoading('');
