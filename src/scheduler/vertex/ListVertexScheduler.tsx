@@ -74,7 +74,8 @@ function ListVertexScheduler({
   setMaxRuns,
   setEditMode,
   setJobNameSelected,
-  setGcsPath
+  setGcsPath,
+  handleDagIdSelection
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -111,6 +112,7 @@ function ListVertexScheduler({
   setEditMode: (value: boolean) => void;
   setJobNameSelected: (value: string) => void;
   setGcsPath: (value: string) => void;
+  handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
@@ -470,7 +472,11 @@ function ListVertexScheduler({
       );
     } else if (cell.column.Header === 'Job Name') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data"
+          onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
+        >
           {cell.value}
         </td>
       );

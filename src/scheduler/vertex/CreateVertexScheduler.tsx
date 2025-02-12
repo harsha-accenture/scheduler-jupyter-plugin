@@ -799,6 +799,7 @@ const CreateVertexScheduler = ({
           setEditMode={setEditMode}
           setJobNameSelected={setJobNameSelected}
           setGcsPath={setGcsPath}
+          setExecutionPageFlag={setExecutionPageFlag}
         />
       ) : (
         <div className="submit-job-container">

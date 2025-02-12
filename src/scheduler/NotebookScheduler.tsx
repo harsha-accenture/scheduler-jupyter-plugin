@@ -152,31 +152,32 @@ const NotebookSchedulerComponent = ({
           </div>
         )
       )}
-
-      <div className="create-scheduler-form-element sub-para">
-        <FormControl>
-          <RadioGroup
-            className="schedule-radio-btn"
-            aria-labelledby="demo-controlled-radio-buttons-group"
-            name="controlled-radio-buttons-group"
-            value={notebookSelector}
-            onChange={handleSchedulerModeChange}
-          >
-            <FormControlLabel
-              value="vertex"
-              className="create-scheduler-label-style"
-              control={<Radio size="small" />}
-              label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
-            />
-            <FormControlLabel
-              value="composer"
-              className="create-scheduler-label-style"
-              control={<Radio size="small" />}
-              label={<Typography sx={{ fontSize: 13 }}>Composer</Typography>}
-            />
-          </RadioGroup>
-        </FormControl>
-      </div>
+      {executionPageFlag && (
+        <div className="create-scheduler-form-element sub-para">
+          <FormControl>
+            <RadioGroup
+              className="schedule-radio-btn"
+              aria-labelledby="demo-controlled-radio-buttons-group"
+              name="controlled-radio-buttons-group"
+              value={notebookSelector}
+              onChange={handleSchedulerModeChange}
+            >
+              <FormControlLabel
+                value="vertex"
+                className="create-scheduler-label-style"
+                control={<Radio size="small" />}
+                label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
+              />
+              <FormControlLabel
+                value="composer"
+                className="create-scheduler-label-style"
+                control={<Radio size="small" />}
+                label={<Typography sx={{ fontSize: 13 }}>Composer</Typography>}
+              />
+            </RadioGroup>
+          </FormControl>
+        </div>
+      )}
 
       {notebookSelector === 'composer' ? (
         <CreateNotebookScheduler

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SchedulerWidget } from '../../controls/SchedulerWidget';
 import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
@@ -23,6 +23,8 @@ import ListVertexScheduler from '../vertex/ListVertexScheduler';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { scheduleMode } from '../../utils/Const';
 import dayjs from 'dayjs';
+import { ISchedulerData } from './VertexInterfaces';
+import VertexExecutionHistory from './VertexExecutionHistory';
 
 const VertexScheduleJobs = ({
   app,
@@ -53,7 +55,8 @@ const VertexScheduleJobs = ({
   setMaxRuns,
   setEditMode,
   setJobNameSelected,
-  setGcsPath
+  setGcsPath,
+  setExecutionPageFlag
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -91,40 +94,76 @@ const VertexScheduleJobs = ({
   setEditMode: (value: boolean) => void;
   setJobNameSelected?: (value: string) => void;
   setGcsPath: (value: string) => void;
+  setExecutionPageFlag: (value: boolean) => void;
 }): React.JSX.Element => {
+  const [showExecutionHistory, setShowExecutionHistory] =
+    useState<boolean>(false);
+  const [schedulerData, setScheduleData] = useState<ISchedulerData>();
+  const [scheduleName, setScheduleName] = useState('');
+
+  /**
+   * Handles the back button click event.
+   */
+  const handleBackButton = () => {
+    setShowExecutionHistory(false);
+    setExecutionPageFlag(true);
+  };
+
+  /**
+   * Handles the selection of a DAG ID and updates the state with the selected scheduler data.
+   * @param {any} schedulerData - The data related to the selected scheduler.
+   * @param {string} scheduleName - The name of the selected schedule.
+   */
+  const handleDagIdSelection = (schedulerData: any, scheduleName: string) => {
+    setShowExecutionHistory(true);
+    setScheduleName(scheduleName);
+    setScheduleData(schedulerData);
+  };
   return (
     <>
-      <ListVertexScheduler
-        region={region}
-        setRegion={setRegion}
-        app={app}
-        setJobId={setJobId}
-        settingRegistry={settingRegistry}
-        setCreateCompleted={setCreateCompleted}
-        setInputFileSelected={setInputFileSelected}
-        setMachineTypeSelected={setMachineTypeSelected}
-        setAcceleratedCount={setAcceleratedCount}
-        setAcceleratorType={setAcceleratorType}
-        setKernelSelected={setKernelSelected}
-        setCloudStorage={setCloudStorage}
-        setDiskTypeSelected={setDiskTypeSelected}
-        setDiskSize={setDiskSize}
-        setParameterDetail={setParameterDetail}
-        setParameterDetailUpdated={setParameterDetailUpdated}
-        setServiceAccountSelected={setServiceAccountSelected}
-        setPrimaryNetworkSelected={setPrimaryNetworkSelected}
-        setSubNetworkSelected={setSubNetworkSelected}
-        setSubNetworkList={setSubNetworkList}
-        setSharedNetworkSelected={setSharedNetworkSelected}
-        setScheduleMode={setScheduleMode}
-        setScheduleField={setScheduleField}
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
-        setMaxRuns={setMaxRuns}
-        setEditMode={setEditMode}
-        setJobNameSelected={setJobNameSelected!}
-        setGcsPath={setGcsPath}
-      />
+      {showExecutionHistory ? (
+        <VertexExecutionHistory
+          region={region}
+          setRegion={setRegion}
+          schedulerData={schedulerData}
+          scheduleName={scheduleName}
+          handleBackButton={handleBackButton}
+          setExecutionPageFlag={setExecutionPageFlag}
+        />
+      ) : (
+        <ListVertexScheduler
+          region={region}
+          setRegion={setRegion}
+          app={app}
+          setJobId={setJobId}
+          settingRegistry={settingRegistry}
+          setCreateCompleted={setCreateCompleted}
+          setInputFileSelected={setInputFileSelected}
+          setMachineTypeSelected={setMachineTypeSelected}
+          setAcceleratedCount={setAcceleratedCount}
+          setAcceleratorType={setAcceleratorType}
+          setKernelSelected={setKernelSelected}
+          setCloudStorage={setCloudStorage}
+          setDiskTypeSelected={setDiskTypeSelected}
+          setDiskSize={setDiskSize}
+          setParameterDetail={setParameterDetail}
+          setParameterDetailUpdated={setParameterDetailUpdated}
+          setServiceAccountSelected={setServiceAccountSelected}
+          setPrimaryNetworkSelected={setPrimaryNetworkSelected}
+          setSubNetworkSelected={setSubNetworkSelected}
+          setSubNetworkList={setSubNetworkList}
+          setSharedNetworkSelected={setSharedNetworkSelected}
+          setScheduleMode={setScheduleMode}
+          setScheduleField={setScheduleField}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+          setMaxRuns={setMaxRuns}
+          setEditMode={setEditMode}
+          setJobNameSelected={setJobNameSelected!}
+          setGcsPath={setGcsPath}
+          handleDagIdSelection={handleDagIdSelection}
+        />
+      )}
     </>
   );
 };
@@ -237,6 +276,7 @@ export class NotebookJobs extends SchedulerWidget {
         setGcsPath={function (value: string): void {
           throw new Error('Function not implemented.');
         }}
+        setExecutionPageFlag={this.setExecutionPageFlag}
       />
     );
   }
