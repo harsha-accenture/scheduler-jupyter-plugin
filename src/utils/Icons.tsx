@@ -25,6 +25,16 @@ import ErrorIcon from '../../style/icons/error_icon.svg';
 import PlusIcon from '../../style/icons/plus_icon.svg';
 import PlusIconDisable from '../../style/icons/plus_icon_disable.svg';
 import DeleteIcon from '../../style/icons/delete_icon.svg';
+import ActiveIcon from '../../style/icons/list_active_icon.svg';
+import EditIconDisable from '../../style/icons/scheduler_edit_dag.svg';
+import EditNotebookIcon from '../../style/icons/scheduler_edit_calendar.svg';
+import FailedIcon from '../../style/icons/list_error_icon.svg';
+import ListCompleteIcon from '../../style/icons/list_completed_with_error.svg';
+import ListPauseIcon from '../../style/icons/list_pause_icon.svg';
+import pauseIcon from '../../style/icons/scheduler_pause.svg';
+import playIcon from '../../style/icons/scheduler_play.svg';
+import CompletedIcon from '../../style/icons/dag_task_success_icon.svg';
+import triggerIcon from '../../style/icons/scheduler_trigger.svg';
 
 export const iconCluster = new LabIcon({
   name: 'launcher:clusters-icon',
@@ -67,4 +77,54 @@ export const iconPlusDisable = new LabIcon({
 export const iconDelete = new LabIcon({
   name: 'launcher:delete-icon',
   svgstr: DeleteIcon
+});
+
+export const iconActive = new LabIcon({
+  name: 'launcher:active-icon',
+  svgstr: ActiveIcon
+});
+
+export const iconEditDag = new LabIcon({
+  name: 'launcher:edit-disable-icon',
+  svgstr: EditIconDisable
+});
+
+export const iconEditNotebook = new LabIcon({
+  name: 'launcher:edit-notebook-icon',
+  svgstr: EditNotebookIcon
+});
+
+export const iconFailed = new LabIcon({
+  name: 'launcher:failed-icon',
+  svgstr: FailedIcon
+});
+
+export const iconListComplete = new LabIcon({
+  name: 'launcher:list-complete-icon',
+  svgstr: ListCompleteIcon
+});
+
+export const iconListPause = new LabIcon({
+  name: 'launcher:list-pause-icon',
+  svgstr: ListPauseIcon
+});
+
+export const iconPause = new LabIcon({
+  name: 'launcher:pause-icon',
+  svgstr: pauseIcon
+});
+
+export const iconPlay = new LabIcon({
+  name: 'launcher:play-icon',
+  svgstr: playIcon
+});
+
+export const iconSuccess = new LabIcon({
+  name: 'launcher:success-icon',
+  svgstr: CompletedIcon
+});
+
+export const iconTrigger = new LabIcon({
+  name: 'launcher:trigger-icon',
+  svgstr: triggerIcon
 });

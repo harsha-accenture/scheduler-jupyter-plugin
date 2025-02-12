@@ -195,3 +195,21 @@ export interface ICellProps {
   };
   render: (value: string) => React.ReactNode;
 }
+
+export interface IVertexCellProps {
+  getCellProps: () => React.TdHTMLAttributes<HTMLTableDataCellElement>;
+  value: string | any;
+  column: {
+    Header: string;
+  };
+  row: {
+    original: {
+      id: string;
+      status: string;
+      lastScheduledRunResponse: {
+        runResponse: string;
+      };
+    };
+  };
+  render: (value: string) => React.ReactNode;
+}
