@@ -321,7 +321,7 @@ function ListVertexScheduler({
     setPageSize,
     state: { pageIndex, pageSize }
   } = useTable(
-    //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
+    //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagList>'
     { columns, data, autoResetPage: false, initialState: { pageSize: 100 } },
     usePagination
   );

@@ -142,13 +142,8 @@ const VertexJobRuns = ({
     prepareRow,
     page
   } = useTable(
-    //@ts-ignore react-table 'columns' which is declared here on type 'TableOptions<ICluster>'
-    {
-      columns,
-      data: filteredData,
-      autoResetPage: false,
-      initialState: { pageSize: filteredData.length }
-    },
+    //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagRunList>'
+    { columns, data: filteredData, autoResetPage: false, initialState: { pageSize: filteredData.length } },
     useGlobalFilter
   );
 

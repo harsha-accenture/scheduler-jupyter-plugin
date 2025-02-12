@@ -29,6 +29,7 @@ export class LogEntriesServices {
     const start_date = encodeURIComponent(jobRunsData?.startDate || '');
     const end_date = encodeURIComponent(jobRunsData?.endDate || '');
     try {
+      /* eslint-disable */
       const data: any = await requestAPI(
         `api/logEntries/listEntries?filter_query=timestamp >= \"${start_date}" AND timestamp <= \"${end_date}" AND SEARCH(\"${dagRunId}\")`
       );
