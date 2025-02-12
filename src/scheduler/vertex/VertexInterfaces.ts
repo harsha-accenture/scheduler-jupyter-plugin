@@ -82,10 +82,10 @@ export interface ISchedulerData {
   schedule: string;
   status: string;
   createTime: string;
-  lastScheduledRunResponse: LastScheduledRunResponse;
+  lastScheduledRunResponse: ILastScheduledRunResponse;
 }
 
-export interface LastScheduledRunResponse {
+export interface ILastScheduledRunResponse {
   scheduledRunTime: string;
   runResponse: string;
 }

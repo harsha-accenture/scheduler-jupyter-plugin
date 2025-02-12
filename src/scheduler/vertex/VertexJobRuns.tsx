@@ -74,7 +74,7 @@ const VertexJobRuns = ({
   );
 
   function handleUpdateHeight() {
-    let updateHeight = window.innerHeight - 485;
+    const updateHeight = window.innerHeight - 485;
     setListDagRunHeight(updateHeight);
   }
 
@@ -142,8 +142,13 @@ const VertexJobRuns = ({
     prepareRow,
     page
   } = useTable(
-    //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagRunList>'
-    { columns, data: filteredData, autoResetPage: false, initialState: { pageSize: filteredData.length } },
+    {
+      //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagRunList>'
+      columns,
+      data: filteredData,
+      autoResetPage: false,
+      initialState: { pageSize: filteredData.length }
+    },
     useGlobalFilter
   );
 
