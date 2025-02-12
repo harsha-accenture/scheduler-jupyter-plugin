@@ -35,6 +35,7 @@ import pauseIcon from '../../style/icons/scheduler_pause.svg';
 import playIcon from '../../style/icons/scheduler_play.svg';
 import CompletedIcon from '../../style/icons/dag_task_success_icon.svg';
 import triggerIcon from '../../style/icons/scheduler_trigger.svg';
+import downloadIcon from '../../style/icons/scheduler_download.svg';
 
 export const iconCluster = new LabIcon({
   name: 'launcher:clusters-icon',
@@ -127,4 +128,9 @@ export const iconSuccess = new LabIcon({
 export const iconTrigger = new LabIcon({
   name: 'launcher:trigger-icon',
   svgstr: triggerIcon
+});
+
+export const iconDownload = new LabIcon({
+  name: 'launcher:download-icon',
+  svgstr: downloadIcon
 });

@@ -71,4 +71,46 @@ export class StorageServices {
       );
     }
   };
+
+  static downloadJobAPIService = async (
+    gcsUrl: string | undefined,
+    fileName: string | undefined,
+    jobRunId: string | undefined,
+    setJobDownloadLoading: (value: boolean) => void,
+    scheduleName: string
+  ) => {
+    try {
+      const bucketName = gcsUrl?.split('//')[1];
+      setJobDownloadLoading(true);
+      const formattedResponse: any = await requestAPI(
+        `api/storage/downloadOutput?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`,
+        {
+          method: 'POST'
+        }
+      );
+      if (formattedResponse.status === 0) {
+        toast.success(
+          `${scheduleName} job history downloaded successfully`,
+          toastifyCustomStyle
+        );
+      } else {
+        SchedulerLoggingService.log(
+          'Error in downloading the job history',
+          LOG_LEVEL.ERROR
+        );
+        toast.error(
+          `Error in downloading the job history`,
+          toastifyCustomStyle
+        );
+      }
+      setJobDownloadLoading(false);
+    } catch (error) {
+      setJobDownloadLoading(false);
+      SchedulerLoggingService.log(
+        'Error in downloading the job history',
+        LOG_LEVEL.ERROR
+      );
+      toast.error(`Error in downloading the job history`, toastifyCustomStyle);
+    }
+  };
 }
