@@ -525,9 +525,9 @@ export class VertexServices {
     setDarkGreenListDates: (value: string[]) => void
   ) => {
     setIsLoading(true);
-    let selected_month = selectedMonth && selectedMonth.toISOString();
-    let schedule_id = schedulerData?.name.split('/').pop();
-    const serviceURL = `api/vertex/listNotebookExecutionJobs`;
+    const selected_month = selectedMonth && selectedMonth.toISOString();
+    const schedule_id = schedulerData?.name.split('/').pop();
+    const serviceURL = 'api/vertex/listNotebookExecutionJobs';
     const formattedResponse: any = await requestAPI(
       serviceURL +
         `?region_id=${region}&schedule_id=${schedule_id}&start_date=${selected_month}`
@@ -579,12 +579,12 @@ export class VertexServices {
       );
 
       // Initialize grouping lists
-      let blueList: string[] = [];
-      let greyList: string[] = [];
-      let orangeList: string[] = [];
-      let redList: string[] = [];
-      let greenList: string[] = [];
-      let darkGreenList: string[] = [];
+      const blueList: string[] = [];
+      const greyList: string[] = [];
+      const orangeList: string[] = [];
+      const redList: string[] = [];
+      const greenList: string[] = [];
+      const darkGreenList: string[] = [];
 
       // Process grouped data
       Object.keys(groupedDataByDateStatus).forEach(dateValue => {
@@ -619,7 +619,7 @@ export class VertexServices {
       setDagRunsList(transformDagRunListDataCurrent);
     } catch (error) {
       toast.error(
-        `Error in fetching the execution history`,
+        'Error in fetching the execution history',
         toastifyCustomStyle
       );
     }
