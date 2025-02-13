@@ -62,7 +62,7 @@ const VertexJobTaskLogs = ({
    */
   const handleLogs = async () => {
     window.open(
-      `https://pantheon.corp.google.com/logs/query;query=SEARCH${jobRunId};cursorTimestamp=${jobRunsData?.startDate};duration=PT1H?hl=en&mods=metastore_prod_env&project=${projectId}`
+      `https://console.cloud.google.com/logs/query;query=SEARCH${jobRunId};cursorTimestamp=${jobRunsData?.startDate};duration=PT1H?hl=en&mods=metastore_prod_env&project=${projectId}`
     );
   };
 
