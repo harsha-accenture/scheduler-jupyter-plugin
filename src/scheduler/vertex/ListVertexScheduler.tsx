@@ -425,8 +425,7 @@ function ListVertexScheduler({
             />
           </div>
         )}
-        {
-          isPreview &&
+        {isPreview &&
           (data.name === editNotebookLoading ? (
             <div className="icon-buttons-style">
               <CircularProgress
