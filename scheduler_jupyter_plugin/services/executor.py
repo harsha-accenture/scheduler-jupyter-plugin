@@ -133,7 +133,7 @@ class Client:
         DAG_TEMPLATE_CLUSTER_V1 = "pysparkJobTemplate-v1.txt"
         DAG_TEMPLATE_SERVERLESS_V1 = "pysparkBatchTemplate-v1.txt"
         environment = Environment(
-            loader=PackageLoader("dataproc_jupyter_plugin", TEMPLATES_FOLDER_PATH)
+            loader=PackageLoader("scheduler_jupyter_plugin", TEMPLATES_FOLDER_PATH)
         )
 
         gcp_project_id = self.project_id
