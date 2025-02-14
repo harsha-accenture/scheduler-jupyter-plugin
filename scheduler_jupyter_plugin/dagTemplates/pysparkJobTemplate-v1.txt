@@ -123,7 +123,7 @@ dag = DAG(
     '{{name}}', 
     default_args=default_args,
     description='{{name}}',
-    tags =['dataproc_jupyter_plugin'],
+    tags =['scheduler_jupyter_plugin'],
     schedule_interval='{{schedule_interval}}',
     catchup= False
 )
