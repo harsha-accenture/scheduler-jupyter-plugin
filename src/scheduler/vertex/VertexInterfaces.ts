@@ -66,3 +66,26 @@ export interface IDeleteSchedulerAPIResponse {
   name: string;
   response: object;
 }
+export interface IDagRunList {
+  jobRunId: string;
+  startDate: string;
+  endDate: string;
+  gcsUrl: string;
+  state: string;
+  date: Date;
+  time: string;
+  fileName: string;
+}
+export interface ISchedulerData {
+  name: string;
+  displayName: string;
+  schedule: string;
+  status: string;
+  createTime: string;
+  lastScheduledRunResponse: ILastScheduledRunResponse;
+}
+
+export interface ILastScheduledRunResponse {
+  scheduledRunTime: string;
+  runResponse: string;
+}
