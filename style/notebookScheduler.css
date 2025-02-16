@@ -452,3 +452,9 @@
 .log-icon {
   padding-top: 8px;
 }
+
+.logo-alignment-style {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
