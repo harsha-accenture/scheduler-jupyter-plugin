@@ -448,3 +448,9 @@
 .text-icon {
   line-height: 2;
 }
+
+.logo-alignment-style {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
