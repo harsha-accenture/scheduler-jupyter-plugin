@@ -108,13 +108,13 @@ const VertexJobTaskLogs = ({
       {dagTaskInstancesList.length > 0 && logsFiltered ? (
         <>
           <div role="button" className="log-btn" onClick={handleLogs}>
-            <div className="create-icon log-icon">
+            <div className="create-icon log-icon cursor-icon">
               <iconCreateCluster.react
                 tag="div"
                 className="logo-alignment-style"
               />
             </div>
-            <div className="create-text">VIEW CLOUD LOGS</div>
+            <div className="create-text cursor-icon">VIEW CLOUD LOGS</div>
           </div>
           <div>
             <div className="accordion-vertex-row-parent-header">
