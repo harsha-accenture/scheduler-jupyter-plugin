@@ -458,3 +458,13 @@
   align-items: center;
   justify-content: center;
 }
+
+.cursor-icon {
+  cursor: pointer;
+}
+
+/* Optional: Adjustments for other elements */
+.notebook-template-table-data {
+  padding-left: 15px;
+  border-bottom: 1px solid var(--jp-layout-color3);
+}
