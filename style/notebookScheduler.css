@@ -468,3 +468,17 @@
   padding-left: 15px;
   border-bottom: 1px solid var(--jp-layout-color3);
 }
+
+.cluster-details-header {
+  height: 48px;
+  display: flex;
+  border-bottom: 1px solid var(--jp-layout-color3);
+}
+
+.back-arrow-icon {
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
