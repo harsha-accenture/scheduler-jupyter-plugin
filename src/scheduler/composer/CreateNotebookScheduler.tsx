@@ -46,6 +46,10 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
+import { DynamicDropdown } from '../../controls/DynamicDropdown';
+import { projectListAPI } from '../../services/ProjectService';
+import { RegionDropdown } from '../../controls/RegionDropdown';
+import { authApi } from '../../utils/Config';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -121,6 +125,8 @@ const CreateNotebookScheduler = ({
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
 
   const [isBigQueryNotebook, setIsBigQueryNotebook] = useState(false);
+  const [projectId, setProjectId] = useState('');
+  const [region, setRegion] = useState<string>('');
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -387,6 +393,23 @@ const CreateNotebookScheduler = ({
     }
   }, [selectedMode]);
 
+  /**
+  * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
+  * @param {string} value selected region
+  */
+  const handleRegionChange = (value: React.SetStateAction<string>) => {
+    setRegion(value);
+  };
+
+  useEffect(() => {
+    authApi().then(credentials => {
+      if (credentials && credentials.project_id && credentials.region_id) {
+        setProjectId(credentials.project_id);
+        setRegion(credentials.region_id);
+      } 
+    });
+  }, []);
+
   return (
     <>
       {createCompleted ? (
@@ -423,6 +446,31 @@ const CreateNotebookScheduler = ({
       ) : (
         <div>
           <div className="submit-job-container">
+            <div className="create-scheduler-form-element">
+              <DynamicDropdown
+                value={projectId}
+                onChange={(_, projectId: string | null) =>
+                  setProjectId(projectId ?? '')
+                }
+                fetchFunc={projectListAPI}
+                label="Project ID*"
+                // Always show the clear indicator and hide the dropdown arrow
+                // make it very clear that this is an autocomplete.
+                sx={{
+                  '& .MuiAutocomplete-clearIndicator': {
+                    visibility: 'visible'
+                  }
+                }}
+                popupIcon={null}
+              />
+            </div>
+            <div className="region-overlay create-scheduler-form-element">
+              <RegionDropdown
+                projectId={projectId}
+                region={region}
+                onRegionChange={region => handleRegionChange(region)}
+              />
+            </div>
             <div className="create-scheduler-form-element">
               <Autocomplete
                 className="create-scheduler-style"
