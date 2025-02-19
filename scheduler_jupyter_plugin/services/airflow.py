@@ -48,10 +48,13 @@ class Client:
             "Authorization": f"Bearer {self._access_token}",
         }
 
-    async def get_airflow_uri(self, composer_name):
+    async def get_airflow_uri(self, composer_name, project_id=None, region_id=None):
         try:
             composer_url = await urls.gcp_service_url(COMPOSER_SERVICE_NAME)
-            api_endpoint = f"{composer_url}v1/projects/{self.project_id}/locations/{self.region_id}/environments/{composer_name}"
+            if project_id and region_id:
+                api_endpoint = f"{composer_url}v1/projects/{project_id}/locations/{region_id}/environments/{composer_name}"
+            else:
+                api_endpoint = f"{composer_url}v1/projects/{self.project_id}/locations/{self.region_id}/environments/{composer_name}"
             async with self.client_session.get(
                 api_endpoint, headers=self.create_headers()
             ) as response:
@@ -68,8 +71,10 @@ class Client:
             self.log.exception(f"Error getting airflow uri: {str(e)}")
             raise Exception(f"Error getting airflow uri: {str(e)}")
 
-    async def list_jobs(self, composer_name):
-        airflow_uri, bucket = await self.get_airflow_uri(composer_name)
+    async def list_jobs(self, composer_name, project_id, region_id):
+        airflow_uri, bucket = await self.get_airflow_uri(
+            composer_name, project_id, region_id
+        )
         try:
             api_endpoint = f"{airflow_uri}/api/v1/dags?tags={TAGS}"
             async with self.client_session.get(

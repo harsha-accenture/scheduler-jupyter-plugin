@@ -113,7 +113,9 @@ class DagListController(AirflowHandler):
         return "cluster list"
 
     async def _handle_get(self, client):
-        return await client.list_jobs(self.composer_environment)
+        project_id = self.get_argument("project_id")
+        region_id = self.get_argument("region_id")
+        return await client.list_jobs(self.composer_environment, project_id, region_id)
 
 
 class DagDeleteController(AirflowHandler):
