@@ -170,10 +170,12 @@ export class SchedulerService {
   };
   static listComposersAPIService = async (
     setComposerList: (value: string[]) => void,
+    projectId: string,
+    region: string,
     setIsLoading?: (value: boolean) => void
   ) => {
     try {
-      const formattedResponse: any = await requestAPI('composerList');
+      const formattedResponse: any = await requestAPI(`composerList?project_id=${projectId}&region_id=${region}`);
       if (formattedResponse.length === 0) {
         // Handle the case where the list is empty
         toast.error(
@@ -563,10 +565,12 @@ export class SchedulerService {
     setDagList: (value: IDagList[]) => void,
     setIsLoading: (value: boolean) => void,
     setBucketName: (value: string) => void,
-    composerSelected: string
+    composerSelected: string,
+    projectId: string,
+    region: string
   ) => {
     try {
-      const serviceURL = `dagList?composer=${composerSelected}`;
+      const serviceURL = `dagList?composer=${composerSelected}&project_id=${projectId}&region_id=${region}`;
       const formattedResponse: any = await requestAPI(serviceURL);
       let transformDagListData = [];
       if (formattedResponse && formattedResponse[0].dags) {
@@ -673,6 +677,8 @@ export class SchedulerService {
     setDagList: (value: IDagList[]) => void,
     setIsLoading: (value: boolean) => void,
     setBucketName: (value: string) => void,
+    projectId: string,
+    region: string,
     fromPage?: string | undefined
   ) => {
     try {
@@ -686,7 +692,9 @@ export class SchedulerService {
           setDagList,
           setIsLoading,
           setBucketName,
-          composerSelected
+          composerSelected,
+          projectId,
+          region
         );
         toast.success(
           `Deleted job ${dag_id}. It might take a few minutes to for it to be deleted from the list of jobs.`,
@@ -709,7 +717,9 @@ export class SchedulerService {
     is_status_paused: boolean,
     setDagList: (value: IDagList[]) => void,
     setIsLoading: (value: boolean) => void,
-    setBucketName: (value: string) => void
+    setBucketName: (value: string) => void,
+    projectId: string,
+    region: string
   ) => {
     try {
       const serviceURL = `dagUpdate?composer=${composerSelected}&dag_id=${dag_id}&status=${is_status_paused}`;
@@ -726,7 +736,9 @@ export class SchedulerService {
           setDagList,
           setIsLoading,
           setBucketName,
-          composerSelected
+          composerSelected,
+          projectId,
+          region
         );
       }
     } catch (error) {

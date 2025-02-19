@@ -217,7 +217,9 @@ function listNotebookScheduler({
       is_status_paused,
       setDagList,
       setIsLoading,
-      setBucketName
+      setBucketName,
+      projectId,
+      region
     );
   };
   const handleDeletePopUp = (dag_id: string) => {
@@ -290,7 +292,9 @@ function listNotebookScheduler({
       selectedDagId,
       setDagList,
       setIsLoading,
-      setBucketName
+      setBucketName,
+      projectId,
+      region
     );
     setDeletePopupOpen(false);
     setDeletingNotebook(false);
@@ -304,6 +308,8 @@ function listNotebookScheduler({
       setDagList,
       setIsLoading,
       setBucketName,
+      projectId,
+      region,
       fromPage
     );
   };
@@ -311,6 +317,8 @@ function listNotebookScheduler({
   const listComposersAPI = async () => {
     await SchedulerService.listComposersAPIService(
       setComposerList,
+      projectId,
+      region,
       setIsLoading
     );
   };
@@ -320,7 +328,9 @@ function listNotebookScheduler({
       setDagList,
       setIsLoading,
       setBucketName,
-      composerSelectedList
+      composerSelectedList,
+      projectId,
+      region
     );
   };
 
@@ -531,30 +541,30 @@ function listNotebookScheduler({
   }, [composerList]);
 
   useEffect(() => {
-    if (composerSelectedList !== '') {
+    if (composerSelectedList !== '' && projectId && region) {
       setIsLoading(true);
       listDagInfoAPI();
       handleImportErrordata();
     }
-  }, [composerSelectedList]);
+  }, [composerSelectedList, projectId, region]);
 
   useEffect(() => {
-    if (composerSelectedList !== '') {
+    if (composerSelectedList !== '' && projectId && region) {
       pollingDagList(listDagInfoAPI, false);
     }
     return () => {
       pollingDagList(listDagInfoAPI, true);
     };
-  }, [composerSelectedList]);
+  }, [composerSelectedList, projectId, region]);
 
   useEffect(() => {
-    if (composerSelectedList !== '') {
+    if (composerSelectedList !== '' && projectId && region) {
       pollingImportError(handleImportErrordata, false);
     }
     return () => {
       pollingImportError(handleImportErrordata, true);
     };
-  }, [composerSelectedList]);
+  }, [composerSelectedList, projectId, region]);
 
    /**
    * Changing the region value
@@ -563,6 +573,12 @@ function listNotebookScheduler({
    const handleRegionChange = (value: React.SetStateAction<string>) => {
     setRegion(value);
   };
+
+  useEffect(() => {
+    if(projectId && region) {
+      listComposersAPI();
+    }
+  }, [projectId, region])
 
   useEffect(() => {
     authApi().then(credentials => {
