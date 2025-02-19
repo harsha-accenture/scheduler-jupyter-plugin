@@ -175,7 +175,7 @@ export class SchedulerService {
     setIsLoading?: (value: boolean) => void,
   ) => {
     try {
-      const formattedResponse: any = await requestAPI(`composerList&project_id=${projectId}&region_id=${region}`);
+      const formattedResponse: any = await requestAPI(`composerList?project_id=${projectId}&region_id=${region}`);
       if (formattedResponse.length === 0) {
         // Handle the case where the list is empty
         toast.error(
