@@ -44,11 +44,14 @@ class Client:
             "Authorization": f"Bearer {self._access_token}",
         }
 
-    async def list_environments(self) -> List[ComposerEnvironment]:
+    async def list_environments(self, project_id=None, region_id=None) -> List[ComposerEnvironment]:
         try:
             environments = []
             composer_url = await urls.gcp_service_url(COMPOSER_SERVICE_NAME)
-            api_endpoint = f"{composer_url}/v1/projects/{self.project_id}/locations/{self.region_id}/environments"
+            if project_id and region_id:
+                api_endpoint = f"{composer_url}/v1/projects/{project_id}/locations/{region_id}/environments"
+            else:
+                api_endpoint = f"{composer_url}/v1/projects/{self.project_id}/locations/{self.region_id}/environments"
 
             headers = self.create_headers()
             async with self.client_session.get(
