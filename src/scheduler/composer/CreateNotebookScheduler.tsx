@@ -144,7 +144,11 @@ const CreateNotebookScheduler = ({
   };
 
   const listComposersAPI = async () => {
-    await SchedulerService.listComposersAPIService(setComposerList);
+    await SchedulerService.listComposersAPIService(
+      setComposerList,
+      region,
+      projectId
+    );
   };
 
   const handleComposerSelected = (data: string | null) => {
@@ -354,8 +358,6 @@ const CreateNotebookScheduler = ({
   };
 
   useEffect(() => {
-    listComposersAPI();
-
     if (context !== '') {
       setInputFileSelected(context.path);
       if (context.path.toLowerCase().startsWith('bigframes')) {
@@ -369,6 +371,12 @@ const CreateNotebookScheduler = ({
       setParameterDetailUpdated([]);
     }
   }, []);
+
+  useEffect(() => {
+    if(projectId && region) {
+      listComposersAPI();
+    }
+  }, [projectId, region])
 
   useEffect(() => {
     if (composerSelected !== '' && dagList.length > 0) {
