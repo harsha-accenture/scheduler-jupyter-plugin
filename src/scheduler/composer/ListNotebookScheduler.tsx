@@ -19,7 +19,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationView } from '../../utils/PaginationView';
-import { ICellProps } from '../../utils/Config';
+import { ICellProps, authApi } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import deleteIcon from '../../../style/icons/scheduler_delete.svg';
@@ -36,6 +36,9 @@ import ImportErrorPopup from '../../utils/ImportErrorPopup';
 import triggerIcon from '../../../style/icons/scheduler_trigger.svg';
 import { PLUGIN_ID, scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { DynamicDropdown } from '../../controls/DynamicDropdown';
+import { projectListAPI } from '../../services/ProjectService';
+import { RegionDropdown } from '../../controls/RegionDropdown';
 
 const iconDelete = new LabIcon({
   name: 'launcher:delete-icon',
@@ -152,6 +155,8 @@ function listNotebookScheduler({
   const [importErrorData, setImportErrorData] = useState<string[]>([]);
   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
+  const [region, setRegion] = useState<string>('');
+  const [projectId, setProjectId] = useState<string>('');
   const columns = React.useMemo(
     () => [
       {
@@ -551,10 +556,52 @@ function listNotebookScheduler({
     };
   }, [composerSelectedList]);
 
+   /**
+   * Changing the region value
+   * @param {string} value selected region
+   */
+   const handleRegionChange = (value: React.SetStateAction<string>) => {
+    setRegion(value);
+  };
+
+  useEffect(() => {
+    authApi().then(credentials => {
+      if (credentials && credentials.project_id && credentials.region_id) {
+        setProjectId(credentials.project_id);
+        setRegion(credentials.region_id);
+      }
+    });
+  }, []);
+
   return (
     <div>
       <div className="select-text-overlay-scheduler">
-        <div className="create-scheduler-form-element">
+        <div className="create-scheduler-form-element list-menu">
+          <DynamicDropdown
+            value={projectId}
+            onChange={(_, projectId: string | null) =>
+              setProjectId(projectId ?? '')
+            }
+            fetchFunc={projectListAPI}
+            label="Project ID*"
+            // Always show the clear indicator and hide the dropdown arrow
+            // make it very clear that this is an autocomplete.
+            sx={{
+              '& .MuiAutocomplete-clearIndicator': {
+                visibility: 'visible'
+              }
+            }}
+            popupIcon={null}
+          />
+        </div>
+        <div className="region-overlay create-scheduler-form-element list-menu">
+          <RegionDropdown
+            projectId={projectId}
+            region={region}
+            onRegionChange={region => handleRegionChange(region)}
+          />
+        </div>
+        <div className="create-scheduler-form-element list-menu">
           <Autocomplete
             options={composerList}
             value={composerSelectedList}
