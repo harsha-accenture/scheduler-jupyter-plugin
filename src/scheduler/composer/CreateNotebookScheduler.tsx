@@ -259,6 +259,8 @@ const CreateNotebookScheduler = ({
     const randomDagId = uuidv4();
 
     const payload = {
+      project_id: projectId,
+      region_id: region,
       input_filename: inputFileSelected,
       composer_environment_name: composerSelected,
       output_formats: outputFormats,
