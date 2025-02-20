@@ -274,16 +274,11 @@ class Client:
                             line.split("int('")[1].split("')")[0]
                         )  # Extract retry_delay from the line
                     elif "email_on_failure" in line:
-                        second_part = line.split(":")[1].strip()
-                        email_on_failure = second_part.split("'")[
-                            1
-                        ]  # Extract email_failure from the line
+                        email_on_failure = line.split(":")[1].strip()
                     elif "email_on_retry" in line:
-                        second_part = line.split(":")[1].strip()
-                        email_on_retry = second_part.split("'")[1]
+                        email_on_retry = line.split(":")[1].strip()
                     elif "email_on_success" in line:
-                        second_part = line.split(":")[1].strip()
-                        email_on_success = second_part.split("'")[1]
+                        email_on_success = line.split(":")[1].strip()
                     elif "schedule_interval" in line:
                         schedule_interval = (
                             line.split("=")[-1]
