@@ -248,7 +248,7 @@ class Client:
         shutil.copy2(wrapper_papermill_path, LOCAL_DAG_FILE_LOCATION)
         return file_path
 
-    async def execute(self, input_data):
+    async def execute(self, input_data, project_id=None, region_id=None):
         try:
             job = DescribeJob(**input_data)
             global job_id
@@ -256,7 +256,7 @@ class Client:
             job_id = job.dag_id
             job_name = job.name
             dag_file = f"dag_{job_name}.py"
-            gcs_dag_bucket = await self.get_bucket(job.composer_environment_name, job.project_id, job.region_id)
+            gcs_dag_bucket = await self.get_bucket(job.composer_environment_name, project_id, region_id)
             wrapper_pappermill_file_path = WRAPPER_PAPPERMILL_FILE
 
             if await self.check_file_exists(

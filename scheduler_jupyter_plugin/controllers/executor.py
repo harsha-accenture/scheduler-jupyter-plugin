@@ -29,6 +29,8 @@ class ExecutorController(APIHandler):
     async def post(self):
         try:
             input_data = self.get_json_body()
+            project_id = self.get_argument("project_id", default=None)
+            region_id = self.get_argument("region_id", default=None)
             if not re.fullmatch(
                 constants.COMPOSER_ENVIRONMENT_REGEXP,
                 input_data["composer_environment_name"],
@@ -42,7 +44,7 @@ class ExecutorController(APIHandler):
                 client = executor.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-                result = await client.execute(input_data)
+                result = await client.execute(input_data, project_id, region_id)
                 self.finish(json.dumps(result))
         except Exception as e:
             self.log.exception(f"Error creating dag schedule: {str(e)}")
