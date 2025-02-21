@@ -256,7 +256,9 @@ class Client:
             job_id = job.dag_id
             job_name = job.name
             dag_file = f"dag_{job_name}.py"
-            gcs_dag_bucket = await self.get_bucket(job.composer_environment_name, project_id, region_id)
+            gcs_dag_bucket = await self.get_bucket(
+                job.composer_environment_name, project_id, region_id
+            )
             wrapper_pappermill_file_path = WRAPPER_PAPPERMILL_FILE
 
             if await self.check_file_exists(
