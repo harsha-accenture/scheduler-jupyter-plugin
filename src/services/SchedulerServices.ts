@@ -172,10 +172,12 @@ export class SchedulerService {
     setComposerList: (value: string[]) => void,
     projectId: string,
     region: string,
-    setIsLoading?: (value: boolean) => void,
+    setIsLoading?: (value: boolean) => void
   ) => {
     try {
-      const formattedResponse: any = await requestAPI(`composerList?project_id=${projectId}&region_id=${region}`);
+      const formattedResponse: any = await requestAPI(
+        `composerList?project_id=${projectId}&region_id=${region}`
+      );
       if (formattedResponse.length === 0) {
         // Handle the case where the list is empty
         toast.error(
@@ -215,10 +217,13 @@ export class SchedulerService {
   ) => {
     setCreatingScheduler(true);
     try {
-      const data: any = await requestAPI(`createJobScheduler?project_id=${projectId}&region_id=${region}`, {
-        body: JSON.stringify(payload),
-        method: 'POST'
-      });
+      const data: any = await requestAPI(
+        `createJobScheduler?project_id=${projectId}&region_id=${region}`,
+        {
+          body: JSON.stringify(payload),
+          method: 'POST'
+        }
+      );
       if (data.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);

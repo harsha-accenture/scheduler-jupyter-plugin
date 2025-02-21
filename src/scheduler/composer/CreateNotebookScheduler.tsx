@@ -286,7 +286,7 @@ const CreateNotebookScheduler = ({
       setCreatingScheduler,
       editMode,
       projectId,
-      region,
+      region
     );
     setEditMode(false);
   };
@@ -378,7 +378,7 @@ const CreateNotebookScheduler = ({
     if (projectId && region) {
       listComposersAPI();
     }
-  }, [projectId, region])
+  }, [projectId, region]);
 
   useEffect(() => {
     if (composerSelected !== '' && dagList.length > 0) {
@@ -404,9 +404,9 @@ const CreateNotebookScheduler = ({
   }, [selectedMode]);
 
   /**
-  * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
-  * @param {string} value selected region
-  */
+   * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
+   * @param {string} value selected region
+   */
   const handleRegionChange = (value: React.SetStateAction<string>) => {
     setRegion(value);
   };
@@ -495,7 +495,9 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
-            {!composerSelected && <ErrorMessage message="Environment is required" />}
+            {!composerSelected && (
+              <ErrorMessage message="Environment is required" />
+            )}
             <div className="create-scheduler-label">Output formats</div>
             <div className="create-scheduler-form-element">
               <FormGroup row={true}>
@@ -584,9 +586,10 @@ const CreateNotebookScheduler = ({
                         <TextField {...params} label="Cluster*" />
                       )}
                     />
-                    {!clusterSelected && <ErrorMessage message="Cluster is required" />}
+                    {!clusterSelected && (
+                      <ErrorMessage message="Cluster is required" />
+                    )}
                   </>
-
                 )}
               {selectedMode === 'serverless' && !isLoadingKernelDetail && (
                 <>
@@ -599,9 +602,10 @@ const CreateNotebookScheduler = ({
                       <TextField {...params} label="Serverless*" />
                     )}
                   />
-                  {!serverlessSelected && <ErrorMessage message="Serverless is required" />}
+                  {!serverlessSelected && (
+                    <ErrorMessage message="Serverless is required" />
+                  )}
                 </>
-
               )}
             </div>
             {!isBigQueryNotebook && selectedMode === 'cluster' && (
