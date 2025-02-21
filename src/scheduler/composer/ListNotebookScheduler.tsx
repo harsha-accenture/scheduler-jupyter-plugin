@@ -370,7 +370,7 @@ function listNotebookScheduler({
   const renderActions = (data: any) => {
     const is_status_paused = data.status === 'Paused';
     return (
-      <div className="actions-icon">
+      <div className="actions-icon-btn">
         <div
           role="button"
           className="icon-buttons-style"
