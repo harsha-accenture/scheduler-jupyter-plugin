@@ -209,11 +209,13 @@ export class SchedulerService {
     app: JupyterLab,
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
-    editMode: boolean
+    editMode: boolean,
+    projectId: string,
+    region: string
   ) => {
     setCreatingScheduler(true);
     try {
-      const data: any = await requestAPI('createJobScheduler', {
+      const data: any = await requestAPI(`createJobScheduler?project_id=${projectId}&region_id=${region}`, {
         body: JSON.stringify(payload),
         method: 'POST'
       });
