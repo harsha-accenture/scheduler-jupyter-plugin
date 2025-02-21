@@ -435,6 +435,9 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
+            {!composerSelected && (
+              <ErrorMessage message="Environment is required field" />
+            )}
             <div className="create-scheduler-label">Output formats</div>
             <div className="create-scheduler-form-element">
               <FormGroup row={true}>
@@ -523,6 +526,9 @@ const CreateNotebookScheduler = ({
                     )}
                   />
                 )}
+              {!clusterSelected && (
+                <ErrorMessage message="Cluster is required field" />
+              )}
               {selectedMode === 'serverless' && !isLoadingKernelDetail && (
                 <Autocomplete
                   className="create-scheduler-style"
@@ -533,6 +539,9 @@ const CreateNotebookScheduler = ({
                     <TextField {...params} label="Serverless*" />
                   )}
                 />
+              )}
+              {!serverlessSelected && (
+                <ErrorMessage message="Serverless is required field" />
               )}
             </div>
             {!isBigQueryNotebook && selectedMode === 'cluster' && (
