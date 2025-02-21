@@ -151,7 +151,7 @@ submit_pyspark_job = DataprocSubmitJobOperator(
     job={
         'reference': {'project_id': '{{gcpProjectId}}'},
         'placement': {'cluster_name': '{{cluster_name}}'},
-        'labels': {'client': 'dataproc-jupyter-plugin'},
+        'labels': {'client': 'scheduler-jupyter-plugin'},
         'pyspark_job': {
             'main_python_file_uri': '{{inputFilePath}}',
             'args' : notebook_args
