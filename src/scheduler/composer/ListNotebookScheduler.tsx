@@ -152,6 +152,8 @@ function listNotebookScheduler({
   const [importErrorData, setImportErrorData] = useState<string[]>([]);
   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
+  const projectId = '';
+  const region = '';
   const columns = React.useMemo(
     () => [
       {
@@ -306,6 +308,8 @@ function listNotebookScheduler({
   const listComposersAPI = async () => {
     await SchedulerService.listComposersAPIService(
       setComposerList,
+      projectId,
+      region,
       setIsLoading
     );
   };
