@@ -46,6 +46,10 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
+import { DynamicDropdown } from '../../controls/DynamicDropdown';
+import { projectListAPI } from '../../services/ProjectService';
+import { RegionDropdown } from '../../controls/RegionDropdown';
+import { authApi } from '../../utils/Config';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -121,6 +125,8 @@ const CreateNotebookScheduler = ({
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
 
   const [isBigQueryNotebook, setIsBigQueryNotebook] = useState(false);
+  const [projectId, setProjectId] = useState('');
+  const [region, setRegion] = useState<string>('');
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -138,7 +144,11 @@ const CreateNotebookScheduler = ({
   };
 
   const listComposersAPI = async () => {
-    await SchedulerService.listComposersAPIService(setComposerList);
+    await SchedulerService.listComposersAPIService(
+      setComposerList,
+      region,
+      projectId
+    );
   };
 
   const handleComposerSelected = (data: string | null) => {
@@ -274,7 +284,9 @@ const CreateNotebookScheduler = ({
       app,
       setCreateCompleted,
       setCreatingScheduler,
-      editMode
+      editMode,
+      projectId,
+      region
     );
     setEditMode(false);
   };
@@ -348,8 +360,6 @@ const CreateNotebookScheduler = ({
   };
 
   useEffect(() => {
-    listComposersAPI();
-
     if (context !== '') {
       setInputFileSelected(context.path);
       if (context.path.toLowerCase().startsWith('bigframes')) {
@@ -363,6 +373,12 @@ const CreateNotebookScheduler = ({
       setParameterDetailUpdated([]);
     }
   }, []);
+
+  useEffect(() => {
+    if (projectId && region) {
+      listComposersAPI();
+    }
+  }, [projectId, region]);
 
   useEffect(() => {
     if (composerSelected !== '' && dagList.length > 0) {
@@ -386,6 +402,23 @@ const CreateNotebookScheduler = ({
       listSessionTemplatesAPI();
     }
   }, [selectedMode]);
+
+  /**
+   * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
+   * @param {string} value selected region
+   */
+  const handleRegionChange = (value: React.SetStateAction<string>) => {
+    setRegion(value);
+  };
+
+  useEffect(() => {
+    authApi().then(credentials => {
+      if (credentials && credentials.project_id && credentials.region_id) {
+        setProjectId(credentials.project_id);
+        setRegion(credentials.region_id);
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -424,6 +457,33 @@ const CreateNotebookScheduler = ({
         <div>
           <div className="submit-job-container">
             <div className="create-scheduler-form-element">
+              <DynamicDropdown
+                value={projectId}
+                onChange={(_, projectId: string | null) =>
+                  setProjectId(projectId ?? '')
+                }
+                fetchFunc={projectListAPI}
+                label="Project ID*"
+                // Always show the clear indicator and hide the dropdown arrow
+                // make it very clear that this is an autocomplete.
+                sx={{
+                  '& .MuiAutocomplete-clearIndicator': {
+                    visibility: 'visible'
+                  }
+                }}
+                popupIcon={null}
+              />
+            </div>
+            {!projectId && <ErrorMessage message="Project ID is required" />}
+            <div className="region-overlay create-scheduler-form-element scheduler-region-top">
+              <RegionDropdown
+                projectId={projectId}
+                region={region}
+                onRegionChange={region => handleRegionChange(region)}
+              />
+            </div>
+            {!region && <ErrorMessage message="Region is required" />}
+            <div className="create-scheduler-form-element">
               <Autocomplete
                 className="create-scheduler-style"
                 options={composerList}
@@ -435,6 +495,9 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
+            {!composerSelected && (
+              <ErrorMessage message="Environment is required" />
+            )}
             <div className="create-scheduler-label">Output formats</div>
             <div className="create-scheduler-form-element">
               <FormGroup row={true}>
@@ -513,26 +576,36 @@ const CreateNotebookScheduler = ({
               {!isBigQueryNotebook &&
                 selectedMode === 'cluster' &&
                 !isLoadingKernelDetail && (
-                  <Autocomplete
-                    className="create-scheduler-style"
-                    options={clusterList}
-                    value={clusterSelected}
-                    onChange={(_event, val) => handleClusterSelected(val)}
-                    renderInput={params => (
-                      <TextField {...params} label="Cluster*" />
+                  <>
+                    <Autocomplete
+                      className="create-scheduler-style"
+                      options={clusterList}
+                      value={clusterSelected}
+                      onChange={(_event, val) => handleClusterSelected(val)}
+                      renderInput={params => (
+                        <TextField {...params} label="Cluster*" />
+                      )}
+                    />
+                    {!clusterSelected && (
+                      <ErrorMessage message="Cluster is required" />
                     )}
-                  />
+                  </>
                 )}
               {selectedMode === 'serverless' && !isLoadingKernelDetail && (
-                <Autocomplete
-                  className="create-scheduler-style"
-                  options={serverlessList}
-                  value={serverlessSelected}
-                  onChange={(_event, val) => handleServerlessSelected(val)}
-                  renderInput={params => (
-                    <TextField {...params} label="Serverless*" />
+                <>
+                  <Autocomplete
+                    className="create-scheduler-style"
+                    options={serverlessList}
+                    value={serverlessSelected}
+                    onChange={(_event, val) => handleServerlessSelected(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Serverless*" />
+                    )}
+                  />
+                  {!serverlessSelected && (
+                    <ErrorMessage message="Serverless is required" />
                   )}
-                />
+                </>
               )}
             </div>
             {!isBigQueryNotebook && selectedMode === 'cluster' && (

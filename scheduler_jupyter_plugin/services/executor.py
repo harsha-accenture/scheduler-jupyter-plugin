@@ -69,10 +69,13 @@ class Client:
             "Authorization": f"Bearer {self._access_token}",
         }
 
-    async def get_bucket(self, runtime_env):
+    async def get_bucket(self, runtime_env, project_id, region_id):
         try:
             composer_url = await urls.gcp_service_url(COMPOSER_SERVICE_NAME)
-            api_endpoint = f"{composer_url}v1/projects/{self.project_id}/locations/{self.region_id}/environments/{runtime_env}"
+            if project_id and region_id:
+                api_endpoint = f"{composer_url}v1/projects/{project_id}/locations/{region_id}/environments/{runtime_env}"
+            else:
+                api_endpoint = f"{composer_url}v1/projects/{self.project_id}/locations/{self.region_id}/environments/{runtime_env}"
             headers = self.create_headers()
             async with self.client_session.get(
                 api_endpoint, headers=headers
@@ -245,7 +248,7 @@ class Client:
         shutil.copy2(wrapper_papermill_path, LOCAL_DAG_FILE_LOCATION)
         return file_path
 
-    async def execute(self, input_data):
+    async def execute(self, input_data, project_id=None, region_id=None):
         try:
             job = DescribeJob(**input_data)
             global job_id
@@ -253,7 +256,9 @@ class Client:
             job_id = job.dag_id
             job_name = job.name
             dag_file = f"dag_{job_name}.py"
-            gcs_dag_bucket = await self.get_bucket(job.composer_environment_name)
+            gcs_dag_bucket = await self.get_bucket(
+                job.composer_environment_name, project_id, region_id
+            )
             wrapper_pappermill_file_path = WRAPPER_PAPPERMILL_FILE
 
             if await self.check_file_exists(

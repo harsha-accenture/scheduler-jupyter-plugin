@@ -170,10 +170,14 @@ export class SchedulerService {
   };
   static listComposersAPIService = async (
     setComposerList: (value: string[]) => void,
+    projectId: string,
+    region: string,
     setIsLoading?: (value: boolean) => void
   ) => {
     try {
-      const formattedResponse: any = await requestAPI('composerList');
+      const formattedResponse: any = await requestAPI(
+        `composerList?project_id=${projectId}&region_id=${region}`
+      );
       if (formattedResponse.length === 0) {
         // Handle the case where the list is empty
         toast.error(
@@ -207,14 +211,19 @@ export class SchedulerService {
     app: JupyterLab,
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
-    editMode: boolean
+    editMode: boolean,
+    projectId: string,
+    region: string
   ) => {
     setCreatingScheduler(true);
     try {
-      const data: any = await requestAPI('createJobScheduler', {
-        body: JSON.stringify(payload),
-        method: 'POST'
-      });
+      const data: any = await requestAPI(
+        `createJobScheduler?project_id=${projectId}&region_id=${region}`,
+        {
+          body: JSON.stringify(payload),
+          method: 'POST'
+        }
+      );
       if (data.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);
