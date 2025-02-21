@@ -566,19 +566,19 @@ function listNotebookScheduler({
     };
   }, [composerSelectedList, projectId, region]);
 
-   /**
+  /**
    * Changing the region value
    * @param {string} value selected region
    */
-   const handleRegionChange = (value: React.SetStateAction<string>) => {
+  const handleRegionChange = (value: React.SetStateAction<string>) => {
     setRegion(value);
   };
 
   useEffect(() => {
-    if(projectId && region) {
+    if (projectId && region) {
       listComposersAPI();
     }
-  }, [projectId, region])
+  }, [projectId, region]);
 
   useEffect(() => {
     authApi().then(credentials => {
