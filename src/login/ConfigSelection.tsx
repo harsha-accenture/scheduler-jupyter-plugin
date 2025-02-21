@@ -237,6 +237,7 @@ function ConfigSelection({
                     Provide Feedback
                   </a>
                   <span className="privacy-terms"> • </span>
+                  {/* TODO: change this to scheduler jupyter plugin git repository*/}
                   <a
                     href="https://github.com/GoogleCloudDataproc/dataproc-jupyter-plugin"
                     target="_blank"
