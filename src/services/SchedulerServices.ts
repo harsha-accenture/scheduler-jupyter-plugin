@@ -17,7 +17,7 @@
 
 import { requestAPI } from '../handler/Handler';
 import { SchedulerLoggingService, LOG_LEVEL } from './LoggingService';
-import { toastifyCustomStyle } from '../utils/Config';
+import { showToast, toastifyCustomStyle } from '../utils/Config';
 import { JupyterLab } from '@jupyterlab/application';
 import { scheduleMode } from '../utils/Const';
 import {
@@ -170,6 +170,8 @@ export class SchedulerService {
   };
   static listComposersAPIService = async (
     setComposerList: (value: string[]) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void,
     setIsLoading?: (value: boolean) => void
   ) => {
     try {
@@ -190,6 +192,41 @@ export class SchedulerService {
         });
         composerEnvironmentList.sort();
         setComposerList(composerEnvironmentList);
+        if (formattedResponse.length === undefined) {
+          try {
+            const errorObject = JSON.parse(
+              formattedResponse['Error fetching environments list'].slice(
+                formattedResponse['Error fetching environments list'].indexOf(
+                  '{'
+                )
+              )
+            );
+            if (errorObject.error.code === 403) {
+              setIsApiError(true);
+              setApiError(
+                'Cloud Composer API is not enabled in the project. Click here to enable the API.'
+              );
+              if (setIsLoading) {
+                setIsLoading(false);
+              }
+            }
+          } catch (error) {
+            console.error('Error parsing error message:', error);
+            showToast(
+              'Error fetching environments list. Please try again later.',
+              'error-featching-env-list'
+            );
+          }
+        } else {
+          setIsApiError(false);
+          setApiError('');
+          let composerEnvironmentList: string[] = [];
+          formattedResponse.forEach((data: IComposerAPIResponse) => {
+            composerEnvironmentList.push(data.name);
+          });
+          composerEnvironmentList.sort();
+          setComposerList(composerEnvironmentList);
+        }
       }
     } catch (error) {
       SchedulerLoggingService.log(

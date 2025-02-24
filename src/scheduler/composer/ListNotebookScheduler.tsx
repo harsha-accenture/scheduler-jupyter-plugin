@@ -19,7 +19,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationView } from '../../utils/PaginationView';
-import { ICellProps } from '../../utils/Config';
+import { ICellProps, extractUrl } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import deleteIcon from '../../../style/icons/scheduler_delete.svg';
@@ -36,6 +36,7 @@ import ImportErrorPopup from '../../utils/ImportErrorPopup';
 import triggerIcon from '../../../style/icons/scheduler_trigger.svg';
 import { PLUGIN_ID, scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { iconError } from '../../utils/Icons';
 
 const iconDelete = new LabIcon({
   name: 'launcher:delete-icon',
@@ -152,6 +153,8 @@ function listNotebookScheduler({
   const [importErrorData, setImportErrorData] = useState<string[]>([]);
   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
+  const [isApiError, setIsApiError] = useState(false);
+  const [apiError, setApiError] = useState('');
   const columns = React.useMemo(
     () => [
       {
@@ -306,6 +309,8 @@ function listNotebookScheduler({
   const listComposersAPI = async () => {
     await SchedulerService.listComposersAPIService(
       setComposerList,
+      setIsApiError,
+      setApiError,
       setIsLoading
     );
   };
@@ -551,6 +556,28 @@ function listNotebookScheduler({
     };
   }, [composerSelectedList]);
 
+  const extractLink = (message: string) => {
+    const url = extractUrl();
+    if (!url) return message;
+
+    const beforeLink = message.split('Click here ')[0] || '';
+
+    return (
+      <>
+        {beforeLink}
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'blue', textDecoration: 'underline' }}
+        >
+          Click here
+        </a>{' '}
+        to enable it.
+      </>
+    );
+  };
+
   return (
     <div>
       <div className="select-text-overlay-scheduler">
@@ -586,6 +613,14 @@ function listNotebookScheduler({
                 onDelete={(dagId: string) => handleDeleteImportError(dagId)}
               />
             )}
+          </div>
+        )}
+      </div>
+      <div className="create-scheduler-form-element">
+        {isApiError && (
+          <div className="error-api">
+            <iconError.react tag="div" className="logo-alignment-style" />
+            <div className="error-key-missing">{extractLink(apiError)}</div>
           </div>
         )}
       </div>
@@ -637,7 +672,7 @@ function listNotebookScheduler({
               Loading Notebook Schedulers
             </div>
           )}
-          {!isLoading && (
+          {!isLoading && !apiError && (
             <div className="no-data-style">No rows to display</div>
           )}
         </div>
