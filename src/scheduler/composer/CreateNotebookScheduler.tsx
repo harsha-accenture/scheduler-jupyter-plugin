@@ -548,7 +548,6 @@ const CreateNotebookScheduler = ({
                   )}
                 </>
               )}
-
             </div>
             {!isBigQueryNotebook && selectedMode === 'cluster' && (
               <div className="create-scheduler-form-element">
