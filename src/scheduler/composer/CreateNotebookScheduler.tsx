@@ -146,8 +146,8 @@ const CreateNotebookScheduler = ({
   const listComposersAPI = async () => {
     await SchedulerService.listComposersAPIService(
       setComposerList,
-      region,
-      projectId
+      projectId,
+      region
     );
   };
 
