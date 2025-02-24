@@ -516,33 +516,39 @@ const CreateNotebookScheduler = ({
               {!isBigQueryNotebook &&
                 selectedMode === 'cluster' &&
                 !isLoadingKernelDetail && (
+                  <>
+                    <Autocomplete
+                      className="create-scheduler-style"
+                      options={clusterList}
+                      value={clusterSelected}
+                      onChange={(_event, val) => handleClusterSelected(val)}
+                      renderInput={params => (
+                        <TextField {...params} label="Cluster*" />
+                      )}
+                    />
+                    {!clusterSelected && (
+                      <ErrorMessage message="Cluster is required field" />
+                    )}
+                  </>
+                )}
+
+              {selectedMode === 'serverless' && !isLoadingKernelDetail && (
+                <>
                   <Autocomplete
                     className="create-scheduler-style"
-                    options={clusterList}
-                    value={clusterSelected}
-                    onChange={(_event, val) => handleClusterSelected(val)}
+                    options={serverlessList}
+                    value={serverlessSelected}
+                    onChange={(_event, val) => handleServerlessSelected(val)}
                     renderInput={params => (
-                      <TextField {...params} label="Cluster*" />
+                      <TextField {...params} label="Serverless*" />
                     )}
                   />
-                )}
-              {!clusterSelected && (
-                <ErrorMessage message="Cluster is required field" />
-              )}
-              {selectedMode === 'serverless' && !isLoadingKernelDetail && (
-                <Autocomplete
-                  className="create-scheduler-style"
-                  options={serverlessList}
-                  value={serverlessSelected}
-                  onChange={(_event, val) => handleServerlessSelected(val)}
-                  renderInput={params => (
-                    <TextField {...params} label="Serverless*" />
+                  {!serverlessSelected && (
+                    <ErrorMessage message="Serverless is required field" />
                   )}
-                />
+                </>
               )}
-              {!serverlessSelected && (
-                <ErrorMessage message="Serverless is required field" />
-              )}
+
             </div>
             {!isBigQueryNotebook && selectedMode === 'cluster' && (
               <div className="create-scheduler-form-element">
