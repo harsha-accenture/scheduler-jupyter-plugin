@@ -21,6 +21,7 @@ import { SchedulerLoggingService } from '../services/LoggingService';
 import {
   API_HEADER_BEARER,
   API_HEADER_CONTENT_TYPE,
+  CLOUD_COMPOSER_API,
   HTTP_METHOD,
   gcpServiceUrls
 } from './Const';
@@ -213,3 +214,13 @@ export interface IVertexCellProps {
   };
   render: (value: string) => React.ReactNode;
 }
+
+export const extractUrl = () => {
+  return CLOUD_COMPOSER_API;
+};
+
+export const showToast = (message: string, id?: string) => {
+  if (!id || !toast.isActive(id)) {
+    toast.error(message, { toastId: id, ...toastifyCustomStyle });
+  }
+};
