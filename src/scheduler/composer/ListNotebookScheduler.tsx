@@ -19,7 +19,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationView } from '../../utils/PaginationView';
-import { ICellProps, extractUrl } from '../../utils/Config';
+import { ICellProps } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import deleteIcon from '../../../style/icons/scheduler_delete.svg';
@@ -37,6 +37,7 @@ import triggerIcon from '../../../style/icons/scheduler_trigger.svg';
 import { PLUGIN_ID, scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { iconError } from '../../utils/Icons';
+import EnableNotifyMessage from '../common/EnableNotifyMessage';
 
 const iconDelete = new LabIcon({
   name: 'launcher:delete-icon',
@@ -556,30 +557,6 @@ function listNotebookScheduler({
     };
   }, [composerSelectedList]);
 
-  const extractLink = (message: string) => {
-    const url = extractUrl();
-    if (!url) {
-      return message;
-    }
-
-    const beforeLink = message.split('Click here ')[0] || '';
-
-    return (
-      <>
-        {beforeLink}
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: 'blue', textDecoration: 'underline' }}
-        >
-          Click here
-        </a>{' '}
-        to enable it.
-      </>
-    );
-  };
-
   return (
     <div>
       <div className="select-text-overlay-scheduler">
@@ -622,7 +599,9 @@ function listNotebookScheduler({
         {isApiError && (
           <div className="error-api">
             <iconError.react tag="div" className="logo-alignment-style" />
-            <div className="error-key-missing">{extractLink(apiError)}</div>
+            <div className="error-key-missing">
+              <EnableNotifyMessage message={apiError} />
+            </div>
           </div>
         )}
       </div>

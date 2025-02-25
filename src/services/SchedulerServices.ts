@@ -187,16 +187,9 @@ export class SchedulerService {
         }
       } else if (formattedResponse.length === undefined) {
         try {
-          const errorObject = JSON.parse(
-            formattedResponse['Error fetching environments list'].slice(
-              formattedResponse['Error fetching environments list'].indexOf('{')
-            )
-          );
-          if (errorObject.error.code === 403) {
+          if (formattedResponse.error.code === 403) {
             setIsApiError(true);
-            setApiError(
-              'Cloud Composer API is not enabled in the project. Click here to enable the API.'
-            );
+            setApiError(formattedResponse.error.message);
             if (setIsLoading) {
               setIsLoading(false);
             }

@@ -46,8 +46,8 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
-import { extractUrl } from '../../utils/Config';
 import { iconError } from '../../utils/Icons';
+import EnableNotifyMessage from '../common/EnableNotifyMessage';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -396,28 +396,6 @@ const CreateNotebookScheduler = ({
     }
   }, [selectedMode]);
 
-  const extractLink = (message: string) => {
-    const url = extractUrl();
-    if (!url) {
-      return message;
-    }
-    const beforeLink = message.split('Click here ')[0] || '';
-    return (
-      <>
-        {beforeLink}
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: 'blue', textDecoration: 'underline' }}
-        >
-          Click here
-        </a>{' '}
-        to enable it.
-      </>
-    );
-  };
-
   return (
     <>
       {createCompleted ? (
@@ -473,7 +451,9 @@ const CreateNotebookScheduler = ({
             {isApiError && (
               <div className="error-key-parent">
                 <iconError.react tag="div" className="logo-alignment-style" />
-                <div className="error-key-missing">{extractLink(apiError)}</div>
+                <div className="error-key-missing">
+                  <EnableNotifyMessage message={apiError} />
+                  </div>
               </div>
             )}
 
