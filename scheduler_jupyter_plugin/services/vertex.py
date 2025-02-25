@@ -224,6 +224,9 @@ class Client:
                             }
                             uiconfig.append(formatted_config)
                         return uiconfig
+                elif response.status == 403:
+                    resp = await response.json()
+                    return resp
                 else:
                     self.log.exception("Error listing ui config")
                     raise Exception(
@@ -282,6 +285,9 @@ class Client:
                         resp["schedules"] = schedule_list
                         result.update(resp)
                         return result
+                elif response.status == 403:
+                    resp = await response.json()
+                    return resp
                 else:
                     self.log.exception(
                         f"Error listing schedules: {response.reason} {await response.text()}"
