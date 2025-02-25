@@ -464,7 +464,7 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
-            {!composerSelected && (
+            {!composerSelected && !isApiError && (
               <ErrorMessage message="Environment is required field" />
             )}
 
