@@ -15,26 +15,31 @@
  * limitations under the License.
  */
 
-import React from 'react'
+import React from 'react';
 
 const EnableNotifyMessage = ({ message }: { message: string }): JSX.Element => {
-    const pattern = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g; // REGX to extract URL from string
-    const url : any = message.match(pattern);
-    const beforeLink = message.split('. ')[0] || '';
-    return (
-        <>
-            {beforeLink}
-            <a
-                href={url[0]}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: 'blue', textDecoration: 'underline', paddingLeft: '3px' }}
-            >
-                Click here
-            </a>{' '}
-            to enable it.
-        </>
-    );
-}
+  const pattern =
+    /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g; // REGX to extract URL from string
+  const url: any = message.match(pattern);
+  const beforeLink = message.split('. ')[0] || '';
+  return (
+    <>
+      {beforeLink}
+      <a
+        href={url[0]}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          color: 'blue',
+          textDecoration: 'underline',
+          paddingLeft: '3px'
+        }}
+      >
+        Click here
+      </a>{' '}
+      to enable it.
+    </>
+  );
+};
 
 export default EnableNotifyMessage;

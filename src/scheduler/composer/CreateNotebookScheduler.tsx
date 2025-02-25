@@ -453,7 +453,7 @@ const CreateNotebookScheduler = ({
                 <iconError.react tag="div" className="logo-alignment-style" />
                 <div className="error-key-missing">
                   <EnableNotifyMessage message={apiError} />
-                  </div>
+                </div>
               </div>
             )}
 

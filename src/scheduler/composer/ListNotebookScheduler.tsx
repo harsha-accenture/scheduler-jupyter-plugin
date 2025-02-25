@@ -595,7 +595,7 @@ function listNotebookScheduler({
           </div>
         )}
       </div>
-      <div className="create-scheduler-form-element">
+      <div>
         {isApiError && (
           <div className="error-api">
             <iconError.react tag="div" className="logo-alignment-style" />
