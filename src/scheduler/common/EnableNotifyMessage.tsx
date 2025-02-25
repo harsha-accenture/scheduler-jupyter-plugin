@@ -19,7 +19,7 @@ import React from 'react';
 
 const EnableNotifyMessage = ({ message }: { message: string }): JSX.Element => {
   const pattern =
-    // eslint-disable-next-line no-use-before-define
+    // eslint-disable-next-line
     /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/g; // REGX to extract URL from string
   const url: any = message.match(pattern);
   const beforeLink = message.split('. ')[0] || '';
