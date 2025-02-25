@@ -558,7 +558,9 @@ function listNotebookScheduler({
 
   const extractLink = (message: string) => {
     const url = extractUrl();
-    if (!url) return message;
+    if (!url) {
+      return message;
+    }
 
     const beforeLink = message.split('Click here ')[0] || '';
 
