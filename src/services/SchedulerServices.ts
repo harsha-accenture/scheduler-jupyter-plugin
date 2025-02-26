@@ -17,7 +17,7 @@
 
 import { requestAPI } from '../handler/Handler';
 import { SchedulerLoggingService, LOG_LEVEL } from './LoggingService';
-import { toastifyCustomStyle } from '../utils/Config';
+import { showToast, toastifyCustomStyle } from '../utils/Config';
 import { JupyterLab } from '@jupyterlab/application';
 import { scheduleMode } from '../utils/Const';
 import {
@@ -170,6 +170,8 @@ export class SchedulerService {
   };
   static listComposersAPIService = async (
     setComposerList: (value: string[]) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void,
     setIsLoading?: (value: boolean) => void
   ) => {
     try {
@@ -183,7 +185,25 @@ export class SchedulerService {
         if (setIsLoading) {
           setIsLoading(false);
         }
+      } else if (formattedResponse.length === undefined) {
+        try {
+          if (formattedResponse.error.code === 403) {
+            setIsApiError(true);
+            setApiError(formattedResponse.error.message);
+            if (setIsLoading) {
+              setIsLoading(false);
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing error message:', error);
+          showToast(
+            'Error fetching environments list. Please try again later.',
+            'error-featching-env-list'
+          );
+        }
       } else {
+        setIsApiError(false);
+        setApiError('');
         const composerEnvironmentList: string[] = [];
         formattedResponse.forEach((data: IComposerAPIResponse) => {
           composerEnvironmentList.push(data.name);

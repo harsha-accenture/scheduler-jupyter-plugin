@@ -26,9 +26,6 @@ import { MainAreaWidget, IThemeManager } from '@jupyterlab/apputils';
 import { ILauncher } from '@jupyterlab/launcher';
 import { iconCluster, iconScheduledNotebooks } from './utils/Icons';
 import { AuthLogin } from './login/AuthLogin';
-import { eventEmitter } from './utils/SignalEmitter';
-import { Notification } from '@jupyterlab/apputils';
-import { SchedulerService } from './services/SchedulerServices';
 import { NotebookScheduler } from './scheduler/NotebookScheduler';
 import { NotebookButtonExtension } from './controls/NotebookButtonExtension';
 import { TITLE_LAUNCHER_CATEGORY } from './utils/Const';
@@ -87,55 +84,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
         app.shell.add(widget, 'main');
       }
     });
-
-    // Capture the signal
-    eventEmitter.on('schedulerConfigChange', (message: string) => {
-      checkAllApisEnabled();
-    });
-
-    const checkAllApisEnabled = async () => {
-      const composerListResponse =
-        await SchedulerService.listComposersAPICheckService();
-
-      const apiChecks = [
-        {
-          response: composerListResponse,
-          errorKey: 'Error fetching environments list',
-          errorMessage: 'Cloud Composer API has not been used in project',
-          notificationMessage: 'The Cloud Composer API is not enabled.',
-          enableLink:
-            'https://console.cloud.google.com/apis/library/composer.googleapis.com'
-        }
-      ];
-
-      apiChecks.forEach(
-        ({
-          response,
-          errorKey,
-          errorMessage,
-          notificationMessage,
-          enableLink
-        }) => {
-          const errorValue = errorKey
-            .split('.')
-            .reduce((acc, key) => acc?.[key], response);
-          if (errorValue && errorValue.includes(errorMessage)) {
-            Notification.error(notificationMessage, {
-              actions: [
-                {
-                  label: 'Enable',
-                  callback: () => window.open(enableLink, '_blank'),
-                  displayType: 'link'
-                }
-              ],
-              autoClose: false
-            });
-          }
-        }
-      );
-    };
-
-    await checkAllApisEnabled();
 
     app.docRegistry.addWidgetExtension(
       'Notebook',

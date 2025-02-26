@@ -482,3 +482,9 @@
   justify-content: center;
   cursor: pointer;
 }
+
+.error-schedule-link {
+  color: blue;
+  text-decoration: underline;
+  padding-left: 3px;
+}

@@ -36,6 +36,8 @@ import ImportErrorPopup from '../../utils/ImportErrorPopup';
 import triggerIcon from '../../../style/icons/scheduler_trigger.svg';
 import { PLUGIN_ID, scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { iconError } from '../../utils/Icons';
+import EnableNotifyMessage from '../common/EnableNotifyMessage';
 
 const iconDelete = new LabIcon({
   name: 'launcher:delete-icon',
@@ -152,6 +154,8 @@ function listNotebookScheduler({
   const [importErrorData, setImportErrorData] = useState<string[]>([]);
   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
+  const [isApiError, setIsApiError] = useState(false);
+  const [apiError, setApiError] = useState('');
   const columns = React.useMemo(
     () => [
       {
@@ -306,6 +310,8 @@ function listNotebookScheduler({
   const listComposersAPI = async () => {
     await SchedulerService.listComposersAPIService(
       setComposerList,
+      setIsApiError,
+      setApiError,
       setIsLoading
     );
   };
@@ -589,6 +595,16 @@ function listNotebookScheduler({
           </div>
         )}
       </div>
+      <div>
+        {isApiError && (
+          <div className="error-api">
+            <iconError.react tag="div" className="logo-alignment-style" />
+            <div className="error-key-missing">
+              <EnableNotifyMessage message={apiError} />
+            </div>
+          </div>
+        )}
+      </div>
       {dagList.length > 0 ? (
         <div className="notebook-templates-list-table-parent">
           <TableData
@@ -637,7 +653,7 @@ function listNotebookScheduler({
               Loading Notebook Schedulers
             </div>
           )}
-          {!isLoading && (
+          {!isLoading && !apiError && (
             <div className="no-data-style">No rows to display</div>
           )}
         </div>

@@ -46,6 +46,8 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
+import { iconError } from '../../utils/Icons';
+import EnableNotifyMessage from '../common/EnableNotifyMessage';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -122,6 +124,9 @@ const CreateNotebookScheduler = ({
 
   const [isBigQueryNotebook, setIsBigQueryNotebook] = useState(false);
 
+  const [isApiError, setIsApiError] = useState(false);
+  const [apiError, setApiError] = useState('');
+
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
       setClusterList,
@@ -138,7 +143,11 @@ const CreateNotebookScheduler = ({
   };
 
   const listComposersAPI = async () => {
-    await SchedulerService.listComposersAPIService(setComposerList);
+    await SchedulerService.listComposersAPIService(
+      setComposerList,
+      setIsApiError,
+      setApiError
+    );
   };
 
   const handleComposerSelected = (data: string | null) => {
@@ -435,9 +444,19 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
-            {!composerSelected && (
+            {!composerSelected && !isApiError && (
               <ErrorMessage message="Environment is required field" />
             )}
+
+            {isApiError && (
+              <div className="error-key-parent">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">
+                  <EnableNotifyMessage message={apiError} />
+                </div>
+              </div>
+            )}
+
             <div className="create-scheduler-label">Output formats</div>
             <div className="create-scheduler-form-element">
               <FormGroup row={true}>
