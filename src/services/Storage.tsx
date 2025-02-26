@@ -97,7 +97,7 @@ export class StorageServices {
       );
       if (formattedResponse.status === 0) {
         toast.success(
-          `${scheduleName} job history downloaded successfully`,
+          `${fileName} has been successfully downloaded from the ${scheduleName} job history`,
           toastifyCustomStyle
         );
       } else {
