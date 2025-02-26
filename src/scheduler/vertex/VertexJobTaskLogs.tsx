@@ -22,6 +22,7 @@ import { authApi } from '../../utils/Config';
 import { toast } from 'react-toastify';
 import createClusterIcon from '../../../style/icons/create_cluster_icon.svg';
 import { LabIcon } from '@jupyterlab/ui-components';
+import { LOG_EXPLORER_BASE_URL } from '../../utils/Const';
 
 const iconCreateCluster = new LabIcon({
   name: 'launcher:create-cluster-icon',
@@ -61,9 +62,17 @@ const VertexJobTaskLogs = ({
    *  Redirect to pantheon cloud logs
    */
   const handleLogs = async () => {
-    window.open(
-      `https://console.cloud.google.com/logs/query;query=SEARCH${jobRunId};cursorTimestamp=${jobRunsData?.startDate};duration=PT1H?hl=en&mods=metastore_prod_env&project=${projectId}`
-    );
+    const logExplorerUrl = new URL(LOG_EXPLORER_BASE_URL);
+    logExplorerUrl.searchParams.set("query", jobRunId);
+    if (jobRunsData?.startDate) {
+      logExplorerUrl.searchParams.set("cursorTimestamp", jobRunsData.startDate);
+    }
+    logExplorerUrl.searchParams.set("project", projectId);
+    try {
+      window.open(logExplorerUrl.toString());
+    } catch (error) {
+      console.error("Failed to open Log Explorer window:", error);
+    }
   };
 
   /**
@@ -73,14 +82,14 @@ const VertexJobTaskLogs = ({
     (
       taskInstance: {
         severity:
-          | string
-          | number
-          | boolean
-          | React.ReactElement<any, string | React.JSXElementConstructor<any>>
-          | Iterable<React.ReactNode>
-          | React.ReactPortal
-          | null
-          | undefined;
+        | string
+        | number
+        | boolean
+        | React.ReactElement<any, string | React.JSXElementConstructor<any>>
+        | Iterable<React.ReactNode>
+        | React.ReactPortal
+        | null
+        | undefined;
         date: string;
         time: string;
         textPayload: string;
@@ -127,17 +136,17 @@ const VertexJobTaskLogs = ({
               (
                 taskInstance: {
                   severity:
-                    | string
-                    | number
-                    | boolean
-                    | React.ReactElement<
-                        any,
-                        string | React.JSXElementConstructor<any>
-                      >
-                    | Iterable<React.ReactNode>
-                    | React.ReactPortal
-                    | null
-                    | undefined;
+                  | string
+                  | number
+                  | boolean
+                  | React.ReactElement<
+                    any,
+                    string | React.JSXElementConstructor<any>
+                  >
+                  | Iterable<React.ReactNode>
+                  | React.ReactPortal
+                  | null
+                  | undefined;
                   date: string;
                   time: string;
                   textPayload: string;
