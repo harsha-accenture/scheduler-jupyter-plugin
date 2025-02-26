@@ -60,9 +60,16 @@ export class StorageServices {
           method: 'POST'
         }
       );
-      setBucketError(formattedResponse.error);
+      if (formattedResponse === null) {
+        toast.success('Bucket created successfully', toastifyCustomStyle);
+      } else if (formattedResponse?.error) {
+        let errorMessage = '400: Bucket not created.';
+        if (formattedResponse.error.includes('false')) {
+          errorMessage = `${errorMessage} ${formattedResponse.error.split('false:')[1]}`;
+        }
+        setBucketError(errorMessage);
+      }
       setIsCreatingNewBucket(false);
-      toast.success('Bucket created successfully', toastifyCustomStyle);
     } catch (error) {
       setIsCreatingNewBucket(false);
       SchedulerLoggingService.log(
