@@ -70,16 +70,14 @@ export enum ClusterStatus {
   STATUS_ACTIVE = 'ACTIVE'
 }
 
-export const LOG_EXPLORER_BASE_URL= 'https://console.cloud.google.com/logs/query';
+export const LOG_EXPLORER_BASE_URL =
+  'https://console.cloud.google.com/logs/query';
 
-export const VIEW_LOGS_BATCH_URL =
-  `${LOG_EXPLORER_BASE_URL};query=resource.type="cloud_dataproc_batch"`;
+export const VIEW_LOGS_BATCH_URL = `${LOG_EXPLORER_BASE_URL};query=resource.type="cloud_dataproc_batch"`;
 
-export const VIEW_LOGS_CLUSTER_URL =
-  `${LOG_EXPLORER_BASE_URL};query=resource.type="cloud_dataproc_cluster" resource.labels.cluster_name=`;
+export const VIEW_LOGS_CLUSTER_URL = `${LOG_EXPLORER_BASE_URL};query=resource.type="cloud_dataproc_cluster" resource.labels.cluster_name=`;
 
-export const VIEW_LOGS_SESSION_URL =
-  `${LOG_EXPLORER_BASE_URL};query=resource.type="cloud_dataproc_session"`;
+export const VIEW_LOGS_SESSION_URL = `${LOG_EXPLORER_BASE_URL};query=resource.type="cloud_dataproc_session"`;
 
 export const CORN_EXP_DOC_URL =
   'https://cloud.google.com/scheduler/docs/configuring/cron-job-schedules';
