@@ -315,6 +315,7 @@ const CreateVertexScheduler = ({
    * @returns {void}
    */
   const handleCloudStorageSelected = (value: string | null) => {
+    setBucketError("");
     if (value === `Create and Select "${searchValue}"`) {
       createNewBucket();
     } else {
