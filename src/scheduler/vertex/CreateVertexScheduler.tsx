@@ -603,8 +603,6 @@ const CreateVertexScheduler = ({
   const isSaveDisabled = () => {
     return (
       !selectedMachineType ||
-      (selectedMachineType.acceleratorConfigs !== null &&
-        !(acceleratorType && acceleratedCount)) ||
       jobNameSelected === '' ||
       region === null ||
       creatingVertexScheduler ||
@@ -852,12 +850,9 @@ const CreateVertexScheduler = ({
                         value={acceleratorType}
                         onChange={(_event, val) => handleAccelerationType(val)}
                         renderInput={params => (
-                          <TextField {...params} label="Accelerator type*" />
+                          <TextField {...params} label="Accelerator type" />
                         )}
                       />
-                      {!acceleratorType && (
-                        <ErrorMessage message="Accelerator type is required" />
-                      )}
                     </div>
 
                     {item?.acceleratorConfigs?.map(
@@ -881,13 +876,10 @@ const CreateVertexScheduler = ({
                                   renderInput={params => (
                                     <TextField
                                       {...params}
-                                      label="Accelerator count*"
+                                      label="Accelerator count"
                                     />
                                   )}
                                 />
-                                {!acceleratedCount && (
-                                  <ErrorMessage message="Accelerator count is required" />
-                                )}
                               </div>
                             ) : null}
                           </>
