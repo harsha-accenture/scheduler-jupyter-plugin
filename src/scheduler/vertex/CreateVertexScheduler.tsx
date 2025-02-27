@@ -603,8 +603,6 @@ const CreateVertexScheduler = ({
   const isSaveDisabled = () => {
     return (
       !selectedMachineType ||
-      (selectedMachineType.acceleratorConfigs !== null &&
-        !(acceleratorType && acceleratedCount)) ||
       jobNameSelected === '' ||
       region === null ||
       creatingVertexScheduler ||
@@ -649,12 +647,10 @@ const CreateVertexScheduler = ({
    * Create a job schedule
    */
   const handleCreateJobScheduler = async () => {
-    const payload = {
+    const payload: any = {
       input_filename: inputFileSelected,
       display_name: jobNameSelected,
       machine_type: machineTypeSelected,
-      accelerator_type: acceleratorType,
-      accelerator_count: acceleratedCount,
       kernel_name: kernelSelected,
       schedule_value: getScheduleValues(),
       time_zone: timeZoneSelected,
@@ -680,6 +676,11 @@ const CreateVertexScheduler = ({
       disk_type: diskTypeSelected,
       disk_size: diskSize
     };
+
+    if (acceleratorType && acceleratedCount) {
+      payload.accelerator_type = acceleratorType;
+      payload.accelerator_count = acceleratedCount;
+    }
 
     if (editMode) {
       await VertexServices.editVertexJobSchedulerService(
@@ -852,12 +853,9 @@ const CreateVertexScheduler = ({
                         value={acceleratorType}
                         onChange={(_event, val) => handleAccelerationType(val)}
                         renderInput={params => (
-                          <TextField {...params} label="Accelerator type*" />
+                          <TextField {...params} label="Accelerator type" />
                         )}
                       />
-                      {!acceleratorType && (
-                        <ErrorMessage message="Accelerator type is required" />
-                      )}
                     </div>
 
                     {item?.acceleratorConfigs?.map(
