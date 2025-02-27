@@ -647,12 +647,10 @@ const CreateVertexScheduler = ({
    * Create a job schedule
    */
   const handleCreateJobScheduler = async () => {
-    const payload = {
+    const payload: any = {
       input_filename: inputFileSelected,
       display_name: jobNameSelected,
       machine_type: machineTypeSelected,
-      accelerator_type: acceleratorType,
-      accelerator_count: acceleratedCount,
       kernel_name: kernelSelected,
       schedule_value: getScheduleValues(),
       time_zone: timeZoneSelected,
@@ -678,6 +676,11 @@ const CreateVertexScheduler = ({
       disk_type: diskTypeSelected,
       disk_size: diskSize
     };
+
+    if (acceleratorType && acceleratedCount) {
+      payload.accelerator_type = acceleratorType;
+      payload.accelerator_count = acceleratedCount;
+    }
 
     if (editMode) {
       await VertexServices.editVertexJobSchedulerService(
@@ -876,10 +879,13 @@ const CreateVertexScheduler = ({
                                   renderInput={params => (
                                     <TextField
                                       {...params}
-                                      label="Accelerator count"
+                                      label="Accelerator count*"
                                     />
                                   )}
                                 />
+                                {!acceleratedCount && (
+                                  <ErrorMessage message="Accelerator count is required" />
+                                )}
                               </div>
                             ) : null}
                           </>
