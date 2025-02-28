@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 export interface ISessionTemplateRoot {
   error: {
     code: number;
