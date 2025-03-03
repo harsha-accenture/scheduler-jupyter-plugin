@@ -453,6 +453,7 @@ class Client:
             parameters = {
                 param.split(":")[0]: param.split(":")[1] for param in data.parameters
             }
+            labels = {param.split(":")[0]: param.split(":")[1] for param in data.labels}
 
             if data.kernel_name:
                 notebook_execution_job["kernelName"] = data.kernel_name
