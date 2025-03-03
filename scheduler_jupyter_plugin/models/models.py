@@ -54,7 +54,7 @@ class DescribeJob(BaseModel):
     stop_cluster: bool = False
     time_zone: str = None
     email_success: bool = False
-      
+
     @classmethod
     def from_dict(cls, data):
         return cls(**data)
@@ -80,6 +80,7 @@ class DescribeVertexJob(BaseModel):
     end_time: Optional[str] = None
     disk_type: str = None
     disk_size: str = None
+    labels: List[str] = None
 
     @classmethod
     def from_dict(cls, data):
@@ -88,12 +89,12 @@ class DescribeVertexJob(BaseModel):
 
 class DescribeBucketName(BaseModel):
     bucket_name: str = None
-    
+
     @classmethod
     def from_dict(cls, data):
         return cls(**data)
-      
-  
+
+
 class DescribeUpdateVertexJob(BaseModel):
     input_filename: str = None
     display_name: str = None
@@ -115,7 +116,8 @@ class DescribeUpdateVertexJob(BaseModel):
     gcs_notebook_source: str = None
     disk_type: Optional[str] = None
     disk_size: Optional[str] = None
-      
+    labels: List[str] = None
+
     @classmethod
     def from_dict(cls, data):
         return cls(**data)
