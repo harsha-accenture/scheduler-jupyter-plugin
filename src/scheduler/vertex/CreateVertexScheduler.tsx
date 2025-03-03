@@ -968,13 +968,12 @@ const CreateVertexScheduler = ({
           )}
 
           <span className="tab-description tab-text-sub-cl">
-            {bucketError && bucketError !== '' ? (
+            {bucketError &&
+            bucketError !== '' &&
+            !cloudStorageList.includes(cloudStorage!) ? (
               <span className="error-message">{bucketError}</span>
             ) : (
-              <span>
-                Where results are stored. Select an existing bucket or create a
-                new one.
-              </span>
+              <span>Select an existing bucket or create a new one.</span>
             )}
           </span>
           <div className="execution-history-main-wrapper">
