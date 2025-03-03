@@ -90,6 +90,10 @@ const CreateVertexScheduler = ({
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState<
     string[]
   >([]);
+  const [defaultLabelDetail, setDefaultLabelDetail] = useState<string[]>([]);
+  const [defaultLabelDetailUpdated, setDefaultLabelDetailUpdated] = useState<
+    string[]
+  >([]);
   const [keyValidation, setKeyValidation] = useState(-1);
   const [valueValidation, setValueValidation] = useState(-1);
   const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
@@ -658,6 +662,7 @@ const CreateVertexScheduler = ({
       region: region,
       cloud_storage_bucket: `gs://${cloudStorage}`,
       parameters: parameterDetailUpdated,
+      labels: defaultLabelDetailUpdated,
       service_account: serviceAccountSelected?.email,
       network:
         networkSelected === 'networkInThisProject'
@@ -788,6 +793,8 @@ const CreateVertexScheduler = ({
           setDiskSize={setDiskSize}
           setParameterDetail={setParameterDetail}
           setParameterDetailUpdated={setParameterDetailUpdated}
+          setDefaultLabelDetail={setDefaultLabelDetail}
+          setDefaultLabelDetailUpdated={setDefaultLabelDetailUpdated}
           setServiceAccountSelected={setServiceAccountSelected}
           setPrimaryNetworkSelected={setPrimaryNetworkSelected}
           setSubNetworkSelected={setSubNetworkSelected}
@@ -1001,7 +1008,6 @@ const CreateVertexScheduler = ({
           <div className="create-job-scheduler-title sub-title-heading ">
             Parameters
           </div>
-
           <LabelProperties
             labelDetail={parameterDetail}
             setLabelDetail={setParameterDetail}
@@ -1014,6 +1020,24 @@ const CreateVertexScheduler = ({
             setValueValidation={setValueValidation}
             duplicateKeyError={duplicateKeyError}
             setDuplicateKeyError={setDuplicateKeyError}
+          />
+
+          <div className="create-job-scheduler-title sub-title-heading ">
+            Labels
+          </div>
+          <LabelProperties
+            labelDetail={defaultLabelDetail}
+            setLabelDetail={setDefaultLabelDetail}
+            labelDetailUpdated={defaultLabelDetailUpdated}
+            setLabelDetailUpdated={setDefaultLabelDetailUpdated}
+            buttonText="ADD LABEL"
+            keyValidation={keyValidation}
+            setKeyValidation={setKeyValidation}
+            valueValidation={valueValidation}
+            setValueValidation={setValueValidation}
+            duplicateKeyError={duplicateKeyError}
+            setDuplicateKeyError={setDuplicateKeyError}
+            fromPage={editMode ? 'scheduler' : ''}
           />
 
           <div className="create-scheduler-form-element panel-margin">
