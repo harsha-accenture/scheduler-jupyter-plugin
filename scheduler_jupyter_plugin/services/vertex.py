@@ -198,7 +198,6 @@ class Client:
         except Exception as e:
             return {"error": str(e)}
 
-          
     async def list_uiconfig(self, region_id):
         try:
             uiconfig = []
@@ -444,9 +443,10 @@ class Client:
                 else f"TZ={data.time_zone} {schedule_value}"
             )
             # getting list of strings from UI, the api accepts dictionary, so converting it
-            labels = {
+            parameters = {
                 param.split(":")[0]: param.split(":")[1] for param in data.parameters
             }
+            labels = {param.split(":")[0]: param.split(":")[1] for param in data.labels}
 
             if data.kernel_name:
                 notebook_execution_job["kernelName"] = data.kernel_name
@@ -455,6 +455,8 @@ class Client:
             if data.cloud_storage_bucket:
                 notebook_execution_job["gcsOutputUri"] = data.cloud_storage_bucket
             if data.parameters:
+                notebook_execution_job["parameters"] = parameters
+            if data.labels:
                 notebook_execution_job["labels"] = labels
             if data.machine_type:
                 custom_environment_spec["machineSpec"] = {

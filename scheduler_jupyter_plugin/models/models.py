@@ -93,8 +93,8 @@ class DescribeBucketName(BaseModel):
     @classmethod
     def from_dict(cls, data):
         return cls(**data)
-      
-  
+
+
 class DescribeUpdateVertexJob(BaseModel):
     input_filename: str = None
     display_name: str = None
@@ -116,7 +116,8 @@ class DescribeUpdateVertexJob(BaseModel):
     gcs_notebook_source: str = None
     disk_type: Optional[str] = None
     disk_size: Optional[str] = None
-      
+    labels: List[str] = None
+
     @classmethod
     def from_dict(cls, data):
         return cls(**data)
