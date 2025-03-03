@@ -166,7 +166,7 @@ const VertexJobTaskLogs = ({
                           {taskInstance.date + ' ' + taskInstance.time}
                         </div>
                         <div className="accordion-vertex-row-data">
-                          {taskInstance.textPayload.split(']')[1]}
+                          {taskInstance.textPayload}
                         </div>
                       </div>
                     }
