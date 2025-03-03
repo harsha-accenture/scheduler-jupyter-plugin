@@ -370,7 +370,7 @@ export class VertexServices {
     setJobNameSelected: (value: string) => void,
     setGcsPath: (value: string) => void,
     setDefaultLabelDetail: (value: string[]) => void,
-    setDefaultLabelDetailUpdated: (value: string[]) => void,
+    setDefaultLabelDetailUpdated: (value: string[]) => void
   ) => {
     setEditDagLoading(job_id);
     try {
@@ -452,11 +452,13 @@ export class VertexServices {
           setParameterDetailUpdated(parameterList);
         }
 
-        if(Object.prototype.hasOwnProperty.call(
-          formattedResponse.createNotebookExecutionJobRequest
-            .notebookExecutionJob,
-          'labels'
-        )) {
+        if (
+          Object.prototype.hasOwnProperty.call(
+            formattedResponse.createNotebookExecutionJobRequest
+              .notebookExecutionJob,
+            'labels'
+          )
+        ) {
           const labelList = Object.keys(
             formattedResponse.createNotebookExecutionJobRequest
               .notebookExecutionJob.labels

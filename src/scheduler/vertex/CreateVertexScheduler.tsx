@@ -730,7 +730,6 @@ const CreateVertexScheduler = ({
         ...parameterDetailUpdated
       ]);
     }
-
   }, [createCompleted]);
 
   useEffect(() => {
