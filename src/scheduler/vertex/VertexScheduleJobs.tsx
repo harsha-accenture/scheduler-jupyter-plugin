@@ -43,6 +43,8 @@ const VertexScheduleJobs = ({
   setDiskSize,
   setParameterDetail,
   setParameterDetailUpdated,
+  setDefaultLabelDetail,
+  setDefaultLabelDetailUpdated,
   setServiceAccountSelected,
   setPrimaryNetworkSelected,
   setSubNetworkSelected,
@@ -75,6 +77,8 @@ const VertexScheduleJobs = ({
   setDiskSize: (value: string) => void;
   setParameterDetail: (value: string[]) => void;
   setParameterDetailUpdated: (value: string[]) => void;
+  setDefaultLabelDetail: (value: string[]) => void;
+  setDefaultLabelDetailUpdated: (value: string[]) => void;
   setServiceAccountSelected: (
     value: { displayName: string; email: string } | null
   ) => void;
@@ -148,6 +152,8 @@ const VertexScheduleJobs = ({
           setDiskSize={setDiskSize}
           setParameterDetail={setParameterDetail}
           setParameterDetailUpdated={setParameterDetailUpdated}
+          setDefaultLabelDetail={setDefaultLabelDetail}
+          setDefaultLabelDetailUpdated={setDefaultLabelDetailUpdated}
           setServiceAccountSelected={setServiceAccountSelected}
           setPrimaryNetworkSelected={setPrimaryNetworkSelected}
           setSubNetworkSelected={setSubNetworkSelected}
@@ -225,6 +231,12 @@ export class NotebookJobs extends SchedulerWidget {
           throw new Error('Function not implemented.');
         }}
         setParameterDetailUpdated={function (value: string[]): void {
+          throw new Error('Function not implemented.');
+        }}
+        setDefaultLabelDetail={function (value: string[]): void {
+          throw new Error('Function not implemented.');
+        }}
+        setDefaultLabelDetailUpdated={function (value: string[]): void {
           throw new Error('Function not implemented.');
         }}
         setServiceAccountSelected={function (

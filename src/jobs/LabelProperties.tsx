@@ -197,6 +197,7 @@ function LabelProperties({
                         }`}
                         disabled={
                           labelSplit[0] === '' ||
+                          labelSplit[0] !== 'client' ||
                           buttonText !== 'ADD LABEL' ||
                           duplicateKeyError !== -1
                             ? false
