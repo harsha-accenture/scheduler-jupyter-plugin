@@ -225,8 +225,6 @@
 .accordion-vertex-row-data {
   padding-left: 15px;
   width: 10%;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   overflow: hidden;
 }
 
