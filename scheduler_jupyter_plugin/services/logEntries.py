@@ -47,6 +47,7 @@ class Client:
                     "severity": log_dict.get("severity"),
                     "summary": "",
                 }
+                # extracting error message
                 if log_dict.get("textPayload"):
                     formatted_res["summary"] = log_dict["textPayload"]
                 if log_dict.get("jsonPayload"):
