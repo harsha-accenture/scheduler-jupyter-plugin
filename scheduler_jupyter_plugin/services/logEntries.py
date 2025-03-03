@@ -50,9 +50,13 @@ class Client:
                 if log_dict.get("textPayload"):
                     formatted_res["summary"] = log_dict["textPayload"]
                 if log_dict.get("jsonPayload"):
-                    formatted_res["summary"] = f"{formatted_res['summary']} {log_dict['jsonPayload']['message']}"
+                    formatted_res["summary"] = (
+                        f"{formatted_res['summary']} {log_dict['jsonPayload']['message']}"
+                    )
                 if log_dict.get("protoPayload"):
-                    formatted_res["summary"] = log_dict["protoPayload"]["status"]["message"]
+                    formatted_res["summary"] = log_dict["protoPayload"]["status"][
+                        "message"
+                    ]
                 if log_dict.get("httpRequest"):
                     formatted_res["summary"] = log_dict["httpRequest"]["statusMessage"]
                 logs.append(formatted_res)
