@@ -38,8 +38,8 @@ class UIConfigController(APIHandler):
         except Exception as e:
             self.log.exception(f"Error fetching ui config: {str(e)}")
             self.finish({"error": str(e)})
-            
-            
+
+
 class VertexScheduleCreateController(APIHandler):
     @tornado.web.authenticated
     async def post(self):
