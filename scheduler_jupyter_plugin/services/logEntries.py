@@ -47,7 +47,7 @@ class Client:
                     "severity": log_dict.get("severity"),
                 }
                 if log_dict.get("textPayload") and log_dict.get("jsonPayload"):
-                    formatted_res["summary"] = f"{log_dict["textPayload"]}, {log_dict["jsonPayload"]["message"]}"
+                    formatted_res["summary"] = f"{log_dict['textPayload']}, {log_dict['jsonPayload']['message']}"
                 elif log_dict.get("textPayload"):
                     formatted_res["summary"] = log_dict["textPayload"]
                 elif log_dict.get("jsonPayload"):
@@ -57,7 +57,7 @@ class Client:
                 elif log_dict.get("httpRequest"):
                     formatted_res["summary"] = log_dict["httpRequest"]["statusMessage"]
                 else:
-                    formatted_res["summary"] = None
+                    formatted_res["summary"] = ""
                 logs.append(formatted_res)
             return logs
 
