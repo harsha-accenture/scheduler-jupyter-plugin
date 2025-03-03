@@ -953,6 +953,7 @@ const CreateVertexScheduler = ({
 
                 return <li {...props}>{option}</li>;
               }}
+              disabled={isCreatingNewBucket}
             />
           </div>
           {!cloudStorage && (

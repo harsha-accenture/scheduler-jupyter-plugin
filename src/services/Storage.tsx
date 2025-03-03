@@ -62,6 +62,7 @@ export class StorageServices {
       );
       if (formattedResponse === null) {
         toast.success('Bucket created successfully', toastifyCustomStyle);
+        setBucketError('');
       } else if (formattedResponse?.error) {
         let errorMessage = '400: Bucket not created.';
         if (formattedResponse.error.includes('false')) {
