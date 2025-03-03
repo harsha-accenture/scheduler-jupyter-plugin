@@ -368,7 +368,9 @@ export class VertexServices {
     setMaxRuns: (value: string) => void,
     setEditMode: (value: boolean) => void,
     setJobNameSelected: (value: string) => void,
-    setGcsPath: (value: string) => void
+    setGcsPath: (value: string) => void,
+    setDefaultLabelDetail: (value: string[]) => void,
+    setDefaultLabelDetailUpdated: (value: string[]) => void,
   ) => {
     setEditDagLoading(job_id);
     try {
@@ -433,10 +435,29 @@ export class VertexServices {
           Object.prototype.hasOwnProperty.call(
             formattedResponse.createNotebookExecutionJobRequest
               .notebookExecutionJob,
-            'labels'
+            'parameters'
           )
         ) {
           const parameterList = Object.keys(
+            formattedResponse.createNotebookExecutionJobRequest
+              .notebookExecutionJob.parameters
+          ).map(
+            key =>
+              key +
+              ':' +
+              formattedResponse.createNotebookExecutionJobRequest
+                .notebookExecutionJob.parameters[key]
+          );
+          setParameterDetail(parameterList);
+          setParameterDetailUpdated(parameterList);
+        }
+
+        if(Object.prototype.hasOwnProperty.call(
+          formattedResponse.createNotebookExecutionJobRequest
+            .notebookExecutionJob,
+          'labels'
+        )) {
+          const labelList = Object.keys(
             formattedResponse.createNotebookExecutionJobRequest
               .notebookExecutionJob.labels
           ).map(
@@ -446,8 +467,8 @@ export class VertexServices {
               formattedResponse.createNotebookExecutionJobRequest
                 .notebookExecutionJob.labels[key]
           );
-          setParameterDetail(parameterList);
-          setParameterDetailUpdated(parameterList);
+          setDefaultLabelDetail(labelList);
+          setDefaultLabelDetailUpdated(labelList);
         }
 
         setServiceAccountSelected({
