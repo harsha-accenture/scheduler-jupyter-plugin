@@ -51,7 +51,6 @@ class Client:
             "Authorization": f"Bearer {self._access_token}",
         }
 
-
     async def check_bucket_exists(self, bucket_name):
         try:
             if not bucket_name:
@@ -109,9 +108,11 @@ class Client:
             disk_type = job.disk_type.split(" ", 1)[0]
 
             # getting list of strings from UI, the api accepts dictionary, so converting it
-            labels = {
+            parameters = {
                 param.split(":")[0]: param.split(":")[1] for param in job.parameters
             }
+
+            labels = {param.split(":")[0]: param.split(":")[1] for param in job.labels}
 
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             headers = self.create_headers()
@@ -123,6 +124,7 @@ class Client:
                     "parent": f"projects/{self.project_id}/locations/{self.region_id}",
                     "notebookExecutionJob": {
                         "displayName": job.display_name,
+                        "parameters": parameters,
                         "labels": labels,
                         "customEnvironmentSpec": {
                             "machineSpec": {
