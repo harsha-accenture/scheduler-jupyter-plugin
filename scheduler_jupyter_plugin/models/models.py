@@ -80,6 +80,7 @@ class DescribeVertexJob(BaseModel):
     end_time: Optional[str] = None
     disk_type: str = None
     disk_size: str = None
+    labels: List[str] = None
 
     @classmethod
     def from_dict(cls, data):

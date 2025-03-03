@@ -114,6 +114,8 @@ class Client:
                 param.split(":")[0]: param.split(":")[1] for param in job.parameters
             }
 
+            labels = {param.split(":")[0]: param.split(":")[1] for param in job.labels}
+
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             headers = self.create_headers()
             payload = {
