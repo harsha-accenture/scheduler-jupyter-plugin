@@ -97,7 +97,7 @@ export class StorageServices {
         }
       );
       if (formattedResponse.status === 0) {
-        let base_filename = path.basename(
+        const base_filename = path.basename(
           formattedResponse.downloaded_filename
         );
         toast.success(
