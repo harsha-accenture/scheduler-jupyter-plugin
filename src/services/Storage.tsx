@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import { requestAPI } from '../handler/Handler';
 import { SchedulerLoggingService, LOG_LEVEL } from './LoggingService';
 import { toastifyCustomStyle } from '../utils/Config';
+import path from 'path';
 
 export class StorageServices {
   static cloudStorageAPIService = async (
@@ -97,8 +98,11 @@ export class StorageServices {
         }
       );
       if (formattedResponse.status === 0) {
+        const base_filename = path.basename(
+          formattedResponse.downloaded_filename
+        );
         toast.success(
-          `${fileName} has been successfully downloaded from the ${scheduleName} job history`,
+          `${base_filename} has been successfully downloaded from the ${scheduleName} job history`,
           toastifyCustomStyle
         );
       } else {
