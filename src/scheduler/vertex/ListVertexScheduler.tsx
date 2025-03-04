@@ -62,8 +62,6 @@ function ListVertexScheduler({
   setDiskSize,
   setParameterDetail,
   setParameterDetailUpdated,
-  setDefaultLabelDetail,
-  setDefaultLabelDetailUpdated,
   setServiceAccountSelected,
   setPrimaryNetworkSelected,
   setSubNetworkSelected,
@@ -95,8 +93,6 @@ function ListVertexScheduler({
   setDiskSize: (value: string) => void;
   setParameterDetail: (value: string[]) => void;
   setParameterDetailUpdated: (value: string[]) => void;
-  setDefaultLabelDetail: (value: string[]) => void;
-  setDefaultLabelDetailUpdated: (value: string[]) => void;
   setServiceAccountSelected: (
     value: { displayName: string; email: string } | null
   ) => void;
@@ -306,9 +302,7 @@ function ListVertexScheduler({
         setMaxRuns,
         setEditMode,
         setJobNameSelected,
-        setGcsPath,
-        setDefaultLabelDetail,
-        setDefaultLabelDetailUpdated
+        setGcsPath
       );
     }
   };
