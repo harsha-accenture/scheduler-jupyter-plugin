@@ -427,6 +427,10 @@ class Client:
                 "displayName": data.display_name,
                 "gcsNotebookSource": {"uri": data.gcs_notebook_source},
                 "customEnvironmentSpec": custom_environment_spec,
+                "labels": {
+                    "aiplatform.googleapis.com/colab_enterprise_entry_service": "workbench",
+                },
+                "workbenchRuntime": {},
             }
             schedule_value = (
                 "* * * * *" if data.schedule_value == "" else data.schedule_value
@@ -440,7 +444,6 @@ class Client:
             parameters = {
                 param.split(":")[0]: param.split(":")[1] for param in data.parameters
             }
-            labels = {param.split(":")[0]: param.split(":")[1] for param in data.labels}
 
             if data.kernel_name:
                 notebook_execution_job["kernelName"] = data.kernel_name
@@ -450,8 +453,6 @@ class Client:
                 notebook_execution_job["gcsOutputUri"] = data.cloud_storage_bucket
             if data.parameters:
                 notebook_execution_job["parameters"] = parameters
-            if data.labels:
-                notebook_execution_job["labels"] = labels
             if data.machine_type:
                 custom_environment_spec["machineSpec"] = {
                     "machineType": data.machine_type.split(" ", 1)[0],
