@@ -17,6 +17,7 @@ import os
 from google.cloud import storage
 import google.oauth2.credentials as oauth2
 import aiofiles
+import time
 
 
 class Client:
@@ -41,14 +42,19 @@ class Client:
             bucket = storage_client.bucket(bucket_name)
             blob = bucket.blob(blob_name)
             original_file_name = os.path.basename(blob_name)
-            destination_file_name = os.path.join(".", original_file_name)
+           
+            timestamp = time.strftime("%H%M%S")
+            base_name, extension = os.path.splitext(original_file_name)
+            unique_file_name = f"{base_name}_{job_run_id}_{timestamp}{extension}"
+            destination_file_name = os.path.join(".", unique_file_name)
+
             async with aiofiles.open(destination_file_name, "wb") as f:
                 file_data = blob.download_as_bytes()
                 await f.write(file_data)
             self.log.info(
-                f"Output notebook file '{original_file_name}' downloaded successfully"
+                f"Output notebook file '{unique_file_name}' downloaded successfully"
             )
-            return 0
+            return {"status": 0, "downloaded_filename": destination_file_name}
         except Exception as error:
             self.log.exception(f"Error downloading output notebook file: {str(error)}")
             return {"error": str(error)}
