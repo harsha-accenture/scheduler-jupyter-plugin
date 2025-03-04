@@ -114,8 +114,6 @@ class Client:
                 param.split(":")[0]: param.split(":")[1] for param in job.parameters
             }
 
-            labels = {param.split(":")[0]: param.split(":")[1] for param in job.labels}
-
             api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
             headers = self.create_headers()
             payload = {
@@ -127,7 +125,9 @@ class Client:
                     "notebookExecutionJob": {
                         "displayName": job.display_name,
                         "parameters": parameters,
-                        "labels": labels,
+                        "labels": {
+                            "aiplatform.googleapis.com/colab_enterprise_entry_service": "workbench",
+                        },
                         "customEnvironmentSpec": {
                             "machineSpec": {
                                 "machineType": machine_type,
@@ -148,6 +148,7 @@ class Client:
                         "gcsOutputUri": job.cloud_storage_bucket,
                         "serviceAccount": job.service_account,
                         "kernelName": job.kernel_name,
+                        "workbenchRuntime": {},
                     },
                 },
             }
