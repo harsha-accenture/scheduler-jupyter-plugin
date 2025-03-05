@@ -45,8 +45,6 @@ import { VertexServices } from '../../services/Vertex';
 import { IVertexScheduleList } from './VertexInterfaces';
 import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
-import EnableNotifyMessage from '../common/EnableNotifyMessage';
-import { iconError } from '../../utils/Icons';
 
 function ListVertexScheduler({
   region,
@@ -138,8 +136,6 @@ function ListVertexScheduler({
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
   const isPreview = false;
-  const [isApiError, setIsApiError] = useState<boolean>(false);
-  const [apiError, setApiError] = useState('');
 
   const columns = useMemo(
     () => [
