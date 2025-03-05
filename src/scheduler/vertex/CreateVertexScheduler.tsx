@@ -58,6 +58,8 @@ import { StorageServices } from '../../services/Storage';
 import { IAcceleratorConfig, IMachineType } from './VertexInterfaces';
 import { toast } from 'react-toastify';
 import VertexScheduleJobs from './VertexScheduleJobs';
+import EnableNotifyMessage from '../common/EnableNotifyMessage';
+import { iconError } from '../../utils/Icons';
 
 const CreateVertexScheduler = ({
   themeManager,
@@ -176,6 +178,8 @@ const CreateVertexScheduler = ({
   const [endDateError, setEndDateError] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>('');
   const [gcsPath, setGcsPath] = useState('');
+  const [isApiError, setIsApiError] = useState<boolean>(false);
+  const [apiError, setApiError] = useState('');
 
   /**
    * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
