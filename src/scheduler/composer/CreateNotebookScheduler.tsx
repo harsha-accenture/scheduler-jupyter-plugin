@@ -46,8 +46,6 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
-import { iconError } from '../../utils/Icons';
-import EnableNotifyMessage from '../common/EnableNotifyMessage';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -65,7 +63,9 @@ const CreateNotebookScheduler = ({
   jobNameValidation,
   jobNameSpecialValidation,
   jobNameUniqueValidation,
-  setJobNameUniqueValidation
+  setJobNameUniqueValidation,
+  setIsApiError,
+  setApiError
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -83,6 +83,8 @@ const CreateNotebookScheduler = ({
   jobNameSpecialValidation: boolean;
   jobNameUniqueValidation: boolean;
   setJobNameUniqueValidation: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
+  setApiError: React.Dispatch<React.SetStateAction<string>>;
 }): JSX.Element => {
   const [composerList, setComposerList] = useState<string[]>([]);
   const [composerSelected, setComposerSelected] = useState('');
@@ -123,9 +125,6 @@ const CreateNotebookScheduler = ({
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
 
   const [isBigQueryNotebook, setIsBigQueryNotebook] = useState(false);
-
-  const [isApiError, setIsApiError] = useState(false);
-  const [apiError, setApiError] = useState('');
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -428,6 +427,8 @@ const CreateNotebookScheduler = ({
           setTimeZoneSelected={setTimeZoneSelected}
           setEditMode={setEditMode}
           setIsLoadingKernelDetail={setIsLoadingKernelDetail}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
         />
       ) : (
         <div>
@@ -444,17 +445,8 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
-            {!composerSelected && !isApiError && (
+            {!composerSelected && (
               <ErrorMessage message="Environment is required field" />
-            )}
-
-            {isApiError && (
-              <div className="error-key-parent">
-                <iconError.react tag="div" className="logo-alignment-style" />
-                <div className="error-key-missing">
-                  <EnableNotifyMessage message={apiError} />
-                </div>
-              </div>
             )}
 
             <div className="create-scheduler-label">Output formats</div>

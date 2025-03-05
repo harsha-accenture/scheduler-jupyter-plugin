@@ -51,7 +51,9 @@ const NotebookJobComponent = ({
   setStopCluster,
   setTimeZoneSelected,
   setEditMode,
-  setIsLoadingKernelDetail
+  setIsLoadingKernelDetail,
+  setIsApiError,
+  setApiError
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -82,6 +84,8 @@ const NotebookJobComponent = ({
   setTimeZoneSelected?: (value: string) => void;
   setEditMode?: (value: boolean) => void;
   setIsLoadingKernelDetail?: (value: boolean) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -145,6 +149,8 @@ const NotebookJobComponent = ({
                 bucketName={bucketName}
                 setBucketName={setBucketName}
                 setIsLoadingKernelDetail={setIsLoadingKernelDetail}
+                setIsApiError={setIsApiError}
+                setApiError={setApiError}
               />
             }
           </div>
@@ -157,15 +163,21 @@ const NotebookJobComponent = ({
 export class NotebookJobs extends SchedulerWidget {
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 
   constructor(
     app: JupyterLab,
     settingRegistry: ISettingRegistry,
-    themeManager: IThemeManager
+    themeManager: IThemeManager,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void
   ) {
     super(themeManager);
     this.app = app;
     this.settingRegistry = settingRegistry;
+    this.setIsApiError = setIsApiError;
+    this.setApiError = setApiError;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -173,6 +185,8 @@ export class NotebookJobs extends SchedulerWidget {
         app={this.app}
         settingRegistry={this.settingRegistry}
         themeManager={this.themeManager}
+        setIsApiError={this.setIsApiError}
+        setApiError={this.setApiError}
       />
     );
   }
