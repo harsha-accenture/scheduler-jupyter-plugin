@@ -488,3 +488,7 @@
 .enable-text-label {
   width: 60%;
 }
+
+.enable-error-text-label {
+  padding-left: 13px;
+}

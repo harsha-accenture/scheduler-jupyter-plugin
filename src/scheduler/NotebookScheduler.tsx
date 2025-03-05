@@ -34,6 +34,8 @@ import {
   Typography
 } from '@mui/material';
 import CreateVertexScheduler from './vertex/CreateVertexScheduler';
+import EnableNotifyMessage from './common/EnableNotifyMessage';
+import { iconError } from '../utils/Icons';
 
 const NotebookSchedulerComponent = ({
   themeManager,
@@ -58,6 +60,8 @@ const NotebookSchedulerComponent = ({
     context !== '' ? useState(false) : useState(true);
   const [notebookSelector, setNotebookSelector] = useState<string>('vertex');
   const [executionPageFlag, setExecutionPageFlag] = useState<boolean>(true);
+  const [isApiError, setIsApiError] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   useEffect(() => {
     if (context !== '') {
@@ -153,29 +157,43 @@ const NotebookSchedulerComponent = ({
         )
       )}
       {executionPageFlag && (
-        <div className="create-scheduler-form-element sub-para">
-          <FormControl>
-            <RadioGroup
-              className="schedule-radio-btn"
-              aria-labelledby="demo-controlled-radio-buttons-group"
-              name="controlled-radio-buttons-group"
-              value={notebookSelector}
-              onChange={handleSchedulerModeChange}
-            >
-              <FormControlLabel
-                value="vertex"
-                className="create-scheduler-label-style"
-                control={<Radio size="small" />}
-                label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
-              />
-              <FormControlLabel
-                value="composer"
-                className="create-scheduler-label-style"
-                control={<Radio size="small" />}
-                label={<Typography sx={{ fontSize: 13 }}>Composer</Typography>}
-              />
-            </RadioGroup>
-          </FormControl>
+        <div>
+          <div className="create-scheduler-form-element sub-para">
+            <FormControl>
+              <RadioGroup
+                className="schedule-radio-btn"
+                aria-labelledby="demo-controlled-radio-buttons-group"
+                name="controlled-radio-buttons-group"
+                value={notebookSelector}
+                onChange={handleSchedulerModeChange}
+              >
+                <FormControlLabel
+                  value="vertex"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
+                />
+                <FormControlLabel
+                  value="composer"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>Composer</Typography>
+                  }
+                />
+              </RadioGroup>
+            </FormControl>
+          </div>
+          <div>
+            {isApiError && (
+              <div className="error-key-parent enable-error-text-label">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">
+                  <EnableNotifyMessage message={apiError} />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -197,6 +215,8 @@ const NotebookSchedulerComponent = ({
           jobNameSpecialValidation={jobNameSpecialValidation}
           jobNameUniqueValidation={jobNameUniqueValidation}
           setJobNameUniqueValidation={setJobNameUniqueValidation}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
         />
       ) : (
         <CreateVertexScheduler
@@ -212,6 +232,8 @@ const NotebookSchedulerComponent = ({
           editMode={editMode}
           setEditMode={setEditMode}
           setExecutionPageFlag={setExecutionPageFlag}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
         />
       )}
     </div>

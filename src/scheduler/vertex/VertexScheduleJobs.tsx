@@ -56,7 +56,9 @@ const VertexScheduleJobs = ({
   setEditMode,
   setJobNameSelected,
   setGcsPath,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  setIsApiError,
+  setApiError
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -95,6 +97,8 @@ const VertexScheduleJobs = ({
   setJobNameSelected?: (value: string) => void;
   setGcsPath: (value: string) => void;
   setExecutionPageFlag: (value: boolean) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] =
     useState<boolean>(false);
@@ -162,6 +166,8 @@ const VertexScheduleJobs = ({
           setJobNameSelected={setJobNameSelected!}
           setGcsPath={setGcsPath}
           handleDagIdSelection={handleDagIdSelection}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
         />
       )}
     </>
@@ -277,6 +283,12 @@ export class NotebookJobs extends SchedulerWidget {
           throw new Error('Function not implemented.');
         }}
         setExecutionPageFlag={this.setExecutionPageFlag}
+        setIsApiError={function (value: boolean): void {
+          throw new Error('Function not implemented.');
+        }}
+        setApiError={function (value: string): void {
+          throw new Error('Function not implemented.');
+        }}
       />
     );
   }

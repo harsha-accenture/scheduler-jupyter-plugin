@@ -58,8 +58,6 @@ import { StorageServices } from '../../services/Storage';
 import { IAcceleratorConfig, IMachineType } from './VertexInterfaces';
 import { toast } from 'react-toastify';
 import VertexScheduleJobs from './VertexScheduleJobs';
-import EnableNotifyMessage from '../common/EnableNotifyMessage';
-import { iconError } from '../../utils/Icons';
 
 const CreateVertexScheduler = ({
   themeManager,
@@ -73,7 +71,9 @@ const CreateVertexScheduler = ({
   setInputFileSelected,
   editMode,
   setEditMode,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  setIsApiError,
+  setApiError
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -87,6 +87,8 @@ const CreateVertexScheduler = ({
   editMode: boolean;
   setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
   setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
+  setApiError: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [parameterDetail, setParameterDetail] = useState<string[]>([]);
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState<
@@ -174,8 +176,6 @@ const CreateVertexScheduler = ({
   const [endDateError, setEndDateError] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>('');
   const [gcsPath, setGcsPath] = useState('');
-  const [isApiError, setIsApiError] = useState<boolean>(false);
-  const [apiError, setApiError] = useState('');
 
   /**
    * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
@@ -808,6 +808,8 @@ const CreateVertexScheduler = ({
           setJobNameSelected={setJobNameSelected}
           setGcsPath={setGcsPath}
           setExecutionPageFlag={setExecutionPageFlag}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
         />
       ) : (
         <div className="submit-job-container">
@@ -819,15 +821,7 @@ const CreateVertexScheduler = ({
             />
           </div>
           {!region && <ErrorMessage message="Region is required" />}
-          
-          {isApiError && (
-            <div className="error-key-parent">
-              <iconError.react tag="div" className="logo-alignment-style" />
-              <div className="error-key-missing">
-                <EnableNotifyMessage message={apiError} />
-              </div>
-            </div>
-          )}
+
           <div className="create-scheduler-form-element">
             <Autocomplete
               className="create-scheduler-style"

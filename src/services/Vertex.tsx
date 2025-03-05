@@ -155,12 +155,18 @@ export class VertexServices {
         serviceURL + `?region_id=${region}`
       );
       if (Object.keys(formattedResponse).length !== 0) {
-        if (formattedResponse.hasOwnProperty('error') && formattedResponse.error.code === 403) {
+        if (
+          formattedResponse.hasOwnProperty('error') &&
+          formattedResponse.error.code === 403
+        ) {
           setIsApiError(true);
           setApiError(formattedResponse.error.message);
           setIsLoading(false);
         } else {
-          if (formattedResponse.hasOwnProperty('schedules') && formattedResponse.schedules.length > 0) {
+          if (
+            formattedResponse.hasOwnProperty('schedules') &&
+            formattedResponse.schedules.length > 0
+          ) {
             setDagList(formattedResponse.schedules);
             setIsLoading(false);
           } else {
