@@ -492,3 +492,7 @@
 .enable-error-text-label {
   padding-left: 13px;
 }
+
+.text-enable-warning {
+  padding-top: 13px;
+}

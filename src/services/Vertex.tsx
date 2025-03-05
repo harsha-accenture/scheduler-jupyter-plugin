@@ -156,7 +156,7 @@ export class VertexServices {
       );
       if (Object.keys(formattedResponse).length !== 0) {
         if (
-          formattedResponse.hasOwnProperty('error') &&
+          Object.hasOwn(formattedResponse, 'error') &&
           formattedResponse.error.code === 403
         ) {
           setIsApiError(true);
@@ -164,7 +164,7 @@ export class VertexServices {
           setIsLoading(false);
         } else {
           if (
-            formattedResponse.hasOwnProperty('schedules') &&
+            Object.hasOwn(formattedResponse, 'schedules') &&
             formattedResponse.schedules.length > 0
           ) {
             setDagList(formattedResponse.schedules);
