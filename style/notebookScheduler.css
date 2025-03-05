@@ -480,7 +480,11 @@
 }
 
 .error-schedule-link {
-  color: blue;
+  color: blue !important;
   text-decoration: underline;
   padding-left: 3px;
+}
+
+.enable-text-label {
+  width: 60%;
 }

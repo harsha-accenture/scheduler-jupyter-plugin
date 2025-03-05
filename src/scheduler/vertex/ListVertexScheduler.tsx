@@ -44,6 +44,8 @@ import { VertexServices } from '../../services/Vertex';
 import { IDagList } from './VertexInterfaces';
 import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
+import EnableNotifyMessage from '../common/EnableNotifyMessage';
+import { iconError } from '../../utils/Icons';
 
 function ListVertexScheduler({
   region,
@@ -129,6 +131,8 @@ function ListVertexScheduler({
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
   const isPreview = false;
+  const [isApiError, setIsApiError] = useState<boolean>(false);
+  const [apiError, setApiError] = useState('');
 
   const columns = React.useMemo(
     () => [
@@ -157,7 +161,13 @@ function ListVertexScheduler({
    */
   const listDagInfoAPI = async () => {
     setIsLoading(true);
-    await VertexServices.listVertexSchedules(setDagList, region, setIsLoading);
+    await VertexServices.listVertexSchedules(
+      setDagList,
+      region,
+      setIsLoading,
+      setIsApiError,
+      setApiError
+    );
   };
 
   /**
@@ -178,7 +188,9 @@ function ListVertexScheduler({
         setDagList,
         setIsLoading,
         displayName,
-        setResumeLoading
+        setResumeLoading,
+        setIsApiError,
+        setApiError
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
@@ -187,7 +199,9 @@ function ListVertexScheduler({
         setDagList,
         setIsLoading,
         displayName,
-        setResumeLoading
+        setResumeLoading,
+        setIsApiError,
+        setApiError
       );
     }
   };
@@ -240,7 +254,9 @@ function ListVertexScheduler({
       uniqueScheduleId,
       scheduleDisplayName,
       setDagList,
-      setIsLoading
+      setIsLoading,
+      setIsApiError,
+      setApiError
     );
     setDeletePopupOpen(false);
     setDeletingSchedule(false);
@@ -646,16 +662,28 @@ function ListVertexScheduler({
   return (
     <div>
       <div className="select-text-overlay-scheduler">
-        <div className="region-overlay create-scheduler-form-element content-pd-space ">
-          <RegionDropdown
-            projectId={projectId}
-            region={region}
-            onRegionChange={region => setRegion(region)}
-          />
-          {!isLoading && !region && (
-            <ErrorMessage message="Region is required" />
+        <div className='enable-text-label'>
+          <div className="region-overlay create-scheduler-form-element content-pd-space ">
+            <RegionDropdown
+              projectId={projectId}
+              region={region}
+              onRegionChange={region => setRegion(region)}
+            />
+            {!isLoading && !region && (
+              <ErrorMessage message="Region is required" />
+            )}
+          </div>
+
+          {isApiError && (
+            <div className="error-key-parent">
+              <iconError.react tag="div" className="logo-alignment-style" />
+              <div className="error-key-missing">
+                <EnableNotifyMessage message={apiError} />
+              </div>
+            </div>
           )}
         </div>
+
         <div className="btn-refresh">
           <Button
             disabled={isLoading}
