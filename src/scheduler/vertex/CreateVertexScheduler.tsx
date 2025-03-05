@@ -58,6 +58,8 @@ import { StorageServices } from '../../services/Storage';
 import { IAcceleratorConfig, IMachineType } from './VertexInterfaces';
 import { toast } from 'react-toastify';
 import VertexScheduleJobs from './VertexScheduleJobs';
+import EnableNotifyMessage from '../common/EnableNotifyMessage';
+import { iconError } from '../../utils/Icons';
 
 const CreateVertexScheduler = ({
   themeManager,
@@ -172,6 +174,8 @@ const CreateVertexScheduler = ({
   const [endDateError, setEndDateError] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>('');
   const [gcsPath, setGcsPath] = useState('');
+  const [isApiError, setIsApiError] = useState<boolean>(false);
+  const [apiError, setApiError] = useState('');
 
   /**
    * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
@@ -527,7 +531,9 @@ const CreateVertexScheduler = ({
     await VertexServices.machineTypeAPIService(
       region,
       setMachineTypeList,
-      setMachineTypeLoading
+      setMachineTypeLoading,
+      setIsApiError,
+      setApiError
     );
   };
 
@@ -813,6 +819,15 @@ const CreateVertexScheduler = ({
             />
           </div>
           {!region && <ErrorMessage message="Region is required" />}
+          
+          {isApiError && (
+            <div className="error-key-parent">
+              <iconError.react tag="div" className="logo-alignment-style" />
+              <div className="error-key-missing">
+                <EnableNotifyMessage message={apiError} />
+              </div>
+            </div>
+          )}
           <div className="create-scheduler-form-element">
             <Autocomplete
               className="create-scheduler-style"
