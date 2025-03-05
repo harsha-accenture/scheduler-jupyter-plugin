@@ -44,8 +44,6 @@ import { VertexServices } from '../../services/Vertex';
 import { IDagList } from './VertexInterfaces';
 import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
-import EnableNotifyMessage from '../common/EnableNotifyMessage';
-import { iconError } from '../../utils/Icons';
 
 function ListVertexScheduler({
   region,
@@ -77,7 +75,9 @@ function ListVertexScheduler({
   setEditMode,
   setJobNameSelected,
   setGcsPath,
-  handleDagIdSelection
+  handleDagIdSelection,
+  setIsApiError,
+  setApiError
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -115,6 +115,8 @@ function ListVertexScheduler({
   setJobNameSelected: (value: string) => void;
   setGcsPath: (value: string) => void;
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
@@ -131,8 +133,6 @@ function ListVertexScheduler({
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
   const isPreview = false;
-  const [isApiError, setIsApiError] = useState<boolean>(false);
-  const [apiError, setApiError] = useState('');
 
   const columns = React.useMemo(
     () => [
@@ -662,7 +662,7 @@ function ListVertexScheduler({
   return (
     <div>
       <div className="select-text-overlay-scheduler">
-        <div className='enable-text-label'>
+        <div className="enable-text-label">
           <div className="region-overlay create-scheduler-form-element content-pd-space ">
             <RegionDropdown
               projectId={projectId}
@@ -673,15 +673,6 @@ function ListVertexScheduler({
               <ErrorMessage message="Region is required" />
             )}
           </div>
-
-          {isApiError && (
-            <div className="error-key-parent">
-              <iconError.react tag="div" className="logo-alignment-style" />
-              <div className="error-key-missing">
-                <EnableNotifyMessage message={apiError} />
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="btn-refresh">
