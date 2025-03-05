@@ -812,7 +812,7 @@ const CreateVertexScheduler = ({
           setApiError={setApiError}
         />
       ) : (
-        <div className="submit-job-container">
+        <div className="submit-job-container text-enable-warning">
           <div className="region-overlay create-scheduler-form-element">
             <RegionDropdown
               projectId={projectId}
