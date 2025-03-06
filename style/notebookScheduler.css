@@ -479,8 +479,8 @@
   cursor: pointer;
 }
 
-.error-schedule-link {
-  color: blue !important;
+.enable-error-text-label a {
+  color: blue;
   text-decoration: underline;
   padding-left: 3px;
 }
