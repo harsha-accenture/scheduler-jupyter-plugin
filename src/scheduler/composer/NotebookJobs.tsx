@@ -53,7 +53,8 @@ const NotebookJobComponent = ({
   setEditMode,
   setIsLoadingKernelDetail,
   setIsApiError,
-  setApiError
+  setApiError,
+  setExecutionPageFlag
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -86,6 +87,7 @@ const NotebookJobComponent = ({
   setIsLoadingKernelDetail?: (value: boolean) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  setExecutionPageFlag: (value: boolean) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -112,6 +114,7 @@ const NotebookJobComponent = ({
           dagId={dagId}
           handleBackButton={handleBackButton}
           bucketName={bucketName}
+          setExecutionPageFlag={setExecutionPageFlag}
         />
       ) : (
         <div>
@@ -165,19 +168,22 @@ export class NotebookJobs extends SchedulerWidget {
   settingRegistry: ISettingRegistry;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  setExecutionPageFlag: (value: boolean) => void;
 
   constructor(
     app: JupyterLab,
     settingRegistry: ISettingRegistry,
     themeManager: IThemeManager,
     setIsApiError: (value: boolean) => void,
-    setApiError: (value: string) => void
+    setApiError: (value: string) => void,
+    setExecutionPageFlag: (value: boolean) => void
   ) {
     super(themeManager);
     this.app = app;
     this.settingRegistry = settingRegistry;
     this.setIsApiError = setIsApiError;
     this.setApiError = setApiError;
+    this.setExecutionPageFlag = setExecutionPageFlag;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -187,6 +193,7 @@ export class NotebookJobs extends SchedulerWidget {
         themeManager={this.themeManager}
         setIsApiError={this.setIsApiError}
         setApiError={this.setApiError}
+        setExecutionPageFlag={this.setExecutionPageFlag}
       />
     );
   }
