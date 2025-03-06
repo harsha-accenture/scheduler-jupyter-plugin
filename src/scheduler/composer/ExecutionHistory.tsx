@@ -44,7 +44,7 @@ const ExecutionHistory = ({
   dagId: string;
   handleBackButton: () => void;
   bucketName: string;
-  setExecutionPageFlag: (value : boolean) => void;
+  setExecutionPageFlag: (value: boolean) => void;
 }): JSX.Element => {
   const [dagRunId, setDagRunId] = useState('');
   const currentDate = new Date().toLocaleDateString();
