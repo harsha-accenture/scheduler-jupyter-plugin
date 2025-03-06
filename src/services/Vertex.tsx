@@ -17,7 +17,7 @@
 import { toast } from 'react-toastify';
 import { requestAPI } from '../handler/Handler';
 import { SchedulerLoggingService, LOG_LEVEL } from './LoggingService';
-import { toastifyCustomStyle } from '../utils/Config';
+import { showToast, toastifyCustomStyle } from '../utils/Config';
 import {
   ICreatePayload,
   IDagList,
@@ -35,7 +35,9 @@ export class VertexServices {
   static machineTypeAPIService = async (
     region: string,
     setMachineTypeList: (value: IMachineType[]) => void,
-    setMachineTypeLoading: (value: boolean) => void
+    setMachineTypeLoading: (value: boolean) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void
   ) => {
     try {
       setMachineTypeLoading(true);
@@ -44,6 +46,17 @@ export class VertexServices {
       );
       if (formattedResponse.length > 0) {
         setMachineTypeList(formattedResponse);
+      } else if (formattedResponse.length === undefined) {
+        try {
+          if (formattedResponse.error.code === 403) {
+            setIsApiError(true);
+            setApiError(formattedResponse.error.message);
+          }
+        } catch (error) {
+          showToast(
+            'Error fetching machine type list. Please try again later.'
+          );
+        }
       } else {
         setMachineTypeList([]);
       }
@@ -132,7 +145,9 @@ export class VertexServices {
   static listVertexSchedules = async (
     setDagList: (value: IDagList[]) => void,
     region: string,
-    setIsLoading: (value: boolean) => void
+    setIsLoading: (value: boolean) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void
   ) => {
     try {
       const serviceURL = 'api/vertex/listSchedules';
@@ -140,13 +155,25 @@ export class VertexServices {
         serviceURL + `?region_id=${region}`
       );
       if (Object.keys(formattedResponse).length !== 0) {
-        if (formattedResponse.schedules.length > 0) {
-          setDagList(formattedResponse.schedules);
+        if (
+          Object.hasOwn(formattedResponse, 'error') &&
+          formattedResponse.error.code === 403
+        ) {
+          setIsApiError(true);
+          setApiError(formattedResponse.error.message);
           setIsLoading(false);
+        } else {
+          if (
+            Object.hasOwn(formattedResponse, 'schedules') &&
+            formattedResponse.schedules.length > 0
+          ) {
+            setDagList(formattedResponse.schedules);
+            setIsLoading(false);
+          } else {
+            setDagList([]);
+            setIsLoading(false);
+          }
         }
-      } else {
-        setDagList([]);
-        setIsLoading(false);
       }
     } catch (error) {
       setDagList([]);
@@ -162,7 +189,9 @@ export class VertexServices {
     setDagList: (value: IDagList[]) => void,
     setIsLoading: (value: boolean) => void,
     displayName: string,
-    setResumeLoading: (value: string) => void
+    setResumeLoading: (value: string) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -178,7 +207,9 @@ export class VertexServices {
         await VertexServices.listVertexSchedules(
           setDagList,
           region,
-          setIsLoading
+          setIsLoading,
+          setIsApiError,
+          setApiError
         );
         setResumeLoading('');
       } else {
@@ -199,7 +230,9 @@ export class VertexServices {
     setDagList: (value: IDagList[]) => void,
     setIsLoading: (value: boolean) => void,
     displayName: string,
-    setResumeLoading: (value: string) => void
+    setResumeLoading: (value: string) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -215,7 +248,9 @@ export class VertexServices {
         await VertexServices.listVertexSchedules(
           setDagList,
           region,
-          setIsLoading
+          setIsLoading,
+          setIsApiError,
+          setApiError
         );
         setResumeLoading('');
       } else {
@@ -269,7 +304,9 @@ export class VertexServices {
     scheduleId: string,
     displayName: string,
     setDagList: (value: IDagList[]) => void,
-    setIsLoading: (value: boolean) => void
+    setIsLoading: (value: boolean) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void
   ) => {
     try {
       const serviceURL = 'api/vertex/deleteSchedule';
@@ -281,7 +318,9 @@ export class VertexServices {
         await VertexServices.listVertexSchedules(
           setDagList,
           region,
-          setIsLoading
+          setIsLoading,
+          setIsApiError,
+          setApiError
         );
         toast.success(
           `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,

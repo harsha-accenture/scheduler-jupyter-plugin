@@ -56,7 +56,9 @@ const VertexScheduleJobs = ({
   setEditMode,
   setJobNameSelected,
   setGcsPath,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  setIsApiError,
+  setApiError
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -95,6 +97,8 @@ const VertexScheduleJobs = ({
   setJobNameSelected?: (value: string) => void;
   setGcsPath: (value: string) => void;
   setExecutionPageFlag: (value: boolean) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] =
     useState<boolean>(false);
@@ -162,6 +166,8 @@ const VertexScheduleJobs = ({
           setJobNameSelected={setJobNameSelected!}
           setGcsPath={setGcsPath}
           handleDagIdSelection={handleDagIdSelection}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
         />
       )}
     </>
@@ -172,17 +178,119 @@ export class NotebookJobs extends SchedulerWidget {
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
   setExecutionPageFlag: (value: boolean) => void;
+  setJobId: (value: string) => void;
+  setCreateCompleted: (value: boolean) => void;
+  setInputFileSelected: (value: string) => void;
+  region: string;
+  setRegion: (value: string) => void;
+  setMachineTypeSelected: (value: string | null) => void;
+  setAcceleratedCount: (value: string | null) => void;
+  setAcceleratorType: (value: string | null) => void;
+  setKernelSelected: (value: string | null) => void;
+  setCloudStorage: (value: string | null) => void;
+  setDiskTypeSelected: (value: string | null) => void;
+  setDiskSize: (value: string) => void;
+  setParameterDetail: (value: string[]) => void;
+  setParameterDetailUpdated: (value: string[]) => void;
+  setServiceAccountSelected: (
+    value: { displayName: string; email: string } | null
+  ) => void;
+  setPrimaryNetworkSelected: (
+    value: { name: string; link: string } | null
+  ) => void;
+  setSubNetworkSelected: (value: { name: string; link: string } | null) => void;
+  setSubNetworkList: (value: { name: string; link: string }[]) => void;
+  setSharedNetworkSelected: (
+    value: { name: string; network: string; subnetwork: string } | null
+  ) => void;
+  setScheduleMode: (value: scheduleMode) => void;
+  setScheduleField: (value: string) => void;
+  setStartDate: (value: dayjs.Dayjs | null) => void;
+  setEndDate: (value: dayjs.Dayjs | null) => void;
+  setMaxRuns: (value: string) => void;
+  setEditMode: (value: boolean) => void;
+  setJobNameSelected?: (value: string) => void;
+  setGcsPath: (value: string) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 
   constructor(
     app: JupyterLab,
     settingRegistry: ISettingRegistry,
     themeManager: IThemeManager,
-    setExecutionPageFlag: (value: boolean) => void
+    setExecutionPageFlag: (value: boolean) => void,
+    setJobId: (value: string) => void,
+    setCreateCompleted: (value: boolean) => void,
+    setInputFileSelected: (value: string) => void,
+    region: string,
+    setRegion: (value: string) => void,
+    setMachineTypeSelected: (value: string | null) => void,
+    setAcceleratedCount: (value: string | null) => void,
+    setAcceleratorType: (value: string | null) => void,
+    setKernelSelected: (value: string | null) => void,
+    setCloudStorage: (value: string | null) => void,
+    setDiskTypeSelected: (value: string | null) => void,
+    setDiskSize: (value: string) => void,
+    setParameterDetail: (value: string[]) => void,
+    setParameterDetailUpdated: (value: string[]) => void,
+    setServiceAccountSelected: (
+      value: { displayName: string; email: string } | null
+    ) => void,
+    setPrimaryNetworkSelected: (
+      value: { name: string; link: string } | null
+    ) => void,
+    setSubNetworkSelected: (
+      value: { name: string; link: string } | null
+    ) => void,
+    setSubNetworkList: (value: { name: string; link: string }[]) => void,
+    setSharedNetworkSelected: (
+      value: { name: string; network: string; subnetwork: string } | null
+    ) => void,
+    setScheduleMode: (value: scheduleMode) => void,
+    setScheduleField: (value: string) => void,
+    setStartDate: (value: dayjs.Dayjs | null) => void,
+    setEndDate: (value: dayjs.Dayjs | null) => void,
+    setMaxRuns: (value: string) => void,
+    setEditMode: (value: boolean) => void,
+    setGcsPath: (value: string) => void,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void,
+    setJobNameSelected?: (value: string) => void
   ) {
     super(themeManager);
     this.app = app;
     this.settingRegistry = settingRegistry;
     this.setExecutionPageFlag = setExecutionPageFlag;
+    this.setJobId = setJobId;
+    this.setCreateCompleted = setCreateCompleted;
+    this.setInputFileSelected = setInputFileSelected;
+    this.region = region;
+    this.setRegion = setRegion;
+    this.setMachineTypeSelected = setMachineTypeSelected;
+    this.setAcceleratedCount = setAcceleratedCount;
+    this.setAcceleratorType = setAcceleratorType;
+    this.setKernelSelected = setKernelSelected;
+    this.setCloudStorage = setCloudStorage;
+    this.setDiskTypeSelected = setDiskTypeSelected;
+    this.setDiskSize = setDiskSize;
+    this.setParameterDetail = setParameterDetail;
+    this.setParameterDetailUpdated = setParameterDetailUpdated;
+    this.setServiceAccountSelected = setServiceAccountSelected;
+    this.setPrimaryNetworkSelected = setPrimaryNetworkSelected;
+    this.setSubNetworkSelected = setSubNetworkSelected;
+    this.setSubNetworkList = setSubNetworkList;
+    this.setSharedNetworkSelected = setSharedNetworkSelected;
+    this.setScheduleMode = setScheduleMode;
+    this.setScheduleField = setScheduleField;
+    this.setStartDate = setStartDate;
+    this.setEndDate = setEndDate;
+    this.setMaxRuns = setMaxRuns;
+    this.setEditMode = setEditMode;
+    this.setJobNameSelected = setJobNameSelected;
+    this.setExecutionPageFlag = setExecutionPageFlag;
+    this.setIsApiError = setIsApiError;
+    this.setApiError = setApiError;
+    this.setGcsPath = setGcsPath;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -190,93 +298,35 @@ export class NotebookJobs extends SchedulerWidget {
         app={this.app}
         settingRegistry={this.settingRegistry}
         themeManager={this.themeManager}
-        setCreateCompleted={function (value: boolean): void {
-          throw new Error('Function not implemented.');
-        }}
-        setInputFileSelected={function (value: string): void {
-          throw new Error('Function not implemented.');
-        }}
-        region={''}
-        setRegion={function (value: string): void {
-          throw new Error('Function not implemented.');
-        }}
-        setMachineTypeSelected={function (value: string | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setAcceleratedCount={function (value: string | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setAcceleratorType={function (value: string | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setKernelSelected={function (value: string | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setCloudStorage={function (value: string | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setDiskTypeSelected={function (value: string | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setDiskSize={function (value: string): void {
-          throw new Error('Function not implemented.');
-        }}
-        setParameterDetail={function (value: string[]): void {
-          throw new Error('Function not implemented.');
-        }}
-        setParameterDetailUpdated={function (value: string[]): void {
-          throw new Error('Function not implemented.');
-        }}
-        setServiceAccountSelected={function (
-          value: { displayName: string; email: string } | null
-        ): void {
-          throw new Error('Function not implemented.');
-        }}
-        setPrimaryNetworkSelected={function (
-          value: { name: string; link: string } | null
-        ): void {
-          throw new Error('Function not implemented.');
-        }}
-        setSubNetworkSelected={function (
-          value: { name: string; link: string } | null
-        ): void {
-          throw new Error('Function not implemented.');
-        }}
-        setSubNetworkList={function (
-          value: { name: string; link: string }[]
-        ): void {
-          throw new Error('Function not implemented.');
-        }}
-        setSharedNetworkSelected={function (
-          value: { name: string; network: string; subnetwork: string } | null
-        ): void {
-          throw new Error('Function not implemented.');
-        }}
-        setScheduleMode={function (value: scheduleMode): void {
-          throw new Error('Function not implemented.');
-        }}
-        setScheduleField={function (value: string): void {
-          throw new Error('Function not implemented.');
-        }}
-        setStartDate={function (value: dayjs.Dayjs | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setEndDate={function (value: dayjs.Dayjs | null): void {
-          throw new Error('Function not implemented.');
-        }}
-        setMaxRuns={function (value: string): void {
-          throw new Error('Function not implemented.');
-        }}
-        setEditMode={function (value: boolean): void {
-          throw new Error('Function not implemented.');
-        }}
-        setJobId={function (value: string): void {
-          throw new Error('Function not implemented.');
-        }}
-        setGcsPath={function (value: string): void {
-          throw new Error('Function not implemented.');
-        }}
+        setJobId={this.setJobId}
+        setCreateCompleted={this.setCreateCompleted}
+        setInputFileSelected={this.setInputFileSelected}
+        region={this.region}
+        setRegion={this.setRegion}
+        setMachineTypeSelected={this.setMachineTypeSelected}
+        setAcceleratedCount={this.setAcceleratedCount}
+        setAcceleratorType={this.setAcceleratorType}
+        setKernelSelected={this.setKernelSelected}
+        setCloudStorage={this.setCloudStorage}
+        setDiskTypeSelected={this.setDiskTypeSelected}
+        setDiskSize={this.setDiskSize}
+        setParameterDetail={this.setParameterDetail}
+        setParameterDetailUpdated={this.setParameterDetailUpdated}
+        setServiceAccountSelected={this.setServiceAccountSelected}
+        setPrimaryNetworkSelected={this.setPrimaryNetworkSelected}
+        setSubNetworkSelected={this.setSubNetworkSelected}
+        setSubNetworkList={this.setSubNetworkList}
+        setSharedNetworkSelected={this.setSharedNetworkSelected}
+        setScheduleMode={this.setScheduleMode}
+        setScheduleField={this.setScheduleField}
+        setStartDate={this.setStartDate}
+        setEndDate={this.setEndDate}
+        setMaxRuns={this.setMaxRuns}
+        setEditMode={this.setEditMode}
+        setGcsPath={this.setGcsPath}
         setExecutionPageFlag={this.setExecutionPageFlag}
+        setIsApiError={this.setIsApiError}
+        setApiError={this.setApiError}
       />
     );
   }

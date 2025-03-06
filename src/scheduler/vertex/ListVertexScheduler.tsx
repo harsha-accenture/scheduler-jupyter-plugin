@@ -75,7 +75,9 @@ function ListVertexScheduler({
   setEditMode,
   setJobNameSelected,
   setGcsPath,
-  handleDagIdSelection
+  handleDagIdSelection,
+  setIsApiError,
+  setApiError
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -113,6 +115,8 @@ function ListVertexScheduler({
   setJobNameSelected: (value: string) => void;
   setGcsPath: (value: string) => void;
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
@@ -157,7 +161,13 @@ function ListVertexScheduler({
    */
   const listDagInfoAPI = async () => {
     setIsLoading(true);
-    await VertexServices.listVertexSchedules(setDagList, region, setIsLoading);
+    await VertexServices.listVertexSchedules(
+      setDagList,
+      region,
+      setIsLoading,
+      setIsApiError,
+      setApiError
+    );
   };
 
   /**
@@ -178,7 +188,9 @@ function ListVertexScheduler({
         setDagList,
         setIsLoading,
         displayName,
-        setResumeLoading
+        setResumeLoading,
+        setIsApiError,
+        setApiError
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
@@ -187,7 +199,9 @@ function ListVertexScheduler({
         setDagList,
         setIsLoading,
         displayName,
-        setResumeLoading
+        setResumeLoading,
+        setIsApiError,
+        setApiError
       );
     }
   };
@@ -240,7 +254,9 @@ function ListVertexScheduler({
       uniqueScheduleId,
       scheduleDisplayName,
       setDagList,
-      setIsLoading
+      setIsLoading,
+      setIsApiError,
+      setApiError
     );
     setDeletePopupOpen(false);
     setDeletingSchedule(false);
@@ -646,16 +662,19 @@ function ListVertexScheduler({
   return (
     <div>
       <div className="select-text-overlay-scheduler">
-        <div className="region-overlay create-scheduler-form-element content-pd-space ">
-          <RegionDropdown
-            projectId={projectId}
-            region={region}
-            onRegionChange={region => setRegion(region)}
-          />
-          {!isLoading && !region && (
-            <ErrorMessage message="Region is required" />
-          )}
+        <div className="enable-text-label">
+          <div className="region-overlay create-scheduler-form-element content-pd-space ">
+            <RegionDropdown
+              projectId={projectId}
+              region={region}
+              onRegionChange={region => setRegion(region)}
+            />
+            {!isLoading && !region && (
+              <ErrorMessage message="Region is required" />
+            )}
+          </div>
         </div>
+
         <div className="btn-refresh">
           <Button
             disabled={isLoading}

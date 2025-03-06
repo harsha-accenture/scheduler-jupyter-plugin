@@ -71,7 +71,9 @@ const CreateVertexScheduler = ({
   setInputFileSelected,
   editMode,
   setEditMode,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  setIsApiError,
+  setApiError
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -85,6 +87,8 @@ const CreateVertexScheduler = ({
   editMode: boolean;
   setEditMode: React.Dispatch<React.SetStateAction<boolean>>;
   setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
+  setApiError: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [parameterDetail, setParameterDetail] = useState<string[]>([]);
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState<
@@ -527,7 +531,9 @@ const CreateVertexScheduler = ({
     await VertexServices.machineTypeAPIService(
       region,
       setMachineTypeList,
-      setMachineTypeLoading
+      setMachineTypeLoading,
+      setIsApiError,
+      setApiError
     );
   };
 
@@ -802,9 +808,11 @@ const CreateVertexScheduler = ({
           setJobNameSelected={setJobNameSelected}
           setGcsPath={setGcsPath}
           setExecutionPageFlag={setExecutionPageFlag}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
         />
       ) : (
-        <div className="submit-job-container">
+        <div className="submit-job-container text-enable-warning">
           <div className="region-overlay create-scheduler-form-element">
             <RegionDropdown
               projectId={projectId}
@@ -813,6 +821,7 @@ const CreateVertexScheduler = ({
             />
           </div>
           {!region && <ErrorMessage message="Region is required" />}
+
           <div className="create-scheduler-form-element">
             <Autocomplete
               className="create-scheduler-style"
