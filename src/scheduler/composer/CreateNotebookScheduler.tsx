@@ -122,7 +122,7 @@ const CreateNotebookScheduler = ({
   const [dagListCall, setDagListCall] = useState(false);
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
 
-  const [isBigQueryNotebook, setIsBigQueryNotebook] = useState(false);
+  const [isLocalKernel, setIsLocalKernel] = useState(true);
 
   const [isApiError, setIsApiError] = useState(false);
   const [apiError, setApiError] = useState('');
@@ -265,6 +265,7 @@ const CreateNotebookScheduler = ({
       mode_selected: selectedMode,
       retry_count: retryCount,
       retry_delay: retryDelay,
+      local_kernel: isLocalKernel,
       email_failure: emailOnFailure,
       email_delay: emailOnRetry,
       email_success: emailOnSuccess,
@@ -277,6 +278,7 @@ const CreateNotebookScheduler = ({
       [selectedMode === 'cluster' ? 'cluster_name' : 'serverless_name']:
         selectedMode === 'cluster' ? clusterSelected : serverlessDataSelected
     };
+    console.log("doubt ")
 
     await SchedulerService.createJobSchedulerService(
       payload,
@@ -319,6 +321,11 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
+      if (context.sessionContext.kernelDisplayName.includes('Local')) {
+        setIsLocalKernel(true);
+      } else {
+        setIsLocalKernel(false);
+      }
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource
@@ -361,10 +368,6 @@ const CreateNotebookScheduler = ({
 
     if (context !== '') {
       setInputFileSelected(context.path);
-      if (context.path.toLowerCase().startsWith('bigframes')) {
-        setIsBigQueryNotebook(true);
-        setSelectedMode('serverless');
-      }
     }
     setJobNameSelected('');
     if (!editMode) {
@@ -493,7 +496,7 @@ const CreateNotebookScheduler = ({
                 fromPage="scheduler"
               />
             </>
-            {!isBigQueryNotebook && (
+            {!isLocalKernel && (
               <div className="create-scheduler-form-element">
                 <FormControl>
                   <RadioGroup
@@ -532,9 +535,7 @@ const CreateNotebookScheduler = ({
                   data-testid="loader"
                 />
               )}
-              {!isBigQueryNotebook &&
-                selectedMode === 'cluster' &&
-                !isLoadingKernelDetail && (
+              {selectedMode === 'cluster' && !isLoadingKernelDetail && (
                   <>
                     <Autocomplete
                       className="create-scheduler-style"
@@ -568,7 +569,7 @@ const CreateNotebookScheduler = ({
                 </>
               )}
             </div>
-            {!isBigQueryNotebook && selectedMode === 'cluster' && (
+            { selectedMode === 'cluster' && (
               <div className="create-scheduler-form-element">
                 <FormGroup row={true}>
                   <FormControlLabel
