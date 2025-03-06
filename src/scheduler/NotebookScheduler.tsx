@@ -218,6 +218,7 @@ const NotebookSchedulerComponent = ({
           setJobNameUniqueValidation={setJobNameUniqueValidation}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
+          setExecutionPageFlag={setExecutionPageFlag}
         />
       ) : (
         <CreateVertexScheduler

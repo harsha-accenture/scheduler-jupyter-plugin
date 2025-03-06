@@ -65,7 +65,8 @@ const CreateNotebookScheduler = ({
   jobNameUniqueValidation,
   setJobNameUniqueValidation,
   setIsApiError,
-  setApiError
+  setApiError,
+  setExecutionPageFlag
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -85,6 +86,7 @@ const CreateNotebookScheduler = ({
   setJobNameUniqueValidation: React.Dispatch<React.SetStateAction<boolean>>;
   setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
   setApiError: React.Dispatch<React.SetStateAction<string>>;
+  setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element => {
   const [composerList, setComposerList] = useState<string[]>([]);
   const [composerSelected, setComposerSelected] = useState('');
@@ -429,6 +431,7 @@ const CreateNotebookScheduler = ({
           setIsLoadingKernelDetail={setIsLoadingKernelDetail}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
+          setExecutionPageFlag={setExecutionPageFlag}
         />
       ) : (
         <div>
