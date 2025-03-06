@@ -321,11 +321,11 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      // if (context.sessionContext.kernelDisplayName.includes('Local')) {
-         setIsLocalKernel(true);
-      // } else {
-      //   setIsLocalKernel(false);
-      // }
+      if (context.sessionContext.kernelDisplayName.includes('Local')) {
+        setIsLocalKernel(true);
+      } else {
+        setIsLocalKernel(false);
+      }
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource
