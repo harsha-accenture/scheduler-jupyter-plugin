@@ -76,3 +76,19 @@ class DownloadOutputController(APIHandler):
         except Exception as e:
             self.log.exception("Error download output file")
             self.finish({"error": str(e)})
+
+
+class CheckRequiredPackagesController(APIHandler):
+    @tornado.web.authenticated
+    async def get(self):
+        try:
+            region_id = self.get_argument("composer_environment_name")
+            async with aiohttp.ClientSession() as client_session:
+                client = executor.Client(
+                    await credentials.get_cached(), self.log, client_session
+                )
+                result = await client.check_required_packages(composer_environment_name)
+                self.finish(json.dumps(result))
+        except Exception as e:
+            self.log.exception(f"Error checking packages: {str(e)}")
+            self.finish({"error": str(e)})
