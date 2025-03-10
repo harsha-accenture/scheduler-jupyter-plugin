@@ -277,10 +277,10 @@ class Client:
             packages = ["apache-airflow-providers-papermill", "ipykernel"]
             packages_to_install = []
             cmd = f"gcloud beta composer environments list-packages {composer_environment_name} --location {self.region_id}"
-                process = subprocess.Popen(
-                    cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
-                )
-                stdout, stderr = process.communicate()
+            process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+            )
+            stdout, stderr = process.communicate()
             if stderr:
                 self.log.info(f"Error fetching list of packages: {stderr}")
             else:

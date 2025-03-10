@@ -55,7 +55,7 @@ class DescribeJob(BaseModel):
     time_zone: str = None
     local_kernel: bool = False
     email_success: bool = False
-    packages_to_install: Optiona[List[str]] = None
+    packages_to_install: Optional[List[str]] = None
 
     @classmethod
     def from_dict(cls, data):
