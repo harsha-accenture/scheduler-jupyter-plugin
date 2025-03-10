@@ -127,6 +127,8 @@ const CreateNotebookScheduler = ({
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
   const [isLocalKernel, setIsLocalKernel] = useState<boolean>(false);
 
+  const [responseKey, setResponseKey] = useState<string | null>('');
+
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
       setClusterList,
@@ -285,7 +287,8 @@ const CreateNotebookScheduler = ({
       app,
       setCreateCompleted,
       setCreatingScheduler,
-      editMode
+      editMode,
+      setResponseKey
     );
     setEditMode(false);
   };
@@ -321,11 +324,11 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      if (context.sessionContext.kernelDisplayName.includes('Local')) {
-        setIsLocalKernel(true);
-      } else {
-        setIsLocalKernel(false);
-      }
+      // if (context.sessionContext.kernelDisplayName.includes('Local')) {
+         setIsLocalKernel(true);
+      // } else {
+      //   setIsLocalKernel(false);
+      // }
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource
@@ -434,6 +437,7 @@ const CreateNotebookScheduler = ({
           setIsApiError={setIsApiError}
           setApiError={setApiError}
           setExecutionPageFlag={setExecutionPageFlag}
+          responseKey={responseKey}
         />
       ) : (
         <div>

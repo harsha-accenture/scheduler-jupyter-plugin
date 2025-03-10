@@ -54,7 +54,8 @@ const NotebookJobComponent = ({
   setIsLoadingKernelDetail,
   setIsApiError,
   setApiError,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  responseKey
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -88,6 +89,7 @@ const NotebookJobComponent = ({
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
   setExecutionPageFlag: (value: boolean) => void;
+  responseKey: string | null
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -154,6 +156,7 @@ const NotebookJobComponent = ({
                 setIsLoadingKernelDetail={setIsLoadingKernelDetail}
                 setIsApiError={setIsApiError}
                 setApiError={setApiError}
+                responseKey={responseKey}
               />
             }
           </div>
@@ -169,6 +172,7 @@ export class NotebookJobs extends SchedulerWidget {
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
   setExecutionPageFlag: (value: boolean) => void;
+  responseKey: string;
 
   constructor(
     app: JupyterLab,
@@ -176,7 +180,8 @@ export class NotebookJobs extends SchedulerWidget {
     themeManager: IThemeManager,
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
-    setExecutionPageFlag: (value: boolean) => void
+    setExecutionPageFlag: (value: boolean) => void,
+    responseKey: string
   ) {
     super(themeManager);
     this.app = app;
@@ -184,6 +189,7 @@ export class NotebookJobs extends SchedulerWidget {
     this.setIsApiError = setIsApiError;
     this.setApiError = setApiError;
     this.setExecutionPageFlag = setExecutionPageFlag;
+    this.responseKey = responseKey;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -194,6 +200,7 @@ export class NotebookJobs extends SchedulerWidget {
         setIsApiError={this.setIsApiError}
         setApiError={this.setApiError}
         setExecutionPageFlag={this.setExecutionPageFlag}
+        responseKey={this.responseKey}
       />
     );
   }

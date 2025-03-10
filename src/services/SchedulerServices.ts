@@ -228,6 +228,7 @@ export class SchedulerService {
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
     editMode: boolean,
+    setResponseKey: (value: string) => void
   ) => {
     setCreatingScheduler(true);
     try {
@@ -240,11 +241,17 @@ export class SchedulerService {
         setCreatingScheduler(false);
       } else {
         if (editMode) {
+          if(data.response) {
+            setResponseKey(data.response);
+          }
           toast.success(
             'Job scheduler successfully updated',
             toastifyCustomStyle
           );
         } else {
+          if(data.response) {
+            setResponseKey(data.response);
+          }
           toast.success(
             'Job scheduler successfully created',
             toastifyCustomStyle

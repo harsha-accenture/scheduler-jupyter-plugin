@@ -103,7 +103,8 @@ function listNotebookScheduler({
   setBucketName,
   setIsLoadingKernelDetail,
   setIsApiError,
-  setApiError
+  setApiError,
+  responseKey
 }: {
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
@@ -139,6 +140,7 @@ function listNotebookScheduler({
   setBucketName: (value: string) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  responseKey: string | null;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [composerList, setComposerList] = useState<string[]>([]);
@@ -308,12 +310,23 @@ function listNotebookScheduler({
   };
 
   const listComposersAPI = async () => {
-    await SchedulerService.listComposersAPIService(
-      setComposerList,
-      setIsApiError,
-      setApiError,
-      setIsLoading
-    );
+    if (responseKey) {
+      setTimeout(async () => {
+        await SchedulerService.listComposersAPIService(
+          setComposerList,
+          setIsApiError,
+          setApiError,
+          setIsLoading
+        );
+      }, 2000);
+    } else {
+      await SchedulerService.listComposersAPIService(
+        setComposerList,
+        setIsApiError,
+        setApiError,
+        setIsLoading
+      );
+    }
   };
 
   const listDagInfoAPI = async () => {
