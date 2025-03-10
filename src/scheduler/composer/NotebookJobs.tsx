@@ -52,7 +52,9 @@ const NotebookJobComponent = ({
   setTimeZoneSelected,
   setEditMode,
   setIsLoadingKernelDetail,
-  responseKey
+  setIsApiError,
+  setApiError,
+  setExecutionPageFlag
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -83,7 +85,9 @@ const NotebookJobComponent = ({
   setTimeZoneSelected?: (value: string) => void;
   setEditMode?: (value: boolean) => void;
   setIsLoadingKernelDetail?: (value: boolean) => void;
-  responseKey: string | null
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
+  setExecutionPageFlag: (value: boolean) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -110,6 +114,7 @@ const NotebookJobComponent = ({
           dagId={dagId}
           handleBackButton={handleBackButton}
           bucketName={bucketName}
+          setExecutionPageFlag={setExecutionPageFlag}
         />
       ) : (
         <div>
@@ -147,7 +152,8 @@ const NotebookJobComponent = ({
                 bucketName={bucketName}
                 setBucketName={setBucketName}
                 setIsLoadingKernelDetail={setIsLoadingKernelDetail}
-                responseKey={responseKey}
+                setIsApiError={setIsApiError}
+                setApiError={setApiError}
               />
             }
           </div>
@@ -160,18 +166,24 @@ const NotebookJobComponent = ({
 export class NotebookJobs extends SchedulerWidget {
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
-  responseKey: string;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
+  setExecutionPageFlag: (value: boolean) => void;
 
   constructor(
     app: JupyterLab,
     settingRegistry: ISettingRegistry,
     themeManager: IThemeManager,
-    responseKey: string
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void,
+    setExecutionPageFlag: (value: boolean) => void
   ) {
     super(themeManager);
     this.app = app;
     this.settingRegistry = settingRegistry;
-    this.responseKey = responseKey;
+    this.setIsApiError = setIsApiError;
+    this.setApiError = setApiError;
+    this.setExecutionPageFlag = setExecutionPageFlag;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -179,7 +191,9 @@ export class NotebookJobs extends SchedulerWidget {
         app={this.app}
         settingRegistry={this.settingRegistry}
         themeManager={this.themeManager}
-        responseKey={this.responseKey}
+        setIsApiError={this.setIsApiError}
+        setApiError={this.setApiError}
+        setExecutionPageFlag={this.setExecutionPageFlag}
       />
     );
   }
