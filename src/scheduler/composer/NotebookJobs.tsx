@@ -51,7 +51,8 @@ const NotebookJobComponent = ({
   setStopCluster,
   setTimeZoneSelected,
   setEditMode,
-  setIsLoadingKernelDetail
+  setIsLoadingKernelDetail,
+  responseKey
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -82,6 +83,7 @@ const NotebookJobComponent = ({
   setTimeZoneSelected?: (value: string) => void;
   setEditMode?: (value: boolean) => void;
   setIsLoadingKernelDetail?: (value: boolean) => void;
+  responseKey: string | null
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -145,6 +147,7 @@ const NotebookJobComponent = ({
                 bucketName={bucketName}
                 setBucketName={setBucketName}
                 setIsLoadingKernelDetail={setIsLoadingKernelDetail}
+                responseKey={responseKey}
               />
             }
           </div>
@@ -157,15 +160,18 @@ const NotebookJobComponent = ({
 export class NotebookJobs extends SchedulerWidget {
   app: JupyterLab;
   settingRegistry: ISettingRegistry;
+  responseKey: string;
 
   constructor(
     app: JupyterLab,
     settingRegistry: ISettingRegistry,
-    themeManager: IThemeManager
+    themeManager: IThemeManager,
+    responseKey: string
   ) {
     super(themeManager);
     this.app = app;
     this.settingRegistry = settingRegistry;
+    this.responseKey = responseKey;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -173,6 +179,7 @@ export class NotebookJobs extends SchedulerWidget {
         app={this.app}
         settingRegistry={this.settingRegistry}
         themeManager={this.themeManager}
+        responseKey={this.responseKey}
       />
     );
   }

@@ -126,6 +126,7 @@ const CreateNotebookScheduler = ({
 
   const [isApiError, setIsApiError] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [responseKey, setResponseKey] = useState<string | null>('');
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -285,7 +286,8 @@ const CreateNotebookScheduler = ({
       app,
       setCreateCompleted,
       setCreatingScheduler,
-      editMode
+      editMode,
+      setResponseKey
     );
     setEditMode(false);
   };
@@ -300,8 +302,8 @@ const CreateNotebookScheduler = ({
       (!jobNameUniqueValidation && !editMode) ||
       inputFileSelected === '' ||
       composerSelected === '' ||
-      (selectedMode === 'cluster' && clusterSelected === '') ||
-      (selectedMode === 'serverless' && serverlessSelected === '') ||
+      (selectedMode === 'cluster' && clusterSelected === '' && !isLocalKernel) ||
+      (selectedMode === 'serverless' && serverlessSelected === '' && !isLocalKernel) ||
       ((emailOnFailure || emailOnRetry || emailOnSuccess) &&
         emailList.length === 0)
     );
@@ -321,11 +323,11 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      if (context.sessionContext.kernelDisplayName.includes('Local')) {
-        setIsLocalKernel(true);
-      } else {
-        setIsLocalKernel(false);
-      }
+      // if (context.sessionContext.kernelDisplayName.includes('Local')) {
+         setIsLocalKernel(true);
+      // } else {
+      //   setIsLocalKernel(false);
+      // }
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource
@@ -431,6 +433,7 @@ const CreateNotebookScheduler = ({
           setTimeZoneSelected={setTimeZoneSelected}
           setEditMode={setEditMode}
           setIsLoadingKernelDetail={setIsLoadingKernelDetail}
+          responseKey={responseKey}
         />
       ) : (
         <div>
