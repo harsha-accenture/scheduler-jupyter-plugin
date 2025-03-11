@@ -290,11 +290,6 @@ class Client:
                                 "lastScheduledRunResponse": schedule.get(
                                     "lastScheduledRunResponse"
                                 ),
-                                "jobState": schedule.get(
-                                    "createNotebookExecutionJobRequest"
-                                )
-                                .get("notebookExecutionJob")
-                                .get("jobState"),
                             }
                             schedule_list.append(formatted_schedule)
                         resp["schedules"] = schedule_list
