@@ -895,6 +895,11 @@ export class SchedulerService {
       );
       if (data) {
         toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
+      } else {
+        toast.error(
+          `Failed to Trigger ${dagId} : ${data?.error}`,
+          toastifyCustomStyle
+        );
       }
     } catch (reason) {
       toast.error(
