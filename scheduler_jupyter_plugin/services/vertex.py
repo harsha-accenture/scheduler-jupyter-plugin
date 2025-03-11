@@ -195,7 +195,6 @@ class Client:
         except Exception as e:
             return {"error": str(e)}
 
-          
     async def list_uiconfig(self, region_id):
         try:
             uiconfig = []
@@ -503,8 +502,10 @@ class Client:
         except Exception as e:
             self.log.exception(f"Error updating schedule: {str(e)}")
             return {"Error updating schedule": str(e)}
-          
-    async def list_notebook_execution_jobs(self, region_id, schedule_id, start_date):
+
+    async def list_notebook_execution_jobs(
+        self, region_id, schedule_id, start_date=None
+    ):
         try:
             execution_jobs = []
             api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy=createTime desc"
@@ -523,9 +524,12 @@ class Client:
                             # getting only the jobs whose create time is equal to start date
                             # splitting it in order to get only the date part from the values which is in zulu format (2011-08-12T20:17:46.384Z)
                             if (
-                                start_date.rsplit("-", 1)[0]
+                                start_date
+                                and start_date.rsplit("-", 1)[0]
                                 == job.get("createTime").rsplit("-", 1)[0]
                             ):
+                                execution_jobs.append(job)
+                            else:
                                 execution_jobs.append(job)
                         return execution_jobs
                 else:

@@ -38,8 +38,8 @@ class UIConfigController(APIHandler):
         except Exception as e:
             self.log.exception(f"Error fetching ui config: {str(e)}")
             self.finish({"error": str(e)})
-            
-            
+
+
 class VertexScheduleCreateController(APIHandler):
     @tornado.web.authenticated
     async def post(self):
@@ -200,8 +200,8 @@ class ScheduleGetController(APIHandler):
         except Exception as e:
             self.log.exception(f"Error getting the schedule: {str(e)}")
             self.finish({"error": str(e)})
-            
-            
+
+
 class NotebookExecutionJobListController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
@@ -209,7 +209,7 @@ class NotebookExecutionJobListController(APIHandler):
         try:
             region_id = self.get_argument("region_id")
             schedule_id = self.get_argument("schedule_id")
-            start_date = self.get_argument("start_date")
+            start_date = self.get_argument("start_date", default=None)
             async with aiohttp.ClientSession() as client_session:
                 client = vertex.Client(
                     await credentials.get_cached(), self.log, client_session
