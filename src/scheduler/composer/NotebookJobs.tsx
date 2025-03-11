@@ -104,6 +104,7 @@ const NotebookJobComponent = ({
   const handleBackButton = () => {
     setShowExecutionHistory(false);
     setBackComposerName(composerName);
+    setExecutionPageFlag(true);
   };
 
   return (
