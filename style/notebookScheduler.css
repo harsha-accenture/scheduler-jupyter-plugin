@@ -496,3 +496,32 @@
 .text-enable-warning {
   padding-top: 13px;
 }
+
+.success-message-package {
+  display: flex;
+  color: #34a853;
+}
+
+.success-message-pack {
+  padding-top: 5px;
+}
+
+.success-message-cl-package {
+  color: #f57c00;
+}
+
+.success-message-top {
+  padding-top: 15px;
+}
+
+.warning-message {
+  padding-top: 3px;
+}
+
+.warning-font {
+  font-size: 10px;
+}
+
+.warning-success-message {
+  padding-top: 6px;
+}

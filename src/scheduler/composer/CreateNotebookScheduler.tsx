@@ -46,6 +46,7 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
+import { iconSuccess, iconWarning } from '../../utils/Icons';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -126,8 +127,20 @@ const CreateNotebookScheduler = ({
   const [dagListCall, setDagListCall] = useState(false);
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
   const [isLocalKernel, setIsLocalKernel] = useState<boolean>(false);
+  const [packageInstallationMessage, setPackageInstallationMessage] =
+    useState<string>('');
+  const [packageInstalledList, setPackageInstalledList] = useState<string[]>(
+    []
+  );
+  const [packageListFlag, setPackageListFlag] = useState<boolean>(false);
+  const [apiErrorMessage, setapiErrorMessage] = useState<string>('');
+  const [
+    checkRequiredPackagesInstalledFlag,
+    setCheckRequiredPackagesInstalledFlag
+  ] = useState<boolean>(false);
 
-  const [responseKey, setResponseKey] = useState<string | null>('');
+  const [installationInProgressMessage, setInstallationInProgressMessage] =
+    useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -152,7 +165,7 @@ const CreateNotebookScheduler = ({
     );
   };
 
-  const handleComposerSelected = (data: string | null) => {
+  const handleComposerSelected = async (data: string | null) => {
     if (data) {
       const selectedComposer = data.toString();
       setComposerSelected(selectedComposer);
@@ -161,6 +174,18 @@ const CreateNotebookScheduler = ({
         if (!unique) {
           setJobNameUniqueValidation(true);
         }
+      }
+      if (selectedComposer) {
+        // if (isLocalKernel) {
+        await SchedulerService.checkRequiredPackagesInstalled(
+          selectedComposer,
+          setPackageInstallationMessage,
+          setPackageInstalledList,
+          setPackageListFlag,
+          setapiErrorMessage,
+          setCheckRequiredPackagesInstalledFlag
+        );
+        // }
       }
     }
   };
@@ -280,7 +305,11 @@ const CreateNotebookScheduler = ({
       [selectedMode === 'cluster' ? 'cluster_name' : 'serverless_name']:
         selectedMode === 'cluster' ? clusterSelected : serverlessDataSelected
     };
-    console.log("doubt ")
+
+    if (packageInstalledList.length > 0) {
+      payload['packages_to_install'] = packageInstalledList;
+      setInstallationInProgressMessage(true);
+    }
 
     await SchedulerService.createJobSchedulerService(
       payload,
@@ -288,7 +317,7 @@ const CreateNotebookScheduler = ({
       setCreateCompleted,
       setCreatingScheduler,
       editMode,
-      setResponseKey
+      setInstallationInProgressMessage
     );
     setEditMode(false);
   };
@@ -297,14 +326,19 @@ const CreateNotebookScheduler = ({
     return (
       dagListCall ||
       creatingScheduler ||
+      !checkRequiredPackagesInstalledFlag ||
       jobNameSelected === '' ||
       (!jobNameValidation && !editMode) ||
       (jobNameSpecialValidation && !editMode) ||
       (!jobNameUniqueValidation && !editMode) ||
       inputFileSelected === '' ||
       composerSelected === '' ||
-      (selectedMode === 'cluster' && clusterSelected === '' && !isLocalKernel) ||
-      (selectedMode === 'serverless' && serverlessSelected === '' && !isLocalKernel) ||
+      (selectedMode === 'cluster' &&
+        clusterSelected === '' &&
+        !isLocalKernel) ||
+      (selectedMode === 'serverless' &&
+        serverlessSelected === '' &&
+        !isLocalKernel) ||
       ((emailOnFailure || emailOnRetry || emailOnSuccess) &&
         emailList.length === 0)
     );
@@ -324,11 +358,11 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      // if (context.sessionContext.kernelDisplayName.includes('Local')) {
-         setIsLocalKernel(true);
-      // } else {
-      //   setIsLocalKernel(false);
-      // }
+      if (context.sessionContext.kernelDisplayName.includes('Local')) {
+        setIsLocalKernel(true);
+      } else {
+        setIsLocalKernel(false);
+      }
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource
@@ -437,7 +471,6 @@ const CreateNotebookScheduler = ({
           setIsApiError={setIsApiError}
           setApiError={setApiError}
           setExecutionPageFlag={setExecutionPageFlag}
-          responseKey={responseKey}
         />
       ) : (
         <div>
@@ -454,8 +487,53 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
+
             {!composerSelected && (
               <ErrorMessage message="Environment is required field" />
+            )}
+
+            {apiErrorMessage && <ErrorMessage message={apiErrorMessage} />}
+
+            {packageInstallationMessage && (
+              <>
+                {packageInstalledList.length > 0 ? (
+                  <div className="success-message-package success-message-top">
+                    <iconWarning.react
+                      tag="div"
+                      className="icon-white logo-alignment-style success_icon icon-size-status"
+                    />
+                    <div className="success-message-pack warning-font success-message-cl-package warning-message">
+                      {packageInstallationMessage}
+                    </div>
+                  </div>
+                ) : (
+                  !apiErrorMessage && (
+                    <div className="success-message-package success-message-top">
+                      <CircularProgress
+                        size={18}
+                        aria-label="Loading Spinner"
+                        data-testid="loader"
+                      />
+                      <div className="success-message-pack warning-font success-message-cl-package enable-error-text-label">
+                        {packageInstallationMessage}
+                      </div>
+                    </div>
+                  )
+                )}
+              </>
+            )}
+
+            {packageListFlag && (
+              <div className="success-message-package log-icon">
+                <iconSuccess.react
+                  tag="div"
+                  title="Done !"
+                  className="icon-white logo-alignment-style success_icon icon-size icon-completed"
+                />
+                <div className="warning-success-message">
+                  Required packages are already installed
+                </div>
+              </div>
             )}
 
             <div className="create-scheduler-label">Output formats</div>
@@ -534,21 +612,21 @@ const CreateNotebookScheduler = ({
                 />
               )}
               {selectedMode === 'cluster' && !isLoadingKernelDetail && (
-                  <>
-                    <Autocomplete
-                      className="create-scheduler-style"
-                      options={clusterList}
-                      value={clusterSelected}
-                      onChange={(_event, val) => handleClusterSelected(val)}
-                      renderInput={params => (
-                        <TextField {...params} label="Cluster*" />
-                      )}
-                    />
-                    {!clusterSelected && (
-                      <ErrorMessage message="Cluster is required field" />
+                <>
+                  <Autocomplete
+                    className="create-scheduler-style"
+                    options={clusterList}
+                    value={clusterSelected}
+                    onChange={(_event, val) => handleClusterSelected(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Cluster*" />
                     )}
-                  </>
-                )}
+                  />
+                  {!clusterSelected && (
+                    <ErrorMessage message="Cluster is required field" />
+                  )}
+                </>
+              )}
 
               {selectedMode === 'serverless' && !isLoadingKernelDetail && (
                 <>
@@ -567,7 +645,7 @@ const CreateNotebookScheduler = ({
                 </>
               )}
             </div>
-            { selectedMode === 'cluster' && (
+            {selectedMode === 'cluster' && (
               <div className="create-scheduler-form-element">
                 <FormGroup row={true}>
                   <FormControlLabel
@@ -722,6 +800,7 @@ const CreateNotebookScheduler = ({
                 </div>
               </>
             )}
+
             <div className="save-overlay">
               <Button
                 onClick={() => {
@@ -752,6 +831,20 @@ const CreateNotebookScheduler = ({
                 <div>CANCEL</div>
               </Button>
             </div>
+
+            {installationInProgressMessage && (
+              <div className="success-message-package log-icon">
+                <CircularProgress
+                  size={18}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+                <div className="warning-font enable-error-text-label">
+                  Installing packages taking longer than usual. Scheduled job
+                  starts post installation. Please wait....
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
