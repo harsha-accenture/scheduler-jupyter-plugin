@@ -119,7 +119,7 @@ export class SchedulerService {
           .filter((item: any) => Object.hasOwn(item, 'jupyterSession'))
           .map((data: any) => {
             return {
-              serverlessName: data?.jupyterSession?.displayName,
+              serverlessName: data.jupyterSession.displayName,
               serverlessData: data
             };
           });
@@ -143,7 +143,7 @@ export class SchedulerService {
         const keyLabelStructure = transformSessionTemplateListData.map(
           (obj: { serverlessName: string }) => obj.serverlessName
         );
-
+        
         setServerlessDataList(transformSessionTemplateListData);
         setServerlessList(keyLabelStructure);
         if (setIsLoadingKernelDetail) {
