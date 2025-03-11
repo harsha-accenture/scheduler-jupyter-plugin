@@ -34,6 +34,7 @@ from scheduler_jupyter_plugin.commons.constants import (
     GCS,
     PACKAGE_NAME,
     WRAPPER_PAPPERMILL_FILE,
+    UTF8,
 )
 from scheduler_jupyter_plugin.models.models import DescribeJob
 from scheduler_jupyter_plugin.services import airflow
@@ -284,7 +285,7 @@ class Client:
             if stderr:
                 self.log.info(f"Error fetching list of packages: {stderr}")
             else:
-                decoded_output = stdout.decode("utf-8")
+                decoded_output = stdout.decode(UTF8)
                 installed_packages = set(
                     line.split()[0].lower()
                     for line in decoded_output.splitlines()[2:]

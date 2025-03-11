@@ -176,16 +176,16 @@ const CreateNotebookScheduler = ({
         }
       }
       if (selectedComposer) {
-        // if (isLocalKernel) {
-        await SchedulerService.checkRequiredPackagesInstalled(
-          selectedComposer,
-          setPackageInstallationMessage,
-          setPackageInstalledList,
-          setPackageListFlag,
-          setapiErrorMessage,
-          setCheckRequiredPackagesInstalledFlag
-        );
-        // }
+        if (isLocalKernel) {
+          await SchedulerService.checkRequiredPackagesInstalled(
+            selectedComposer,
+            setPackageInstallationMessage,
+            setPackageInstalledList,
+            setPackageListFlag,
+            setapiErrorMessage,
+            setCheckRequiredPackagesInstalledFlag
+          );
+        }
       }
     }
   };
