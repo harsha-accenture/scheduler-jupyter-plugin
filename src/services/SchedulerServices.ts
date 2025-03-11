@@ -764,6 +764,10 @@ export class SchedulerService {
           composerSelected
         );
       } else {
+        toast.error(
+          `Failed to fetch Update api : ${formattedResponse?.error}`,
+          toastifyCustomStyle
+        );
       }
     } catch (error) {
       SchedulerLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
@@ -870,6 +874,11 @@ export class SchedulerService {
       );
       if (data) {
         toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
+      } else {
+        toast.error(
+          `Failed to Trigger ${dagId} : ${data?.error}`,
+          toastifyCustomStyle
+        );
       }
     } catch (reason) {
       toast.error(
