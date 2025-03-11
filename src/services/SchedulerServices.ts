@@ -143,7 +143,7 @@ export class SchedulerService {
         const keyLabelStructure = transformSessionTemplateListData.map(
           (obj: { serverlessName: string }) => obj.serverlessName
         );
-        
+
         setServerlessDataList(transformSessionTemplateListData);
         setServerlessList(keyLabelStructure);
         if (setIsLoadingKernelDetail) {
