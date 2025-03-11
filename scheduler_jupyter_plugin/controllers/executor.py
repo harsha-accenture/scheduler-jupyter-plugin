@@ -82,7 +82,7 @@ class CheckRequiredPackagesController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
         try:
-            region_id = self.get_argument("composer_environment_name")
+            composer_environment_name = self.get_argument("composer_environment_name")
             async with aiohttp.ClientSession() as client_session:
                 client = executor.Client(
                     await credentials.get_cached(), self.log, client_session
