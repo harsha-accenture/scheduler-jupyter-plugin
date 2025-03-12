@@ -111,9 +111,13 @@ export class SchedulerService {
 
       const formattedResponse: any = await requestAPI(serviceURL);
       let transformSessionTemplateListData = [];
-      if (formattedResponse && formattedResponse.sessionTemplates) {
-        transformSessionTemplateListData =
-          formattedResponse.sessionTemplates.map((data: any) => {
+      if (
+        formattedResponse &&
+        Object.hasOwn(formattedResponse, 'sessionTemplates')
+      ) {
+        transformSessionTemplateListData = formattedResponse.sessionTemplates
+          .filter((item: any) => Object.hasOwn(item, 'jupyterSession'))
+          .map((data: any) => {
             return {
               serverlessName: data.jupyterSession.displayName,
               serverlessData: data
@@ -136,7 +140,6 @@ export class SchedulerService {
         );
       } else {
         const transformSessionTemplateListData = allSessionTemplatesData;
-
         const keyLabelStructure = transformSessionTemplateListData.map(
           (obj: { serverlessName: string }) => obj.serverlessName
         );
