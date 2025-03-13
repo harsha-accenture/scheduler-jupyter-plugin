@@ -505,15 +505,7 @@ function ListVertexScheduler({
               : 'clusters-table-data'
           }
         >
-          {/* {cell.column.Header === 'State' ? (
-            <>
-              <div className="execution-history-main-wrapper">
-                <div>{cell.render('Cell')}</div>
-              </div>
-            </>
-          ) : ( */}
-          <>{cell.render('Cell')}</>
-          {/* )} */}
+          {cell.render('Cell')}
         </td>
       );
     }
