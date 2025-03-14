@@ -775,12 +775,12 @@ const CreateVertexScheduler = ({
   }, []);
 
   useEffect(() => {
-    if(!region) {
+    if (!region) {
       setMachineTypeList([]);
     } else {
       machineTypeAPI();
     }
-  }, [region])
+  }, [region]);
 
   return (
     <>
