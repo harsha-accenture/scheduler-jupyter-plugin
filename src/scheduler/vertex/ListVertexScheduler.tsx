@@ -141,7 +141,7 @@ function ListVertexScheduler({
       },
       {
         Header: 'Last Run Status',
-        accessor: 'lastRunStatus'
+        accessor: 'jobState'
       },
       {
         Header: 'State',
