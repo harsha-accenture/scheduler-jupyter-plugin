@@ -168,8 +168,8 @@ export class VertexServices {
             formattedResponse.schedules.length > 0
           ) {
             const currentDate = new Date().toISOString();
-            await Promise.all(formattedResponse.schedules.map(
-              async (schedule: any) => {
+            await Promise.all(
+              formattedResponse.schedules.map(async (schedule: any) => {
                 const scheduleId = schedule.name.split('/').pop();
                 const serviceURLLastRunResponse =
                   'api/vertex/listNotebookExecutionJobs';
@@ -182,8 +182,8 @@ export class VertexServices {
                     ? lastRunResponse[0].jobState
                     : 'No run found';
                 return schedule;
-              }
-            ));
+              })
+            );
             setDagList(formattedResponse.schedules);
             setIsLoading(false);
           } else {
