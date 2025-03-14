@@ -773,6 +773,15 @@ const CreateVertexScheduler = ({
       setEndDate(null);
     }
   }, []);
+
+  useEffect(() => {
+    if (!region) {
+      setMachineTypeList([]);
+    } else {
+      machineTypeAPI();
+    }
+  }, [region]);
+
   return (
     <>
       {createCompleted ? (
