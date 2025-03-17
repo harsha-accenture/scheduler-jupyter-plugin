@@ -191,6 +191,9 @@ export class VertexServices {
             setIsLoading(false);
           }
         }
+      } else {
+        setDagList([]);
+        setIsLoading(false);
       }
     } catch (error) {
       setDagList([]);
