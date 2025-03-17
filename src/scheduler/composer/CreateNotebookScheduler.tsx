@@ -126,7 +126,6 @@ const CreateNotebookScheduler = ({
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const [dagListCall, setDagListCall] = useState(false);
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
-  // const [isLocalKernel, setIsLocalKernel] = useState<boolean>(false);
   const [packageInstallationMessage, setPackageInstallationMessage] =
     useState<string>('');
   const [packageInstalledList, setPackageInstalledList] = useState<string[]>(
@@ -174,8 +173,7 @@ const CreateNotebookScheduler = ({
         if (!unique) {
           setJobNameUniqueValidation(true);
         }
-      }
-      if (selectedComposer) {
+
         if (selectedMode === 'local') {
           await SchedulerService.checkRequiredPackagesInstalled(
             selectedComposer,
@@ -292,7 +290,6 @@ const CreateNotebookScheduler = ({
       mode_selected: selectedMode,
       retry_count: retryCount,
       retry_delay: retryDelay,
-      // local_kernel: isLocalKernel,
       email_failure: emailOnFailure,
       email_delay: emailOnRetry,
       email_success: emailOnSuccess,
@@ -318,16 +315,13 @@ const CreateNotebookScheduler = ({
       setCreateCompleted,
       setCreatingScheduler,
       editMode,
-      setInstallationInProgressMessage
+      setInstallationInProgressMessage,
+      packageInstalledList
     );
     setEditMode(false);
   };
 
   const isSaveDisabled = () => {
-    console.log(
-      'checkRequiredPackagesInstalledFlag',
-      checkRequiredPackagesInstalledFlag
-    );
     return (
       dagListCall ||
       creatingScheduler ||
@@ -339,11 +333,7 @@ const CreateNotebookScheduler = ({
       inputFileSelected === '' ||
       composerSelected === '' ||
       (selectedMode === 'cluster' && clusterSelected === '') ||
-      // &&
-      // !isLocalKernel
       (selectedMode === 'serverless' && serverlessSelected === '') ||
-      // &&
-      // !isLocalKernel
       ((emailOnFailure || emailOnRetry || emailOnSuccess) &&
         emailList.length === 0)
     );
@@ -363,11 +353,6 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      // if (context.sessionContext.kernelDisplayName.includes('Local')) {
-      //   setIsLocalKernel(true);
-      // } else {
-      //   setIsLocalKernel(false);
-      // }
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource

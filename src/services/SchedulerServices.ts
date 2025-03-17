@@ -231,7 +231,8 @@ export class SchedulerService {
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
     editMode: boolean,
-    setInstallationInProgressMessage: (value: boolean) => void
+    setInstallationInProgressMessage: (value: boolean) => void,
+    packageInstalledList: string[]
   ) => {
     setCreatingScheduler(true);
     try {
@@ -248,15 +249,23 @@ export class SchedulerService {
             'Job scheduler successfully updated',
             toastifyCustomStyle
           );
+          if (packageInstalledList.length > 0) {
+            toast.success(
+              'Installation of packages will take sometime',
+              toastifyCustomStyle
+            );
+          }
         } else {
           toast.success(
             'Job scheduler successfully created',
             toastifyCustomStyle
           );
-          toast.success(
-            'Installation of packages will take sometime',
-            toastifyCustomStyle
-          );
+          if (packageInstalledList.length > 0) {
+            toast.success(
+              'Installation of packages will take sometime',
+              toastifyCustomStyle
+            );
+          }
           setInstallationInProgressMessage(false);
         }
         setCreatingScheduler(false);
