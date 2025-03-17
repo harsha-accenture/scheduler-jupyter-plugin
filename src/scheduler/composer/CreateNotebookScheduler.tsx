@@ -324,7 +324,10 @@ const CreateNotebookScheduler = ({
   };
 
   const isSaveDisabled = () => {
-    console.log('checkRequiredPackagesInstalledFlag', checkRequiredPackagesInstalledFlag);
+    console.log(
+      'checkRequiredPackagesInstalledFlag',
+      checkRequiredPackagesInstalledFlag
+    );
     return (
       dagListCall ||
       creatingScheduler ||
@@ -587,7 +590,9 @@ const CreateNotebookScheduler = ({
                     value="local"
                     control={<Radio size="small" />}
                     label={
-                      <Typography sx={{ fontSize: 13 }}>Composer Environment</Typography>
+                      <Typography sx={{ fontSize: 13 }}>
+                        Composer Environment
+                      </Typography>
                     }
                   />
                   <FormControlLabel
