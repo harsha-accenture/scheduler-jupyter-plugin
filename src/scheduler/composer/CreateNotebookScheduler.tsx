@@ -98,7 +98,7 @@ const CreateNotebookScheduler = ({
   const [valueValidation, setValueValidation] = useState(-1);
   const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
 
-  const [selectedMode, setSelectedMode] = useState('cluster');
+  const [selectedMode, setSelectedMode] = useState('local');
   const [clusterList, setClusterList] = useState<string[]>([]);
   const [serverlessList, setServerlessList] = useState<string[]>([]);
   const [serverlessDataList, setServerlessDataList] = useState<string[]>([]);
@@ -126,7 +126,7 @@ const CreateNotebookScheduler = ({
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const [dagListCall, setDagListCall] = useState(false);
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
-  const [isLocalKernel, setIsLocalKernel] = useState<boolean>(false);
+  // const [isLocalKernel, setIsLocalKernel] = useState<boolean>(false);
   const [packageInstallationMessage, setPackageInstallationMessage] =
     useState<string>('');
   const [packageInstalledList, setPackageInstalledList] = useState<string[]>(
@@ -176,7 +176,7 @@ const CreateNotebookScheduler = ({
         }
       }
       if (selectedComposer) {
-        if (isLocalKernel) {
+        if (selectedMode === 'local') {
           await SchedulerService.checkRequiredPackagesInstalled(
             selectedComposer,
             setPackageInstallationMessage,
@@ -292,7 +292,7 @@ const CreateNotebookScheduler = ({
       mode_selected: selectedMode,
       retry_count: retryCount,
       retry_delay: retryDelay,
-      local_kernel: isLocalKernel,
+      // local_kernel: isLocalKernel,
       email_failure: emailOnFailure,
       email_delay: emailOnRetry,
       email_success: emailOnSuccess,
@@ -307,6 +307,7 @@ const CreateNotebookScheduler = ({
     };
 
     if (packageInstalledList.length > 0) {
+      payload['local_kernel'] = selectedMode === 'local' ? true : false;
       payload['packages_to_install'] = packageInstalledList;
       setInstallationInProgressMessage(true);
     }
@@ -323,6 +324,7 @@ const CreateNotebookScheduler = ({
   };
 
   const isSaveDisabled = () => {
+    console.log('checkRequiredPackagesInstalledFlag', checkRequiredPackagesInstalledFlag);
     return (
       dagListCall ||
       creatingScheduler ||
@@ -333,12 +335,12 @@ const CreateNotebookScheduler = ({
       (!jobNameUniqueValidation && !editMode) ||
       inputFileSelected === '' ||
       composerSelected === '' ||
-      (selectedMode === 'cluster' &&
-        clusterSelected === '' &&
-        !isLocalKernel) ||
-      (selectedMode === 'serverless' &&
-        serverlessSelected === '' &&
-        !isLocalKernel) ||
+      (selectedMode === 'cluster' && clusterSelected === '') ||
+      // &&
+      // !isLocalKernel
+      (selectedMode === 'serverless' && serverlessSelected === '') ||
+      // &&
+      // !isLocalKernel
       ((emailOnFailure || emailOnRetry || emailOnSuccess) &&
         emailList.length === 0)
     );
@@ -358,11 +360,11 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      if (context.sessionContext.kernelDisplayName.includes('Local')) {
-        setIsLocalKernel(true);
-      } else {
-        setIsLocalKernel(false);
-      }
+      // if (context.sessionContext.kernelDisplayName.includes('Local')) {
+      //   setIsLocalKernel(true);
+      // } else {
+      //   setIsLocalKernel(false);
+      // }
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource
@@ -572,39 +574,42 @@ const CreateNotebookScheduler = ({
                 fromPage="scheduler"
               />
             </>
-            {!isLocalKernel && (
-              <div className="create-scheduler-form-element">
-                <FormControl>
-                  <RadioGroup
-                    aria-labelledby="demo-controlled-radio-buttons-group"
-                    name="controlled-radio-buttons-group"
-                    value={selectedMode}
-                    onChange={handleSelectedModeChange}
-                    row={true}
-                  >
-                    <FormControlLabel
-                      value="cluster"
-                      control={<Radio size="small" />}
-                      label={
-                        <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
-                      }
-                    />
-                    <FormControlLabel
-                      value="serverless"
-                      className="create-scheduler-label-style"
-                      control={<Radio size="small" />}
-                      label={
-                        <Typography sx={{ fontSize: 13 }}>
-                          Serverless
-                        </Typography>
-                      }
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </div>
-            )}
             <div className="create-scheduler-form-element">
-              {isLoadingKernelDetail && (
+              <FormControl>
+                <RadioGroup
+                  aria-labelledby="demo-controlled-radio-buttons-group"
+                  name="controlled-radio-buttons-group"
+                  value={selectedMode}
+                  onChange={handleSelectedModeChange}
+                  row={true}
+                >
+                  <FormControlLabel
+                    value="local"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Composer Environment</Typography>
+                    }
+                  />
+                  <FormControlLabel
+                    value="cluster"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
+                    }
+                  />
+                  <FormControlLabel
+                    value="serverless"
+                    className="create-scheduler-label-style"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Serverless</Typography>
+                    }
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+            <div className="create-scheduler-form-element">
+              {isLoadingKernelDetail && selectedMode !== 'local' && (
                 <CircularProgress
                   size={18}
                   aria-label="Loading Spinner"
