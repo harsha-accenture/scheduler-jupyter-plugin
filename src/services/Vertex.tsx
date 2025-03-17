@@ -170,6 +170,7 @@ export class VertexServices {
             const currentDate = new Date().toISOString();
             await Promise.all(
               formattedResponse.schedules.map(async (schedule: any) => {
+                // This will extract schedule id from name ex: name: "projects/411524708443/locations/us-central1/notebookExecutionJobs/7978550051863527424" will return 7978550051863527424
                 const scheduleId = schedule.name.split('/').pop();
                 const serviceURLLastRunResponse =
                   'api/vertex/listNotebookExecutionJobs';
@@ -177,10 +178,11 @@ export class VertexServices {
                   serviceURLLastRunResponse +
                     `?region_id=${region}&schedule_id=${scheduleId}&start_date=${currentDate}`
                 );
-                schedule.jobState =
-                  lastRunResponse.length > 0 && lastRunResponse[0].jobState
+                schedule.jobState = Object.hasOwn(lastRunResponse, 'error')
+                  ? 'Status Error'
+                  : lastRunResponse.length > 0 && lastRunResponse[0].jobState
                     ? lastRunResponse[0].jobState
-                    : 'No run found';
+                    : 'No runs';
                 return schedule;
               })
             );
