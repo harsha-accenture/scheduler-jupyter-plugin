@@ -28,16 +28,11 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/Config';
 import {
-  iconActive,
   iconDelete,
   iconEditDag,
   iconEditNotebook,
-  iconFailed,
-  iconListComplete,
-  iconListPause,
   iconPause,
   iconPlay,
-  iconSuccess,
   iconTrigger
 } from '../../utils/Icons';
 import { VertexServices } from '../../services/Vertex';
@@ -145,7 +140,11 @@ function ListVertexScheduler({
         accessor: 'schedule'
       },
       {
-        Header: 'Status',
+        Header: 'Last Run Status',
+        accessor: 'jobState'
+      },
+      {
+        Header: 'State',
         accessor: 'status'
       },
       {
@@ -497,31 +496,6 @@ function ListVertexScheduler({
         </td>
       );
     } else {
-      const alignIcon =
-        cell.row.original.status === 'ACTIVE' ||
-        cell.row.original.status === 'PAUSED' ||
-        cell.row.original.status === 'COMPLETED';
-
-      let pauseTitle = '';
-
-      if (
-        cell.row.original.status === 'ACTIVE' &&
-        cell.row.original.lastScheduledRunResponse &&
-        cell.row.original.lastScheduledRunResponse.runResponse &&
-        cell.row.original.lastScheduledRunResponse.runResponse === 'OK'
-      ) {
-        pauseTitle = 'ACTIVE';
-      }
-
-      if (
-        cell.row.original.status === 'PAUSED' &&
-        cell.row.original.lastScheduledRunResponse &&
-        cell.row.original.lastScheduledRunResponse.runResponse &&
-        cell.row.original.lastScheduledRunResponse.runResponse === 'OK'
-      ) {
-        pauseTitle = 'PAUSED';
-      }
-
       return (
         <td
           {...cell.getCellProps()}
@@ -531,84 +505,7 @@ function ListVertexScheduler({
               : 'clusters-table-data'
           }
         >
-          {cell.column.Header === 'Status' ? (
-            <>
-              <div className="execution-history-main-wrapper">
-                {cell.row.original.lastScheduledRunResponse === null ? (
-                  cell.row.original.status === 'ACTIVE' ? (
-                    <iconActive.react
-                      tag="div"
-                      title="ACTIVE"
-                      className="icon-white logo-alignment-style success_icon icon-size-status"
-                    />
-                  ) : (
-                    <iconListPause.react
-                      tag="div"
-                      title="PAUSE"
-                      className="icon-white logo-alignment-style success_icon icon-size"
-                    />
-                  )
-                ) : cell.row.original.lastScheduledRunResponse &&
-                  cell.row.original.lastScheduledRunResponse.runResponse ? (
-                  cell.row.original.status === 'COMPLETED' ? (
-                    cell.row.original.lastScheduledRunResponse.runResponse ===
-                    'OK' ? (
-                      <div>
-                        <iconSuccess.react
-                          tag="div"
-                          title="Done !"
-                          className="icon-white logo-alignment-style success_icon icon-size icon-completed"
-                        />
-                      </div>
-                    ) : (
-                      <div>
-                        <iconListComplete.react
-                          tag="div"
-                          title={
-                            cell.row.original.lastScheduledRunResponse &&
-                            cell.row.original.lastScheduledRunResponse
-                              .runResponse
-                          }
-                          className="icon-white logo-alignment-style success_icon icon-size-status"
-                        />
-                      </div>
-                    )
-                  ) : cell.row.original.status === 'ACTIVE' ? (
-                    <iconActive.react
-                      tag="div"
-                      title={pauseTitle}
-                      className="icon-white logo-alignment-style success_icon icon-size-status"
-                    />
-                  ) : (
-                    <iconListPause.react
-                      tag="div"
-                      title={pauseTitle}
-                      className="icon-white logo-alignment-style success_icon icon-size"
-                    />
-                  )
-                ) : (
-                  <div>
-                    <iconFailed.react
-                      tag="div"
-                      title={
-                        !cell.row.original.lastScheduledRunResponse
-                          ? 'Not started'
-                          : cell.row.original.lastScheduledRunResponse &&
-                            cell.row.original.lastScheduledRunResponse
-                              .runResponse
-                      }
-                      className="icon-white logo-alignment-style success_icon icon-size"
-                    />
-                  </div>
-                )}
-                <div className={alignIcon ? 'text-icon' : ''}>
-                  {cell.render('Cell')}
-                </div>
-              </div>
-            </>
-          ) : (
-            <>{cell.render('Cell')}</>
-          )}
+          {cell.render('Cell')}
         </td>
       );
     }
