@@ -345,6 +345,7 @@ class Client:
             dag_file = f"dag_{job_name}.py"
             gcs_dag_bucket = await self.get_bucket(job.composer_environment_name)
             wrapper_pappermill_file_path = WRAPPER_PAPPERMILL_FILE
+            install_packages = {}
 
             if job.packages_to_install != None:
                 install_packages = await self.install_to_composer_environment(
