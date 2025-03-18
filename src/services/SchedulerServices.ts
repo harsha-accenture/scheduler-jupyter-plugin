@@ -926,7 +926,7 @@ export class SchedulerService {
       setCheckRequiredPackagesInstalledFlag(true);
     } catch (reason) {
       toast.error(
-        `Failed to get package list : ${reason}`,
+        `Failed to installation package list : ${reason}`,
         toastifyCustomStyle
       );
     }
