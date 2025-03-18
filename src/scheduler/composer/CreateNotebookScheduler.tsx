@@ -325,7 +325,7 @@ const CreateNotebookScheduler = ({
     return (
       dagListCall ||
       creatingScheduler ||
-      !checkRequiredPackagesInstalledFlag ||
+      (!checkRequiredPackagesInstalledFlag && selectedMode === 'local') ||
       jobNameSelected === '' ||
       (!jobNameValidation && !editMode) ||
       (jobNameSpecialValidation && !editMode) ||
