@@ -431,7 +431,6 @@ const CreateNotebookScheduler = ({
     } else {
       listSessionTemplatesAPI();
     }
-
   }, [selectedMode]);
 
   return (
@@ -837,19 +836,21 @@ const CreateNotebookScheduler = ({
               </Button>
             </div>
 
-            {installationInProgressMessage && selectedMode === 'local' && !createApiKernelErrorFlag && (
-              <div className="success-message-package log-icon">
-                <CircularProgress
-                  size={18}
-                  aria-label="Loading Spinner"
-                  data-testid="loader"
-                />
-                <div className="warning-font enable-error-text-label">
-                  Installing packages taking longer than usual. Scheduled job
-                  starts post installation. Please wait....
+            {installationInProgressMessage &&
+              selectedMode === 'local' &&
+              !createApiKernelErrorFlag && (
+                <div className="success-message-package log-icon">
+                  <CircularProgress
+                    size={18}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
+                  <div className="warning-font enable-error-text-label">
+                    Installing packages taking longer than usual. Scheduled job
+                    starts post installation. Please wait....
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       )}
