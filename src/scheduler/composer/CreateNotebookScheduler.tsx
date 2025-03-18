@@ -141,6 +141,9 @@ const CreateNotebookScheduler = ({
   const [installationInProgressMessage, setInstallationInProgressMessage] =
     useState<boolean>(false);
 
+  const [createApiKernelErrorFlag, setCreateApiKernelErrorFlag] =
+    useState<boolean>(false);
+
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
       setClusterList,
@@ -165,6 +168,8 @@ const CreateNotebookScheduler = ({
   };
 
   const handleComposerSelected = async (data: string | null) => {
+    setPackageListFlag(false);
+    setapiErrorMessage('');
     if (data) {
       const selectedComposer = data.toString();
       setComposerSelected(selectedComposer);
@@ -303,7 +308,7 @@ const CreateNotebookScheduler = ({
         selectedMode === 'cluster' ? clusterSelected : serverlessDataSelected
     };
 
-    if (packageInstalledList.length > 0) {
+    if (packageInstalledList.length > 0 && selectedMode === 'local') {
       payload['local_kernel'] = selectedMode === 'local' ? true : false;
       payload['packages_to_install'] = packageInstalledList;
       setInstallationInProgressMessage(true);
@@ -316,6 +321,8 @@ const CreateNotebookScheduler = ({
       setCreatingScheduler,
       editMode,
       setInstallationInProgressMessage,
+      selectedMode,
+      setCreateApiKernelErrorFlag,
       packageInstalledList
     );
     setEditMode(false);
@@ -424,6 +431,7 @@ const CreateNotebookScheduler = ({
     } else {
       listSessionTemplatesAPI();
     }
+
   }, [selectedMode]);
 
   return (
@@ -482,9 +490,11 @@ const CreateNotebookScheduler = ({
               <ErrorMessage message="Environment is required field" />
             )}
 
-            {apiErrorMessage && <ErrorMessage message={apiErrorMessage} />}
+            {apiErrorMessage && selectedMode === 'local' && (
+              <ErrorMessage message={apiErrorMessage} />
+            )}
 
-            {packageInstallationMessage && (
+            {packageInstallationMessage && selectedMode === 'local' && (
               <>
                 {packageInstalledList.length > 0 ? (
                   <div className="success-message-package success-message-top">
@@ -513,7 +523,7 @@ const CreateNotebookScheduler = ({
               </>
             )}
 
-            {packageListFlag && (
+            {packageListFlag && selectedMode === 'local' && (
               <div className="success-message-package log-icon">
                 <iconSuccess.react
                   tag="div"
@@ -827,7 +837,7 @@ const CreateNotebookScheduler = ({
               </Button>
             </div>
 
-            {installationInProgressMessage && (
+            {installationInProgressMessage && selectedMode === 'local' && !createApiKernelErrorFlag && (
               <div className="success-message-package log-icon">
                 <CircularProgress
                   size={18}
