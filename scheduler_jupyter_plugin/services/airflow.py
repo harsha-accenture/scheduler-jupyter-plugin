@@ -284,7 +284,7 @@ class Client:
                             line.split("=")[-1]
                             .strip()
                             .strip("'\"")
-                            .split(",")[0]
+                            .rsplit(",", 1)[0]
                             .rstrip("'\"")
                         )  # Extract schedule_interval from the line
                     elif "stop_cluster_check" in line:
