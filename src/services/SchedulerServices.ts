@@ -230,7 +230,9 @@ export class SchedulerService {
     app: JupyterLab,
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
-    editMode: boolean
+    editMode: boolean,
+    setInstallationInProgressMessage: (value: boolean) => void,
+    packageInstalledList: string[]
   ) => {
     setCreatingScheduler(true);
     try {
@@ -247,11 +249,24 @@ export class SchedulerService {
             'Job scheduler successfully updated',
             toastifyCustomStyle
           );
+          if (packageInstalledList.length > 0) {
+            toast.success(
+              'Installation of packages will take sometime',
+              toastifyCustomStyle
+            );
+          }
         } else {
           toast.success(
             'Job scheduler successfully created',
             toastifyCustomStyle
           );
+          if (packageInstalledList.length > 0) {
+            toast.success(
+              'Installation of packages will take sometime',
+              toastifyCustomStyle
+            );
+          }
+          setInstallationInProgressMessage(false);
         }
         setCreatingScheduler(false);
         setCreateCompleted(true);
@@ -865,12 +880,52 @@ export class SchedulerService {
       );
     }
   };
+
   static listComposersAPICheckService = async () => {
     try {
       const formattedResponse: any = await requestAPI('composerList');
       return formattedResponse;
     } catch (error) {
       return error;
+    }
+  };
+
+  static checkRequiredPackagesInstalled = async (
+    selectedComposer: string,
+    setPackageInstallationMessage: (value: string) => void,
+    setPackageInstalledList: (value: string[]) => void,
+    setPackageListFlag: (value: boolean) => void,
+    setapiErrorMessage: (value: string) => void,
+    setCheckRequiredPackagesInstalledFlag: (value: boolean) => void
+  ) => {
+    try {
+      setPackageInstallationMessage(
+        'Checking if required packages are installed...'
+      );
+      const installedPackageList: any = await requestAPI(
+        `checkRequiredPackages?composer_environment_name=${selectedComposer}`
+      );
+      console.log('installed packages', installedPackageList);
+      if (installedPackageList.length > 0) {
+        setPackageInstallationMessage(
+          installedPackageList.join(', ') +
+            ' packages will get installed on creation of schedule'
+        );
+        setPackageInstalledList(installedPackageList);
+      } else if (Object.hasOwn(installedPackageList, 'error')) {
+        setPackageInstallationMessage('');
+        setapiErrorMessage(installedPackageList.error);
+      } else {
+        setPackageInstallationMessage('');
+        setPackageListFlag(true);
+      }
+
+      setCheckRequiredPackagesInstalledFlag(true);
+    } catch (reason) {
+      toast.error(
+        `Failed to get package list : ${reason}`,
+        toastifyCustomStyle
+      );
     }
   };
 }
