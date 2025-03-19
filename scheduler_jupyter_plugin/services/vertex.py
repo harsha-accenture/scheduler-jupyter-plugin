@@ -281,6 +281,7 @@ class Client:
                                 "schedule": schedule_value,
                                 "status": schedule.get("state"),
                                 "createTime": schedule.get("createTime"),
+                                "nextRunTime": schedule.get("nextRunTime"),
                                 "gcsNotebookSourceUri": schedule.get(
                                     "createNotebookExecutionJobRequest"
                                 )
