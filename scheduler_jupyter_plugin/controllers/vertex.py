@@ -209,13 +209,15 @@ class NotebookExecutionJobListController(APIHandler):
         try:
             region_id = self.get_argument("region_id")
             schedule_id = self.get_argument("schedule_id")
+            page_size = self.get_argument("page_size")
+            order_by = self.get_argument("order_by")
             start_date = self.get_argument("start_date", default=None)
             async with aiohttp.ClientSession() as client_session:
                 client = vertex.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
                 jobs = await client.list_notebook_execution_jobs(
-                    region_id, schedule_id, start_date
+                    region_id, schedule_id, page_size, order_by, start_date
                 )
                 self.finish(json.dumps(jobs))
         except Exception as e:
