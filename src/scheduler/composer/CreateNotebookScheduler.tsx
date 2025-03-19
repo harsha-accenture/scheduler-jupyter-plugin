@@ -113,6 +113,7 @@ const CreateNotebookScheduler = ({
   const [emailOnRetry, setEmailonRetry] = useState(false);
   const [emailOnSuccess, setEmailOnSuccess] = useState(false);
   const [emailList, setEmailList] = useState<string[]>([]);
+  const [emailError, setEmailError] = useState<boolean>(false);
 
   const [scheduleMode, setScheduleMode] = useState<scheduleMode>('runNow');
   const [scheduleValue, setScheduleValue] = useState(scheduleValueExpression);
@@ -278,6 +279,17 @@ const CreateNotebookScheduler = ({
   };
 
   const handleEmailList = (data: string[]) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let invalidEmail = false;
+    data.forEach(email => {
+      if (!emailPattern.test(email)) {
+        invalidEmail = true;
+        setEmailError(true);
+      }
+    });
+    if (invalidEmail === false) {
+      setEmailError(false);
+    }
     setEmailList(data);
   };
 
@@ -330,6 +342,7 @@ const CreateNotebookScheduler = ({
 
   const isSaveDisabled = () => {
     return (
+      emailError ||
       dagListCall ||
       creatingScheduler ||
       (!checkRequiredPackagesInstalledFlag && selectedMode === 'local') ||
@@ -756,6 +769,9 @@ const CreateNotebookScheduler = ({
               !emailList.length && (
                 <ErrorMessage message="Email recipients is required field" />
               )}
+            {emailError && (
+              <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
+            )}
             <div className="create-scheduler-label">Schedule</div>
             <div className="create-scheduler-form-element">
               <FormControl>
