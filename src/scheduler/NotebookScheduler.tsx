@@ -62,11 +62,13 @@ const NotebookSchedulerComponent = ({
   const [executionPageFlag, setExecutionPageFlag] = useState<boolean>(true);
   const [isApiError, setIsApiError] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [nextPageTokenList, setNextPageTokenList] = useState<string[]>([]);
 
   useEffect(() => {
     if (context !== '') {
       setInputFileSelected(context.path);
     }
+    console.log('inside main parent component')
   }, []);
 
   const handleJobNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,6 +238,8 @@ const NotebookSchedulerComponent = ({
           setExecutionPageFlag={setExecutionPageFlag}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
+          setNextPageTokenList={setNextPageTokenList}
+          nextPageTokenList={nextPageTokenList}
         />
       )}
     </div>

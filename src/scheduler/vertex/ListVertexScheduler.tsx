@@ -18,7 +18,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
-import { PaginationView } from '../../utils/PaginationView';
+import { PaginationComponent } from '../../utils/PaginationComponent';
 import { IVertexCellProps } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { CircularProgress, Button } from '@mui/material';
@@ -72,7 +72,9 @@ function ListVertexScheduler({
   setGcsPath,
   handleDagIdSelection,
   setIsApiError,
-  setApiError
+  setApiError,
+  setNextPageTokenList,
+  nextPageTokenList
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -112,6 +114,8 @@ function ListVertexScheduler({
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  setNextPageTokenList: (value: string[]) => void;
+  nextPageTokenList: string[];
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [dagList, setDagList] = useState<IDagList[]>([]);
@@ -127,6 +131,7 @@ function ListVertexScheduler({
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
+  // const [pageToken, setPageToken] = useState<string>('');
   const isPreview = false;
 
   const columns = React.useMemo(
@@ -165,7 +170,9 @@ function ListVertexScheduler({
       region,
       setIsLoading,
       setIsApiError,
-      setApiError
+      setApiError,
+      setNextPageTokenList,
+      nextPageTokenList
     );
   };
 
@@ -189,7 +196,9 @@ function ListVertexScheduler({
         displayName,
         setResumeLoading,
         setIsApiError,
-        setApiError
+        setApiError,
+        setNextPageTokenList,
+        nextPageTokenList
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
@@ -200,7 +209,9 @@ function ListVertexScheduler({
         displayName,
         setResumeLoading,
         setIsApiError,
-        setApiError
+        setApiError,
+        setNextPageTokenList,
+        nextPageTokenList
       );
     }
   };
@@ -255,7 +266,9 @@ function ListVertexScheduler({
       setDagList,
       setIsLoading,
       setIsApiError,
-      setApiError
+      setApiError,
+      setNextPageTokenList,
+      nextPageTokenList
     );
     setDeletePopupOpen(false);
     setDeletingSchedule(false);
@@ -556,7 +569,20 @@ function ListVertexScheduler({
       });
   }, [projectId]);
 
+  const handleNext = async() => {
+    await VertexServices.listVertexSchedules(
+      setDagList,
+      region,
+      setIsLoading,
+      setIsApiError,
+      setApiError,
+      setNextPageTokenList,
+      nextPageTokenList
+    );
+  }
+
   return (
+    console.log('nextpage token list', nextPageTokenList),
     <div>
       <div className="select-text-overlay-scheduler">
         <div className="enable-text-label">
@@ -599,8 +625,8 @@ function ListVertexScheduler({
               tableDataCondition={tableDataCondition}
               fromPage="Vertex schedulers"
             />
-            {dagList.length > 100 && (
-              <PaginationView
+            {/* {dagList.length > 90 && ( */}
+              <PaginationComponent
                 pageSize={pageSize}
                 setPageSize={setPageSize}
                 pageIndex={pageIndex}
@@ -609,9 +635,10 @@ function ListVertexScheduler({
                 nextPage={nextPage}
                 canPreviousPage={canPreviousPage}
                 canNextPage={canNextPage}
-                scheduleSelected="vertex"
+                nextPageTokenList={nextPageTokenList}
+                handleNext={handleNext}
               />
-            )}
+            {/* // )} */}
             {deletePopupOpen && (
               <DeletePopup
                 onCancel={() => handleCancelDelete()}

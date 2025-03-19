@@ -58,7 +58,9 @@ const VertexScheduleJobs = ({
   setGcsPath,
   setExecutionPageFlag,
   setIsApiError,
-  setApiError
+  setApiError,
+  setNextPageTokenList,
+  nextPageTokenList
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -99,6 +101,8 @@ const VertexScheduleJobs = ({
   setExecutionPageFlag: (value: boolean) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  setNextPageTokenList: (value: string[]) => void;
+  nextPageTokenList: string[];
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] =
     useState<boolean>(false);
@@ -168,6 +172,8 @@ const VertexScheduleJobs = ({
           handleDagIdSelection={handleDagIdSelection}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
+          setNextPageTokenList={setNextPageTokenList}
+          nextPageTokenList={nextPageTokenList}
         />
       )}
     </>
@@ -213,6 +219,8 @@ export class NotebookJobs extends SchedulerWidget {
   setGcsPath: (value: string) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  setNextPageTokenList: (value: string[]) => void;
+    nextPageTokenList: string[];
 
   constructor(
     app: JupyterLab,
@@ -255,7 +263,10 @@ export class NotebookJobs extends SchedulerWidget {
     setGcsPath: (value: string) => void,
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
-    setJobNameSelected?: (value: string) => void
+    setNextPageTokenList: (value: string[]) => void,
+    nextPageTokenList: string[],
+    setJobNameSelected?: (value: string) => void,
+    
   ) {
     super(themeManager);
     this.app = app;
@@ -291,6 +302,8 @@ export class NotebookJobs extends SchedulerWidget {
     this.setIsApiError = setIsApiError;
     this.setApiError = setApiError;
     this.setGcsPath = setGcsPath;
+    this.setNextPageTokenList = setNextPageTokenList;
+    this.nextPageTokenList = nextPageTokenList;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -327,6 +340,8 @@ export class NotebookJobs extends SchedulerWidget {
         setExecutionPageFlag={this.setExecutionPageFlag}
         setIsApiError={this.setIsApiError}
         setApiError={this.setApiError}
+        setNextPageTokenList={this.setNextPageTokenList}
+        nextPageTokenList={this.nextPageTokenList}
       />
     );
   }
