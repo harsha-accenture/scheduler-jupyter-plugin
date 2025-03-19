@@ -524,13 +524,12 @@ class Client:
             self.log.exception(f"Error updating schedule: {str(e)}")
             return {"Error updating schedule": str(e)}
 
-
     async def list_notebook_execution_jobs(
-        self, region_id, schedule_id, start_date=None
+        self, region_id, schedule_id, page_size, start_date=None
     ):
         try:
             execution_jobs = []
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy=createTime desc"
+            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&pageSize={page_size}&orderBy=createTime desc"
 
             headers = self.create_headers()
             async with self.client_session.get(
