@@ -899,7 +899,8 @@ export class SchedulerService {
     setPackageInstalledList: (value: string[]) => void,
     setPackageListFlag: (value: boolean) => void,
     setapiErrorMessage: (value: string) => void,
-    setCheckRequiredPackagesInstalledFlag: (value: boolean) => void
+    setCheckRequiredPackagesInstalledFlag: (value: boolean) => void,
+    setDisabaleEnvLocal: (value: boolean) => void
   ) => {
     try {
       setPackageInstallationMessage(
@@ -908,22 +909,25 @@ export class SchedulerService {
       const installedPackageList: any = await requestAPI(
         `checkRequiredPackages?composer_environment_name=${selectedComposer}`
       );
-      console.log('installed packages', installedPackageList);
+
       if (installedPackageList.length > 0) {
         setPackageInstallationMessage(
           installedPackageList.join(', ') +
             ' packages will get installed on creation of schedule'
         );
         setPackageInstalledList(installedPackageList);
+        setPackageListFlag(false);
       } else if (Object.hasOwn(installedPackageList, 'error')) {
         setPackageInstallationMessage('');
         setapiErrorMessage(installedPackageList.error);
       } else {
         setPackageInstallationMessage('');
+        setPackageInstalledList([]);
         setPackageListFlag(true);
       }
 
       setCheckRequiredPackagesInstalledFlag(true);
+      setDisabaleEnvLocal(false);
     } catch (reason) {
       toast.error(
         `Failed to installation package list : ${reason}`,

@@ -98,7 +98,7 @@ const CreateNotebookScheduler = ({
   const [valueValidation, setValueValidation] = useState(-1);
   const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
 
-  const [selectedMode, setSelectedMode] = useState('local');
+  const [selectedMode, setSelectedMode] = useState('cluster');
   const [clusterList, setClusterList] = useState<string[]>([]);
   const [serverlessList, setServerlessList] = useState<string[]>([]);
   const [serverlessDataList, setServerlessDataList] = useState<string[]>([]);
@@ -144,6 +144,7 @@ const CreateNotebookScheduler = ({
 
   const [createApiKernelErrorFlag, setCreateApiKernelErrorFlag] =
     useState<boolean>(false);
+  const [disableEnvLocal, setDisabaleEnvLocal] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -170,7 +171,9 @@ const CreateNotebookScheduler = ({
 
   const handleComposerSelected = async (data: string | null) => {
     setPackageListFlag(false);
+    setPackageInstalledList([]);
     setapiErrorMessage('');
+    setDisabaleEnvLocal(true);
     if (data) {
       const selectedComposer = data.toString();
       setComposerSelected(selectedComposer);
@@ -187,7 +190,8 @@ const CreateNotebookScheduler = ({
             setPackageInstalledList,
             setPackageListFlag,
             setapiErrorMessage,
-            setCheckRequiredPackagesInstalledFlag
+            setCheckRequiredPackagesInstalledFlag,
+            setDisabaleEnvLocal
           );
         }
       }
@@ -494,12 +498,115 @@ const CreateNotebookScheduler = ({
                 renderInput={params => (
                   <TextField {...params} label="Environment*" />
                 )}
-                disabled={editMode}
+                disabled={editMode || disableEnvLocal}
               />
             </div>
 
             {!composerSelected && (
               <ErrorMessage message="Environment is required field" />
+            )}
+
+            <div className="create-scheduler-form-element">
+              <FormControl>
+                <RadioGroup
+                  aria-labelledby="demo-controlled-radio-buttons-group"
+                  name="controlled-radio-buttons-group"
+                  value={selectedMode}
+                  onChange={handleSelectedModeChange}
+                  row={true}
+                >
+                  <FormControlLabel
+                    value="cluster"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
+                    }
+                  />
+                  <FormControlLabel
+                    value="serverless"
+                    className="create-scheduler-label-style"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Serverless</Typography>
+                    }
+                  />
+                  <FormControlLabel
+                    value="local"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>
+                        Composer Environment
+                      </Typography>
+                    }
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+            <div className="create-scheduler-form-element">
+              {isLoadingKernelDetail && selectedMode !== 'local' && (
+                <CircularProgress
+                  size={18}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+              )}
+              {selectedMode === 'cluster' && !isLoadingKernelDetail && (
+                <>
+                  <Autocomplete
+                    className="create-scheduler-style"
+                    options={clusterList}
+                    value={clusterSelected}
+                    onChange={(_event, val) => handleClusterSelected(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Cluster*" />
+                    )}
+                  />
+                  {!clusterSelected && (
+                    <ErrorMessage message="Cluster is required field" />
+                  )}
+                </>
+              )}
+
+              {selectedMode === 'serverless' && !isLoadingKernelDetail && (
+                <>
+                  <Autocomplete
+                    className="create-scheduler-style"
+                    options={serverlessList}
+                    value={serverlessSelected}
+                    onChange={(_event, val) => handleServerlessSelected(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Serverless*" />
+                    )}
+                  />
+                  {!serverlessSelected && (
+                    <ErrorMessage message="Serverless is required field" />
+                  )}
+                </>
+              )}
+            </div>
+            {selectedMode === 'cluster' && (
+              <div className="create-scheduler-form-element">
+                <FormGroup row={true}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        size="small"
+                        checked={stopCluster}
+                        onChange={handleStopCluster}
+                      />
+                    }
+                    className="create-scheduler-label-style"
+                    label={
+                      <Typography
+                        sx={{ fontSize: 13 }}
+                        title="Stopping cluster abruptly will impact if any other job is running on the cluster at the moment"
+                      >
+                        Stop the cluster after notebook execution
+                      </Typography>
+                    }
+                  />
+                </FormGroup>
+              </div>
             )}
 
             {apiErrorMessage && selectedMode === 'local' && (
@@ -584,108 +691,7 @@ const CreateNotebookScheduler = ({
                 fromPage="scheduler"
               />
             </>
-            <div className="create-scheduler-form-element">
-              <FormControl>
-                <RadioGroup
-                  aria-labelledby="demo-controlled-radio-buttons-group"
-                  name="controlled-radio-buttons-group"
-                  value={selectedMode}
-                  onChange={handleSelectedModeChange}
-                  row={true}
-                >
-                  <FormControlLabel
-                    value="local"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Composer Environment
-                      </Typography>
-                    }
-                  />
-                  <FormControlLabel
-                    value="cluster"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
-                    }
-                  />
-                  <FormControlLabel
-                    value="serverless"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>Serverless</Typography>
-                    }
-                  />
-                </RadioGroup>
-              </FormControl>
-            </div>
-            <div className="create-scheduler-form-element">
-              {isLoadingKernelDetail && selectedMode !== 'local' && (
-                <CircularProgress
-                  size={18}
-                  aria-label="Loading Spinner"
-                  data-testid="loader"
-                />
-              )}
-              {selectedMode === 'cluster' && !isLoadingKernelDetail && (
-                <>
-                  <Autocomplete
-                    className="create-scheduler-style"
-                    options={clusterList}
-                    value={clusterSelected}
-                    onChange={(_event, val) => handleClusterSelected(val)}
-                    renderInput={params => (
-                      <TextField {...params} label="Cluster*" />
-                    )}
-                  />
-                  {!clusterSelected && (
-                    <ErrorMessage message="Cluster is required field" />
-                  )}
-                </>
-              )}
 
-              {selectedMode === 'serverless' && !isLoadingKernelDetail && (
-                <>
-                  <Autocomplete
-                    className="create-scheduler-style"
-                    options={serverlessList}
-                    value={serverlessSelected}
-                    onChange={(_event, val) => handleServerlessSelected(val)}
-                    renderInput={params => (
-                      <TextField {...params} label="Serverless*" />
-                    )}
-                  />
-                  {!serverlessSelected && (
-                    <ErrorMessage message="Serverless is required field" />
-                  )}
-                </>
-              )}
-            </div>
-            {selectedMode === 'cluster' && (
-              <div className="create-scheduler-form-element">
-                <FormGroup row={true}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={stopCluster}
-                        onChange={handleStopCluster}
-                      />
-                    }
-                    className="create-scheduler-label-style"
-                    label={
-                      <Typography
-                        sx={{ fontSize: 13 }}
-                        title="Stopping cluster abruptly will impact if any other job is running on the cluster at the moment"
-                      >
-                        Stop the cluster after notebook execution
-                      </Typography>
-                    }
-                  />
-                </FormGroup>
-              </div>
-            )}
             <div className="create-scheduler-form-element">
               <Input
                 className="create-scheduler-style"
