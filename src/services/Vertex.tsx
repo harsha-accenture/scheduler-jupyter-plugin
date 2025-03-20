@@ -167,25 +167,27 @@ export class VertexServices {
             Object.hasOwn(formattedResponse, 'schedules') &&
             formattedResponse.schedules.length > 0
           ) {
-            const currentDate = new Date().toISOString();
-            await Promise.all(
-              formattedResponse.schedules.map(async (schedule: any) => {
-                // This will extract schedule id from name ex: name: "projects/411524708443/locations/us-central1/notebookExecutionJobs/7978550051863527424" will return 7978550051863527424
-                const scheduleId = schedule.name.split('/').pop();
-                const serviceURLLastRunResponse =
-                  'api/vertex/listNotebookExecutionJobs';
-                const lastRunResponse: any = await requestAPI(
-                  serviceURLLastRunResponse +
-                    `?region_id=${region}&schedule_id=${scheduleId}&start_date=${currentDate}`
-                );
-                schedule.jobState = Object.hasOwn(lastRunResponse, 'error')
-                  ? 'Status Error'
-                  : lastRunResponse.length > 0 && lastRunResponse[0].jobState
-                    ? lastRunResponse[0].jobState
-                    : 'No runs';
-                return schedule;
-              })
-            );
+            // const currentDate = new Date().toISOString();
+            // await Promise.all(
+            // formattedResponse.schedules.forEach((schedule: any) => {
+            //   // This will extract schedule id from name ex: name: "projects/411524708443/locations/us-central1/notebookExecutionJobs/7978550051863527424" will return 7978550051863527424
+            //   const scheduleId = schedule.name.split('/').pop();
+            //   const serviceURLLastRunResponse =
+            //     'api/vertex/listNotebookExecutionJobs';
+            //   requestAPI(
+            //     serviceURLLastRunResponse +
+            //       `?region_id=${region}&schedule_id=${scheduleId}`
+            //   )
+            //     .then((result: any) => {
+            //       schedule.jobState = result;
+            //     })
+            //     .catch(err => {
+            //       console.log(err);
+            //       //toast the error here TODO
+            //     });
+            // });
+            // );
+            // console.log('formatted reposne', formattedResponse.schedules);
             setDagList(formattedResponse.schedules);
             setIsLoading(false);
           } else {
@@ -205,6 +207,30 @@ export class VertexServices {
       );
     }
   };
+
+  static handleListingScheduleNotebookExecutionApiService = async (
+    scheduleId: string | undefined,
+    region: string,
+    setLastRunException: (value: string[]) => void
+  ) => {
+    const serviceURL = 'api/vertex/listNotebookExecutionJobs';
+    const formattedResponse: any = await requestAPI(
+      serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
+    );
+    let jobState = [];
+    if (formattedResponse.length > 5) {
+      jobState = formattedResponse
+        .split(1, 5)
+        .map((item: any) => item.jobState);
+    }
+
+    if (formattedResponse.length < 5) {
+      jobState = formattedResponse.map((item: any) => item.jobState);
+    }
+
+    setLastRunException(jobState);
+  };
+
   static handleUpdateSchedulerPauseAPIService = async (
     scheduleId: string,
     region: string,
