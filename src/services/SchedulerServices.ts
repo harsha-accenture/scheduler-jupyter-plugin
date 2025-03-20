@@ -232,6 +232,8 @@ export class SchedulerService {
     setCreatingScheduler: (value: boolean) => void,
     editMode: boolean,
     setInstallationInProgressMessage: (value: boolean) => void,
+    selectedMode: string,
+    setCreateApiKernelErrorFlag: (value: boolean) => void,
     packageInstalledList: string[]
   ) => {
     setCreatingScheduler(true);
@@ -243,6 +245,7 @@ export class SchedulerService {
       if (data.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);
+        setCreateApiKernelErrorFlag(true);
       } else {
         if (editMode) {
           toast.success(
@@ -630,7 +633,7 @@ export class SchedulerService {
         LOG_LEVEL.ERROR
       );
       if (!toast.isActive('dagListError')) {
-        toast.error(`Failed to fetch clusters : ${error}`, {
+        toast.error(`Failed to fetch scheduler list : ${error}`, {
           ...toastifyCustomStyle,
           toastId: 'clusterError'
         });
@@ -665,7 +668,7 @@ export class SchedulerService {
         LOG_LEVEL.ERROR
       );
       if (!toast.isActive('dagListError')) {
-        toast.error(`Failed to fetch clusters : ${error}`, {
+        toast.error(`Failed to fetch scheduler list : ${error}`, {
           ...toastifyCustomStyle,
           toastId: 'clusterError'
         });
@@ -923,7 +926,7 @@ export class SchedulerService {
       setCheckRequiredPackagesInstalledFlag(true);
     } catch (reason) {
       toast.error(
-        `Failed to get package list : ${reason}`,
+        `Failed to installation package list : ${reason}`,
         toastifyCustomStyle
       );
     }

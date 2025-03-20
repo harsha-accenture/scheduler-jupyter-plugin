@@ -113,6 +113,7 @@ const CreateNotebookScheduler = ({
   const [emailOnRetry, setEmailonRetry] = useState(false);
   const [emailOnSuccess, setEmailOnSuccess] = useState(false);
   const [emailList, setEmailList] = useState<string[]>([]);
+  const [emailError, setEmailError] = useState<boolean>(false);
 
   const [scheduleMode, setScheduleMode] = useState<scheduleMode>('runNow');
   const [scheduleValue, setScheduleValue] = useState(scheduleValueExpression);
@@ -141,6 +142,9 @@ const CreateNotebookScheduler = ({
   const [installationInProgressMessage, setInstallationInProgressMessage] =
     useState<boolean>(false);
 
+  const [createApiKernelErrorFlag, setCreateApiKernelErrorFlag] =
+    useState<boolean>(false);
+
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
       setClusterList,
@@ -165,6 +169,8 @@ const CreateNotebookScheduler = ({
   };
 
   const handleComposerSelected = async (data: string | null) => {
+    setPackageListFlag(false);
+    setapiErrorMessage('');
     if (data) {
       const selectedComposer = data.toString();
       setComposerSelected(selectedComposer);
@@ -273,6 +279,17 @@ const CreateNotebookScheduler = ({
   };
 
   const handleEmailList = (data: string[]) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let invalidEmail = false;
+    data.forEach(email => {
+      if (!emailPattern.test(email)) {
+        invalidEmail = true;
+        setEmailError(true);
+      }
+    });
+    if (invalidEmail === false) {
+      setEmailError(false);
+    }
     setEmailList(data);
   };
 
@@ -303,7 +320,7 @@ const CreateNotebookScheduler = ({
         selectedMode === 'cluster' ? clusterSelected : serverlessDataSelected
     };
 
-    if (packageInstalledList.length > 0) {
+    if (packageInstalledList.length > 0 && selectedMode === 'local') {
       payload['local_kernel'] = selectedMode === 'local' ? true : false;
       payload['packages_to_install'] = packageInstalledList;
       setInstallationInProgressMessage(true);
@@ -316,6 +333,8 @@ const CreateNotebookScheduler = ({
       setCreatingScheduler,
       editMode,
       setInstallationInProgressMessage,
+      selectedMode,
+      setCreateApiKernelErrorFlag,
       packageInstalledList
     );
     setEditMode(false);
@@ -323,6 +342,7 @@ const CreateNotebookScheduler = ({
 
   const isSaveDisabled = () => {
     return (
+      emailError ||
       dagListCall ||
       creatingScheduler ||
       (!checkRequiredPackagesInstalledFlag && selectedMode === 'local') ||
@@ -482,9 +502,11 @@ const CreateNotebookScheduler = ({
               <ErrorMessage message="Environment is required field" />
             )}
 
-            {apiErrorMessage && <ErrorMessage message={apiErrorMessage} />}
+            {apiErrorMessage && selectedMode === 'local' && (
+              <ErrorMessage message={apiErrorMessage} />
+            )}
 
-            {packageInstallationMessage && (
+            {packageInstallationMessage && selectedMode === 'local' && (
               <>
                 {packageInstalledList.length > 0 ? (
                   <div className="success-message-package success-message-top">
@@ -513,7 +535,7 @@ const CreateNotebookScheduler = ({
               </>
             )}
 
-            {packageListFlag && (
+            {packageListFlag && selectedMode === 'local' && (
               <div className="success-message-package log-icon">
                 <iconSuccess.react
                   tag="div"
@@ -747,6 +769,10 @@ const CreateNotebookScheduler = ({
               !emailList.length && (
                 <ErrorMessage message="Email recipients is required field" />
               )}
+            {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
+              emailError && (
+                <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
+              )}
             <div className="create-scheduler-label">Schedule</div>
             <div className="create-scheduler-form-element">
               <FormControl>
@@ -827,19 +853,21 @@ const CreateNotebookScheduler = ({
               </Button>
             </div>
 
-            {installationInProgressMessage && (
-              <div className="success-message-package log-icon">
-                <CircularProgress
-                  size={18}
-                  aria-label="Loading Spinner"
-                  data-testid="loader"
-                />
-                <div className="warning-font enable-error-text-label">
-                  Installing packages taking longer than usual. Scheduled job
-                  starts post installation. Please wait....
+            {installationInProgressMessage &&
+              selectedMode === 'local' &&
+              !createApiKernelErrorFlag && (
+                <div className="success-message-package log-icon">
+                  <CircularProgress
+                    size={18}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
+                  <div className="warning-font enable-error-text-label">
+                    Installing packages taking longer than usual. Scheduled job
+                    starts post installation. Please wait....
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       )}
