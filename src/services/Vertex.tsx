@@ -617,7 +617,7 @@ export class VertexServices {
     const serviceURL = 'api/vertex/listNotebookExecutionJobs';
     const formattedResponse: any = await requestAPI(
       serviceURL +
-        `?region_id=${region}&schedule_id=${schedule_id}&start_date=${selected_month}`
+        `?region_id=${region}&schedule_id=${schedule_id}&start_date=${selected_month}&page_size=100&order_by=createTime desc`
     );
     try {
       let transformDagRunListDataCurrent = [];
