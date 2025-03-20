@@ -769,9 +769,10 @@ const CreateNotebookScheduler = ({
               !emailList.length && (
                 <ErrorMessage message="Email recipients is required field" />
               )}
-            {emailError && (
-              <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
-            )}
+            {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
+              emailError && (
+                <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
+              )}
             <div className="create-scheduler-label">Schedule</div>
             <div className="create-scheduler-form-element">
               <FormControl>
