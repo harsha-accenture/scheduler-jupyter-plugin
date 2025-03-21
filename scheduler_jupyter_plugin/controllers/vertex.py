@@ -209,7 +209,7 @@ class NotebookExecutionJobListController(APIHandler):
         try:
             region_id = self.get_argument("region_id")
             schedule_id = self.get_argument("schedule_id")
-            page_size = self.get_argument("page_size")
+            page_size = self.get_argument("page_size", default=None)
             order_by = self.get_argument("order_by")
             start_date = self.get_argument("start_date", default=None)
             async with aiohttp.ClientSession() as client_session:
