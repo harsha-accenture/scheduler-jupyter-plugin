@@ -217,7 +217,7 @@ class NotebookExecutionJobListController(APIHandler):
                     await credentials.get_cached(), self.log, client_session
                 )
                 jobs = await client.list_notebook_execution_jobs(
-                    region_id, schedule_id, page_size, order_by, start_date
+                    region_id, schedule_id, order_by, page_size, start_date
                 )
                 self.finish(json.dumps(jobs))
         except Exception as e:
