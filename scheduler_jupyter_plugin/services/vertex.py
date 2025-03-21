@@ -525,7 +525,7 @@ class Client:
             return {"Error updating schedule": str(e)}
 
     async def list_notebook_execution_jobs(
-        self, region_id, schedule_id, page_size=None, order_by, start_date=None
+        self, region_id, schedule_id, order_by, page_size=None, start_date=None
     ):
         try:
             execution_jobs = []
