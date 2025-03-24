@@ -45,8 +45,8 @@ export class SchedulerService {
 
       const formattedResponse: any = await requestAPI(serviceURL);
       let transformClusterListData = [];
-      if (formattedResponse && formattedResponse.clusters) {
-        transformClusterListData = formattedResponse.clusters.map(
+      if (formattedResponse?.clusters) {
+        transformClusterListData = formattedResponse?.clusters?.map(
           (data: IClusterAPIResponse) => {
             return {
               clusterName: data.clusterName
@@ -77,9 +77,9 @@ export class SchedulerService {
         setClusterList(keyLabelStructure);
         setIsLoadingKernelDetail(false);
       }
-      if (formattedResponse?.error?.code) {
+      if (formattedResponse?.error) {
         if (!toast.isActive('clusterError')) {
-          toast.error(formattedResponse?.error?.message, {
+          toast.error(formattedResponse?.error, {
             ...toastifyCustomStyle,
             toastId: 'clusterError'
           });
@@ -150,9 +150,9 @@ export class SchedulerService {
           setIsLoadingKernelDetail(false);
         }
       }
-      if (formattedResponse?.error?.code) {
+      if (formattedResponse?.error) {
         if (!toast.isActive('sessionTemplateError')) {
-          toast.error(formattedResponse?.error?.message, {
+          toast.error(formattedResponse?.error, {
             ...toastifyCustomStyle,
             toastId: 'sessionTemplateError'
           });
@@ -242,7 +242,7 @@ export class SchedulerService {
         body: JSON.stringify(payload),
         method: 'POST'
       });
-      if (data.error) {
+      if (data?.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);
         setCreateApiKernelErrorFlag(true);
@@ -610,8 +610,8 @@ export class SchedulerService {
       const serviceURL = `dagList?composer=${composerSelected}`;
       const formattedResponse: any = await requestAPI(serviceURL);
       let transformDagListData = [];
-      if (formattedResponse && formattedResponse[0].dags) {
-        transformDagListData = formattedResponse[0].dags.map(
+      if (formattedResponse.length > 0) {
+        transformDagListData = formattedResponse[0]?.dags?.map(
           (dag: ISchedulerDagData) => {
             return {
               jobid: dag.dag_id,
@@ -622,6 +622,21 @@ export class SchedulerService {
             };
           }
         );
+      } else {
+        const jsonstr = formattedResponse?.error.slice(
+          formattedResponse?.error.indexOf('{'),
+          formattedResponse?.error.lastIndexOf('}') + 1
+        );
+        if (jsonstr) {
+          const errorObject = JSON.parse(jsonstr);
+          toast.error(
+            `Failed to fetch schedule list : ${errorObject.error.message}`,
+            {
+              ...toastifyCustomStyle,
+              toastId: 'dagListError'
+            }
+          );
+        }
       }
       setDagList(transformDagListData);
       setIsLoading(false);
@@ -633,9 +648,9 @@ export class SchedulerService {
         LOG_LEVEL.ERROR
       );
       if (!toast.isActive('dagListError')) {
-        toast.error(`Failed to fetch scheduler list : ${error}`, {
+        toast.error(`Failed to fetch schedule list : ${error}`, {
           ...toastifyCustomStyle,
-          toastId: 'clusterError'
+          toastId: 'dagListError'
         });
       }
     }
@@ -668,7 +683,7 @@ export class SchedulerService {
         LOG_LEVEL.ERROR
       );
       if (!toast.isActive('dagListError')) {
-        toast.error(`Failed to fetch scheduler list : ${error}`, {
+        toast.error(`Failed to fetch schedule list : ${error}`, {
           ...toastifyCustomStyle,
           toastId: 'clusterError'
         });
@@ -758,7 +773,7 @@ export class SchedulerService {
         serviceURL,
         { method: 'POST' }
       );
-      if (formattedResponse && formattedResponse.status === 0) {
+      if (formattedResponse?.status === 0) {
         toast.success(
           `scheduler ${dag_id} updated successfully`,
           toastifyCustomStyle
@@ -769,10 +784,18 @@ export class SchedulerService {
           setBucketName,
           composerSelected
         );
+      } else {
+        toast.error(
+          `Error in pausing the schedule : ${formattedResponse?.error}`,
+          toastifyCustomStyle
+        );
       }
     } catch (error) {
       SchedulerLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-      toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+      toast.error(
+        `Error in pausing the schedule : ${error}`,
+        toastifyCustomStyle
+      );
     }
   };
   static listDagTaskInstancesListService = async (
@@ -789,12 +812,12 @@ export class SchedulerService {
       const data: any = await requestAPI(
         `dagRunTask?composer=${composerName}&dag_id=${dagId}&dag_run_id=${dagRunId}`
       );
-      data.task_instances.sort(
+      data.task_instances?.sort(
         (a: any, b: any) =>
           new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
       );
       let transformDagRunTaskInstanceListData = [];
-      transformDagRunTaskInstanceListData = data.task_instances.map(
+      transformDagRunTaskInstanceListData = data.task_instances?.map(
         (dagRunTask: any) => {
           return {
             tryNumber: dagRunTask.try_number,
@@ -832,7 +855,7 @@ export class SchedulerService {
       const data: any = await requestAPI(
         `dagRunTaskLogs?composer=${composerName}&dag_id=${dagId}&dag_run_id=${dagRunId}&task_id=${taskId}&task_try_number=${tryNumber}`
       );
-      setLogList(data.content);
+      setLogList(data?.content);
       setIsLoadingLogs(false);
     } catch (reason) {
       if (!toast.isActive('credentialsError')) {
@@ -852,8 +875,8 @@ export class SchedulerService {
       const data: any = await requestAPI(
         `importErrorsList?composer=${composerSelectedList}`
       );
-      setImportErrorData(data.import_errors);
-      setImportErrorEntries(data.total_entries);
+      setImportErrorData(data?.import_errors);
+      setImportErrorEntries(data?.total_entries);
     } catch (reason) {
       if (!toast.isActive('credentialsError')) {
         toast.error(`Error on GET credentials..\n${reason}`, {
@@ -875,10 +898,15 @@ export class SchedulerService {
       );
       if (data) {
         toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
+      } else {
+        toast.error(
+          `Failed to trigger ${dagId} : ${data?.error}`,
+          toastifyCustomStyle
+        );
       }
     } catch (reason) {
       toast.error(
-        `Failed to Trigger ${dagId} : ${reason}`,
+        `Failed to trigger ${dagId} : ${reason}`,
         toastifyCustomStyle
       );
     }
