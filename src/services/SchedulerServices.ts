@@ -630,7 +630,7 @@ export class SchedulerService {
         if (jsonstr) {
           const errorObject = JSON.parse(jsonstr);
           toast.error(
-            `Failed to fetch schedule list : ${errorObject.error.message}`,
+            `Failed to fetch scheduler list : ${errorObject.error.message}`,
             {
               ...toastifyCustomStyle,
               toastId: 'dagListError'
@@ -648,7 +648,7 @@ export class SchedulerService {
         LOG_LEVEL.ERROR
       );
       if (!toast.isActive('dagListError')) {
-        toast.error(`Failed to fetch dag list : ${error}`, {
+        toast.error(`Failed to fetch scheduler list : ${error}`, {
           ...toastifyCustomStyle,
           toastId: 'dagListError'
         });
