@@ -792,7 +792,10 @@ export class SchedulerService {
       }
     } catch (error) {
       SchedulerLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-      toast.error(`Error in pausing the schedule : ${error}`, toastifyCustomStyle);
+      toast.error(
+        `Error in pausing the schedule : ${error}`,
+        toastifyCustomStyle
+      );
     }
   };
   static listDagTaskInstancesListService = async (
