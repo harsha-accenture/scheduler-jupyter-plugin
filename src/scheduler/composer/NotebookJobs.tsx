@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SchedulerWidget } from '../../controls/SchedulerWidget';
 import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
@@ -54,7 +54,8 @@ const NotebookJobComponent = ({
   setIsLoadingKernelDetail,
   setIsApiError,
   setApiError,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  setIsLocalKernel
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -88,6 +89,7 @@ const NotebookJobComponent = ({
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
   setExecutionPageFlag: (value: boolean) => void;
+  setIsLocalKernel: (value: boolean) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -106,6 +108,10 @@ const NotebookJobComponent = ({
     setBackComposerName(composerName);
     setExecutionPageFlag(true);
   };
+
+  useEffect(() => {
+    setIsLocalKernel(true);
+  },[])
 
   return (
     <>
@@ -170,6 +176,7 @@ export class NotebookJobs extends SchedulerWidget {
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
   setExecutionPageFlag: (value: boolean) => void;
+  setIsLocalKernel: (value: boolean) => void;
 
   constructor(
     app: JupyterLab,
@@ -177,7 +184,8 @@ export class NotebookJobs extends SchedulerWidget {
     themeManager: IThemeManager,
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
-    setExecutionPageFlag: (value: boolean) => void
+    setExecutionPageFlag: (value: boolean) => void,
+    setIsLocalKernel: (value: boolean) => void
   ) {
     super(themeManager);
     this.app = app;
@@ -185,6 +193,7 @@ export class NotebookJobs extends SchedulerWidget {
     this.setIsApiError = setIsApiError;
     this.setApiError = setApiError;
     this.setExecutionPageFlag = setExecutionPageFlag;
+    this.setIsLocalKernel = setIsLocalKernel;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -195,6 +204,7 @@ export class NotebookJobs extends SchedulerWidget {
         setIsApiError={this.setIsApiError}
         setApiError={this.setApiError}
         setExecutionPageFlag={this.setExecutionPageFlag}
+        setIsLocalKernel={this.setIsLocalKernel}
       />
     );
   }

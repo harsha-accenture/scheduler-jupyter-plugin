@@ -234,7 +234,8 @@ export class SchedulerService {
     setInstallationInProgressMessage: (value: boolean) => void,
     selectedMode: string,
     setCreateApiKernelErrorFlag: (value: boolean) => void,
-    packageInstalledList: string[]
+    packageInstalledList: string[],
+    toastId: any
   ) => {
     setCreatingScheduler(true);
     try {
@@ -258,6 +259,8 @@ export class SchedulerService {
               toastifyCustomStyle
             );
           }
+          setInstallationInProgressMessage(false);
+          toast.dismiss(toastId.current);
         } else {
           toast.success(
             'Job scheduler successfully created',
@@ -269,7 +272,6 @@ export class SchedulerService {
               toastifyCustomStyle
             );
           }
-          setInstallationInProgressMessage(false);
         }
         setCreatingScheduler(false);
         setCreateCompleted(true);
@@ -393,7 +395,9 @@ export class SchedulerService {
                 );
               }
             );
-            setServerlessDataSelected(selectedData[0].serverlessData);
+            if(selectedData.length > 0) {
+              setServerlessDataSelected(selectedData[0].serverlessData);
+            }
           }
         }
         setRetryCount(formattedResponse.retry_count);

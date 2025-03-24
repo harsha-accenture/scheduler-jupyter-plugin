@@ -525,3 +525,29 @@
 .warning-success-message {
   padding-top: 6px;
 }
+
+.block-seperation {
+  margin-top: 0;
+  padding-top: 25px;
+}
+
+.progress-message {
+  width: 88%;
+  text-align: justify;
+  padding-left: 15px;
+}
+
+.progress-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-sub-action {
+  margin: 0;
+}
+
+.block-level-seperation {
+  padding-top: 8px;
+  margin-top: 0;
+}

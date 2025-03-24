@@ -62,6 +62,7 @@ const NotebookSchedulerComponent = ({
   const [executionPageFlag, setExecutionPageFlag] = useState<boolean>(true);
   const [isApiError, setIsApiError] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [isLocalKernel, setIsLocalKernel] = useState(true);
 
   useEffect(() => {
     if (context !== '') {
@@ -98,6 +99,14 @@ const NotebookSchedulerComponent = ({
     const newValue = (event.target as HTMLInputElement).value;
     setNotebookSelector(newValue);
   };
+
+  useEffect(() => {
+    if(isLocalKernel) {
+      setNotebookSelector('vertex');
+    } else {
+      setNotebookSelector('composer');
+    }
+  }, [isLocalKernel])
 
   return (
     <div className="component-level">
@@ -172,6 +181,7 @@ const NotebookSchedulerComponent = ({
                   value="vertex"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={!isLocalKernel}
                   label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
                 />
                 <FormControlLabel
@@ -219,6 +229,8 @@ const NotebookSchedulerComponent = ({
           setIsApiError={setIsApiError}
           setApiError={setApiError}
           setExecutionPageFlag={setExecutionPageFlag}
+          isLocalKernel={isLocalKernel}
+          setIsLocalKernel={setIsLocalKernel}
         />
       ) : (
         <CreateVertexScheduler
@@ -236,6 +248,7 @@ const NotebookSchedulerComponent = ({
           setExecutionPageFlag={setExecutionPageFlag}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
+          setIsLocalKernel={setIsLocalKernel}
         />
       )}
     </div>
