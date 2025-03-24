@@ -209,7 +209,7 @@ class NotebookExecutionJobListController(APIHandler):
         try:
             region_id = self.get_argument("region_id")
             schedule_id = self.get_argument("schedule_id")
-            page_size = self.get_argument("page_size")
+            page_size = self.get_argument("page_size", default=None)
             order_by = self.get_argument("order_by")
             start_date = self.get_argument("start_date", default=None)
             async with aiohttp.ClientSession() as client_session:
@@ -217,7 +217,7 @@ class NotebookExecutionJobListController(APIHandler):
                     await credentials.get_cached(), self.log, client_session
                 )
                 jobs = await client.list_notebook_execution_jobs(
-                    region_id, schedule_id, page_size, order_by, start_date
+                    region_id, schedule_id, order_by, page_size, start_date
                 )
                 self.finish(json.dumps(jobs))
         except Exception as e:
