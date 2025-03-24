@@ -48,8 +48,8 @@ import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
 import { iconSuccess, iconWarning } from '../../utils/Icons';
 // import { toastifyCustomStyle } from '../../utils/CustomStyle';
-import { toast } from 'react-toastify';
-import { ProgressPopUp } from '../../utils/ProgressPopUp';
+// import { toast } from 'react-toastify';
+// import { ProgressPopUp } from '../../utils/ProgressPopUp';
 
 const CreateNotebookScheduler = ({
   themeManager,

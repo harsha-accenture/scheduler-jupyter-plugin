@@ -61,9 +61,11 @@ dag = DAG(
 )
 
 def run_notebook_task(**kwargs):
-    parameters_str = '{{parameters}}'
-    if len(parameters_str)>0:
-        parameters_dict = convert_parameters(parameters_str)
+    parameters = '''
+    {{parameters}}
+    '''
+    if len(parameters)>0:
+        parameters_dict = convert_parameters(parameters)
     else:
         parameters_dict = {}
     output_notebook = kwargs['ti'].xcom_pull(task_ids='generate_output_file')
