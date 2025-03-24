@@ -167,28 +167,31 @@ export class VertexServices {
             Object.hasOwn(formattedResponse, 'schedules') &&
             formattedResponse.schedules.length > 0
           ) {
-            // const currentDate = new Date().toISOString();
             // await Promise.all(
-            // formattedResponse.schedules.forEach((schedule: any) => {
-            //   // This will extract schedule id from name ex: name: "projects/411524708443/locations/us-central1/notebookExecutionJobs/7978550051863527424" will return 7978550051863527424
-            //   const scheduleId = schedule.name.split('/').pop();
-            //   const serviceURLLastRunResponse =
-            //     'api/vertex/listNotebookExecutionJobs';
-            //   requestAPI(
-            //     serviceURLLastRunResponse +
-            //       `?region_id=${region}&schedule_id=${scheduleId}`
-            //   )
-            //     .then((result: any) => {
-            //       schedule.jobState = result;
-            //     })
-            //     .catch(err => {
-            //       console.log(err);
-            //       //toast the error here TODO
-            //     });
-            // });
+              formattedResponse.schedules.forEach((schedule: any) => {
+                // This will extract schedule id from name ex: name: "projects/411524708443/locations/us-central1/notebookExecutionJobs/7978550051863527424" will return 7978550051863527424
+                const scheduleId = schedule.name.split('/').pop();
+                const serviceURLLastRunResponse =
+                  'api/vertex/listNotebookExecutionJobs';
+                requestAPI(
+                  serviceURLLastRunResponse +
+                    `?region_id=${region}&schedule_id=${scheduleId}&page_size=5&order_by=createTime desc`
+                )
+                  .then((result: any) => {
+                    // console.log(result);
+                    const lastFiveRun = result.map((item: any) => item.jobState);
+                    schedule.jobState = lastFiveRun
+                    console.log(schedule);
+                  })
+                  .catch(err => {
+                    console.log(err);
+                    //toast the error here TODO
+                  });
+              })
             // );
-            // console.log('formatted reposne', formattedResponse.schedules);
+            console.log('formatted reposne', formattedResponse.schedules);
             setDagList(formattedResponse.schedules);
+            console.log('executed');
             setIsLoading(false);
           } else {
             setDagList([]);
