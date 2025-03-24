@@ -46,6 +46,7 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
+import { iconSuccess, iconWarning } from '../../utils/Icons';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -97,7 +98,7 @@ const CreateNotebookScheduler = ({
   const [valueValidation, setValueValidation] = useState(-1);
   const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
 
-  const [selectedMode, setSelectedMode] = useState('cluster');
+  const [selectedMode, setSelectedMode] = useState('local');
   const [clusterList, setClusterList] = useState<string[]>([]);
   const [serverlessList, setServerlessList] = useState<string[]>([]);
   const [serverlessDataList, setServerlessDataList] = useState<string[]>([]);
@@ -112,6 +113,7 @@ const CreateNotebookScheduler = ({
   const [emailOnRetry, setEmailonRetry] = useState(false);
   const [emailOnSuccess, setEmailOnSuccess] = useState(false);
   const [emailList, setEmailList] = useState<string[]>([]);
+  const [emailError, setEmailError] = useState<boolean>(false);
 
   const [scheduleMode, setScheduleMode] = useState<scheduleMode>('runNow');
   const [scheduleValue, setScheduleValue] = useState(scheduleValueExpression);
@@ -125,8 +127,23 @@ const CreateNotebookScheduler = ({
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const [dagListCall, setDagListCall] = useState(false);
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
+  const [packageInstallationMessage, setPackageInstallationMessage] =
+    useState<string>('');
+  const [packageInstalledList, setPackageInstalledList] = useState<string[]>(
+    []
+  );
+  const [packageListFlag, setPackageListFlag] = useState<boolean>(false);
+  const [apiErrorMessage, setapiErrorMessage] = useState<string>('');
+  const [
+    checkRequiredPackagesInstalledFlag,
+    setCheckRequiredPackagesInstalledFlag
+  ] = useState<boolean>(false);
 
-  const [isBigQueryNotebook, setIsBigQueryNotebook] = useState(false);
+  const [installationInProgressMessage, setInstallationInProgressMessage] =
+    useState<boolean>(false);
+
+  const [createApiKernelErrorFlag, setCreateApiKernelErrorFlag] =
+    useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -151,7 +168,9 @@ const CreateNotebookScheduler = ({
     );
   };
 
-  const handleComposerSelected = (data: string | null) => {
+  const handleComposerSelected = async (data: string | null) => {
+    setPackageListFlag(false);
+    setapiErrorMessage('');
     if (data) {
       const selectedComposer = data.toString();
       setComposerSelected(selectedComposer);
@@ -159,6 +178,17 @@ const CreateNotebookScheduler = ({
         const unique = getDaglist(selectedComposer);
         if (!unique) {
           setJobNameUniqueValidation(true);
+        }
+
+        if (selectedMode === 'local') {
+          await SchedulerService.checkRequiredPackagesInstalled(
+            selectedComposer,
+            setPackageInstallationMessage,
+            setPackageInstalledList,
+            setPackageListFlag,
+            setapiErrorMessage,
+            setCheckRequiredPackagesInstalledFlag
+          );
         }
       }
     }
@@ -249,6 +279,17 @@ const CreateNotebookScheduler = ({
   };
 
   const handleEmailList = (data: string[]) => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let invalidEmail = false;
+    data.forEach(email => {
+      if (!emailPattern.test(email)) {
+        invalidEmail = true;
+        setEmailError(true);
+      }
+    });
+    if (invalidEmail === false) {
+      setEmailError(false);
+    }
     setEmailList(data);
   };
 
@@ -279,20 +320,32 @@ const CreateNotebookScheduler = ({
         selectedMode === 'cluster' ? clusterSelected : serverlessDataSelected
     };
 
+    if (packageInstalledList.length > 0 && selectedMode === 'local') {
+      payload['local_kernel'] = selectedMode === 'local' ? true : false;
+      payload['packages_to_install'] = packageInstalledList;
+      setInstallationInProgressMessage(true);
+    }
+
     await SchedulerService.createJobSchedulerService(
       payload,
       app,
       setCreateCompleted,
       setCreatingScheduler,
-      editMode
+      editMode,
+      setInstallationInProgressMessage,
+      selectedMode,
+      setCreateApiKernelErrorFlag,
+      packageInstalledList
     );
     setEditMode(false);
   };
 
   const isSaveDisabled = () => {
     return (
+      emailError ||
       dagListCall ||
       creatingScheduler ||
+      (!checkRequiredPackagesInstalledFlag && selectedMode === 'local') ||
       jobNameSelected === '' ||
       (!jobNameValidation && !editMode) ||
       (jobNameSpecialValidation && !editMode) ||
@@ -362,10 +415,6 @@ const CreateNotebookScheduler = ({
 
     if (context !== '') {
       setInputFileSelected(context.path);
-      if (context.path.toLowerCase().startsWith('bigframes')) {
-        setIsBigQueryNotebook(true);
-        setSelectedMode('serverless');
-      }
     }
     setJobNameSelected('');
     if (!editMode) {
@@ -448,8 +497,55 @@ const CreateNotebookScheduler = ({
                 disabled={editMode}
               />
             </div>
+
             {!composerSelected && (
               <ErrorMessage message="Environment is required field" />
+            )}
+
+            {apiErrorMessage && selectedMode === 'local' && (
+              <ErrorMessage message={apiErrorMessage} />
+            )}
+
+            {packageInstallationMessage && selectedMode === 'local' && (
+              <>
+                {packageInstalledList.length > 0 ? (
+                  <div className="success-message-package success-message-top">
+                    <iconWarning.react
+                      tag="div"
+                      className="icon-white logo-alignment-style success_icon icon-size-status"
+                    />
+                    <div className="success-message-pack warning-font success-message-cl-package warning-message">
+                      {packageInstallationMessage}
+                    </div>
+                  </div>
+                ) : (
+                  !apiErrorMessage && (
+                    <div className="success-message-package success-message-top">
+                      <CircularProgress
+                        size={18}
+                        aria-label="Loading Spinner"
+                        data-testid="loader"
+                      />
+                      <div className="success-message-pack warning-font success-message-cl-package enable-error-text-label">
+                        {packageInstallationMessage}
+                      </div>
+                    </div>
+                  )
+                )}
+              </>
+            )}
+
+            {packageListFlag && selectedMode === 'local' && (
+              <div className="success-message-package log-icon">
+                <iconSuccess.react
+                  tag="div"
+                  title="Done !"
+                  className="icon-white logo-alignment-style success_icon icon-size icon-completed"
+                />
+                <div className="warning-success-message">
+                  Required packages are already installed
+                </div>
+              </div>
             )}
 
             <div className="create-scheduler-label">Output formats</div>
@@ -488,63 +584,66 @@ const CreateNotebookScheduler = ({
                 fromPage="scheduler"
               />
             </>
-            {!isBigQueryNotebook && (
-              <div className="create-scheduler-form-element">
-                <FormControl>
-                  <RadioGroup
-                    aria-labelledby="demo-controlled-radio-buttons-group"
-                    name="controlled-radio-buttons-group"
-                    value={selectedMode}
-                    onChange={handleSelectedModeChange}
-                    row={true}
-                  >
-                    <FormControlLabel
-                      value="cluster"
-                      control={<Radio size="small" />}
-                      label={
-                        <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
-                      }
-                    />
-                    <FormControlLabel
-                      value="serverless"
-                      className="create-scheduler-label-style"
-                      control={<Radio size="small" />}
-                      label={
-                        <Typography sx={{ fontSize: 13 }}>
-                          Serverless
-                        </Typography>
-                      }
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </div>
-            )}
             <div className="create-scheduler-form-element">
-              {isLoadingKernelDetail && (
+              <FormControl>
+                <RadioGroup
+                  aria-labelledby="demo-controlled-radio-buttons-group"
+                  name="controlled-radio-buttons-group"
+                  value={selectedMode}
+                  onChange={handleSelectedModeChange}
+                  row={true}
+                >
+                  <FormControlLabel
+                    value="local"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>
+                        Composer Environment
+                      </Typography>
+                    }
+                  />
+                  <FormControlLabel
+                    value="cluster"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
+                    }
+                  />
+                  <FormControlLabel
+                    value="serverless"
+                    className="create-scheduler-label-style"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Serverless</Typography>
+                    }
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+            <div className="create-scheduler-form-element">
+              {isLoadingKernelDetail && selectedMode !== 'local' && (
                 <CircularProgress
                   size={18}
                   aria-label="Loading Spinner"
                   data-testid="loader"
                 />
               )}
-              {!isBigQueryNotebook &&
-                selectedMode === 'cluster' &&
-                !isLoadingKernelDetail && (
-                  <>
-                    <Autocomplete
-                      className="create-scheduler-style"
-                      options={clusterList}
-                      value={clusterSelected}
-                      onChange={(_event, val) => handleClusterSelected(val)}
-                      renderInput={params => (
-                        <TextField {...params} label="Cluster*" />
-                      )}
-                    />
-                    {!clusterSelected && (
-                      <ErrorMessage message="Cluster is required field" />
+              {selectedMode === 'cluster' && !isLoadingKernelDetail && (
+                <>
+                  <Autocomplete
+                    className="create-scheduler-style"
+                    options={clusterList}
+                    value={clusterSelected}
+                    onChange={(_event, val) => handleClusterSelected(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Cluster*" />
                     )}
-                  </>
-                )}
+                  />
+                  {!clusterSelected && (
+                    <ErrorMessage message="Cluster is required field" />
+                  )}
+                </>
+              )}
 
               {selectedMode === 'serverless' && !isLoadingKernelDetail && (
                 <>
@@ -563,7 +662,7 @@ const CreateNotebookScheduler = ({
                 </>
               )}
             </div>
-            {!isBigQueryNotebook && selectedMode === 'cluster' && (
+            {selectedMode === 'cluster' && (
               <div className="create-scheduler-form-element">
                 <FormGroup row={true}>
                   <FormControlLabel
@@ -670,6 +769,10 @@ const CreateNotebookScheduler = ({
               !emailList.length && (
                 <ErrorMessage message="Email recipients is required field" />
               )}
+            {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
+              emailError && (
+                <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
+              )}
             <div className="create-scheduler-label">Schedule</div>
             <div className="create-scheduler-form-element">
               <FormControl>
@@ -718,6 +821,7 @@ const CreateNotebookScheduler = ({
                 </div>
               </>
             )}
+
             <div className="save-overlay">
               <Button
                 onClick={() => {
@@ -748,6 +852,22 @@ const CreateNotebookScheduler = ({
                 <div>CANCEL</div>
               </Button>
             </div>
+
+            {installationInProgressMessage &&
+              selectedMode === 'local' &&
+              !createApiKernelErrorFlag && (
+                <div className="success-message-package log-icon">
+                  <CircularProgress
+                    size={18}
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                  />
+                  <div className="warning-font enable-error-text-label">
+                    Installing packages taking longer than usual. Scheduled job
+                    starts post installation. Please wait....
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       )}
