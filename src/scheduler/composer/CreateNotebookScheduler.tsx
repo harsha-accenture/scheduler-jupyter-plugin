@@ -405,6 +405,7 @@ const CreateNotebookScheduler = ({
             context.sessionContext.kernelPreference.name
           ].resources.endpointParentResource.includes('/sessions')
         ) {
+          setSelectedMode('serverless');
           const selectedData: any = serverlessDataList.filter(
             (serverless: any) => {
               return context.sessionContext.kernelDisplayName.includes(
