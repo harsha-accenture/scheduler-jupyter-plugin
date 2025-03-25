@@ -6,16 +6,18 @@ export const ProgressPopUp = ({
   data
 }: ToastContentProps<{ message: string }>) => {
   return (
-    <div className="progress-main">
-      <div>
-        <CircularProgress
-          size={18}
-          aria-label="Loading Spinner"
-          data-testid="loader"
-        />
+    <div>
+      <div className="progress-main">
+        <span className="progress-message">{data!.message}</span>
+        <span>
+          <CircularProgress
+            size={18}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+            className='spinner-loader-modal '
+          />
+        </span>
       </div>
-      <div><p className="progress-message">{data!.message}</p></div>
-      
     </div>
   );
 };

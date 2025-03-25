@@ -532,15 +532,11 @@
 }
 
 .progress-message {
-  width: 88%;
   text-align: justify;
-  padding-left: 15px;
 }
 
 .progress-main {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding-right: 27px;
 }
 
 .input-sub-action {
@@ -550,4 +546,9 @@
 .block-level-seperation {
   padding-top: 8px;
   margin-top: 0;
+}
+
+.spinner-loader-modal {
+  width: 14px !important;
+  height: 14px !important;
 }

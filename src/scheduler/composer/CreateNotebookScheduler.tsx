@@ -47,9 +47,8 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
 import { iconSuccess, iconWarning } from '../../utils/Icons';
-// import { toastifyCustomStyle } from '../../utils/CustomStyle';
-// import { toast } from 'react-toastify';
-// import { ProgressPopUp } from '../../utils/ProgressPopUp';
+import { ProgressPopUp } from '../../utils/ProgressPopUp';
+import { toast } from 'react-toastify';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -145,12 +144,6 @@ const CreateNotebookScheduler = ({
     checkRequiredPackagesInstalledFlag,
     setCheckRequiredPackagesInstalledFlag
   ] = useState<boolean>(false);
-
-  const [installationInProgressMessage, setInstallationInProgressMessage] =
-    useState<boolean>(false);
-  const [createApiKernelErrorFlag, setCreateApiKernelErrorFlag] =
-    useState<boolean>(false);
-  console.log(createApiKernelErrorFlag);
   const [disableEnvLocal, setDisabaleEnvLocal] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
@@ -177,14 +170,11 @@ const CreateNotebookScheduler = ({
   };
 
   const handleComposerSelected = async (data: string | null) => {
-    console.log('running composer func');
     setPackageListFlag(false);
     setPackageInstalledList([]);
     setapiErrorMessage('');
-    setDisabaleEnvLocal(true);
     if (data) {
       const selectedComposer = data.toString();
-      console.log('composer valiue', selectedComposer);
       setComposerSelected(selectedComposer);
       if (selectedComposer) {
         const unique = getDaglist(selectedComposer);
@@ -193,6 +183,7 @@ const CreateNotebookScheduler = ({
         }
 
         if (isLocalKernel) {
+          setDisabaleEnvLocal(true);
           await SchedulerService.checkRequiredPackagesInstalled(
             selectedComposer,
             setPackageInstallationMessage,
@@ -313,7 +304,6 @@ const CreateNotebookScheduler = ({
     outputFormats.push('ipynb');
 
     const randomDagId = uuidv4();
-    console.log('inside create form ');
     const payload = {
       input_filename: inputFileSelected,
       composer_environment_name: composerSelected,
@@ -338,17 +328,16 @@ const CreateNotebookScheduler = ({
 
     if (packageInstalledList.length > 0 && isLocalKernel) {
       payload['packages_to_install'] = packageInstalledList;
-      setInstallationInProgressMessage(true);
-      // {
-      //   toast(ProgressPopUp, {
-      //     autoClose: false,
-      //     closeButton: installationInProgressMessage,
-      //     data: {
-      //       message:
-      //         'Installing packages taking longer than usual. Scheduled job starts post installation. Please wait....'
-      //     }
-      //   });
-      // }
+      {
+        toast(ProgressPopUp, {
+          autoClose: false,
+          closeButton: true,
+          data: {
+            message:
+              'Installing packages taking longer than usual. Scheduled job starts post installation. Please wait....'
+          }
+        });
+      }
     }
 
     await SchedulerService.createJobSchedulerService(
@@ -357,9 +346,7 @@ const CreateNotebookScheduler = ({
       setCreateCompleted,
       setCreatingScheduler,
       editMode,
-      setInstallationInProgressMessage,
       selectedMode,
-      setCreateApiKernelErrorFlag,
       packageInstalledList,
       toastId
     );
@@ -403,15 +390,11 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      console.log(
-        'context.sessionContext.kernelDisplayName',
-        context.sessionContext.kernelDisplayName
-      );
-      if (context.sessionContext.kernelDisplayName.includes('Remote')) {
-        setIsLocalKernel(false);
-      } else {
-        setIsLocalKernel(true);
-      }
+      // if (context.sessionContext.kernelDisplayName.includes('Remote')) {
+      //   setIsLocalKernel(false);
+      // } else {
+      //   setIsLocalKernel(true);
+      // }
 
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
@@ -487,7 +470,6 @@ const CreateNotebookScheduler = ({
   }, [selectedMode]);
 
   return (
-    console.log('InstallationInProgressMessage', installationInProgressMessage),
     (
       <>
         {createCompleted ? (
@@ -897,21 +879,6 @@ const CreateNotebookScheduler = ({
                   <div>CANCEL</div>
                 </Button>
               </div>
-
-              {/* {installationInProgressMessage &&
-                isLocalKernel &&
-                !createApiKernelErrorFlag && (
-                  <div className="success-message-package log-icon toast-containeer">
-                    {toast(ProgressPopUp, {
-                      autoClose: false,
-                      closeButton: installationInProgressMessage,
-                      data: {
-                        message:
-                          'Installing packages taking longer than usual. Scheduled job starts post installation. Please wait....'
-                      }
-                    })}
-                  </div>
-              )} */}
             </div>
           </div>
         )}

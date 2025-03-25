@@ -231,9 +231,7 @@ export class SchedulerService {
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
     editMode: boolean,
-    setInstallationInProgressMessage: (value: boolean) => void,
     selectedMode: string,
-    setCreateApiKernelErrorFlag: (value: boolean) => void,
     packageInstalledList: string[],
     toastId: any
   ) => {
@@ -246,7 +244,6 @@ export class SchedulerService {
       if (data.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);
-        setCreateApiKernelErrorFlag(true);
       } else {
         if (editMode) {
           toast.success(
@@ -259,7 +256,6 @@ export class SchedulerService {
               toastifyCustomStyle
             );
           }
-          setInstallationInProgressMessage(false);
           toast.dismiss(toastId.current);
         } else {
           toast.success(
