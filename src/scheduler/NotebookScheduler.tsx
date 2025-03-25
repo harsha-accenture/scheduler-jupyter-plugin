@@ -118,7 +118,7 @@ const NotebookSchedulerComponent = ({
   }
 
   useEffect(() => {
-    if(isLocalKernel) {
+    if(isLocalKernel && !createCompleted) {
       setNotebookSelector('vertex');
     } else {
       setNotebookSelector('composer');
@@ -213,7 +213,7 @@ const NotebookSchedulerComponent = ({
                     value="vertex"
                     className="create-scheduler-label-style"
                     control={<Radio size="small" />}
-                    disabled={!isLoadingKernel}
+                    disabled={!isLocalKernel}
                     label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
                   />
                   <FormControlLabel
