@@ -470,6 +470,27 @@ const CreateNotebookScheduler = ({
     }
   }, [selectedMode]);
 
+  useEffect(() => {
+    const checkRequiredPackageApiService = async () => {
+      setPackageListFlag(false);
+      setPackageInstalledList([]);
+      setapiErrorMessage('');
+      await SchedulerService.checkRequiredPackagesInstalled(
+        composerSelected,
+        setPackageInstallationMessage,
+        setPackageInstalledList,
+        setPackageListFlag,
+        setapiErrorMessage,
+        setCheckRequiredPackagesInstalledFlag,
+        setDisabaleEnvLocal
+      );
+    };
+
+    if (isLocalKernel && editMode) {
+      checkRequiredPackageApiService();
+    }
+  }, [editMode, isLocalKernel]);
+
   return (
     (
       <>

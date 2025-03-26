@@ -148,7 +148,9 @@ class NotebookButtonExtensionPoint implements IDisposable {
 
     this.notebookSchedulerButton = new ToolbarButton({
       icon: iconNotebookScheduler,
-      onClick: () => this.onNotebookSchedulerClick(),
+      onClick: () => {
+        this.app.commands.execute('docmanager:save')
+        this.onNotebookSchedulerClick()},
       tooltip: 'Job Scheduler',
       className: 'dark-theme-logs'
     });

@@ -308,12 +308,12 @@ export class SchedulerService {
     dagId: string,
     composerSelectedList: string,
     setEditDagLoading: (value: string) => void,
+    setIsLocalKernel: (value: boolean) => void,
     setCreateCompleted?: (value: boolean) => void,
     setJobNameSelected?: (value: string) => void,
     setComposerSelected?: (value: string) => void,
     setScheduleMode?: (value: scheduleMode) => void,
     setScheduleValue?: (value: string) => void,
-
     setInputFileSelected?: (value: string) => void,
     setParameterDetail?: (value: string[]) => void,
     setParameterDetailUpdated?: (value: string[]) => void,
@@ -371,8 +371,21 @@ export class SchedulerService {
         setJobNameSelected(dagId);
         setComposerSelected(composerSelectedList);
         setInputFileSelected(formattedResponse.input_filename);
-        setParameterDetail(formattedResponse.parameters);
-        setParameterDetailUpdated(formattedResponse.parameters);
+
+        if (formattedResponse.mode_selected === 'local') {
+          setIsLocalKernel(true);
+          if (formattedResponse.parameters.length > 0) {
+            const parameterList = formattedResponse.parameters[0]
+              .split(',')
+              .map((item: any) => item.trim());
+            setParameterDetail(parameterList);
+            setParameterDetailUpdated(parameterList);
+          }
+        } else {
+          setParameterDetail(formattedResponse.parameters);
+          setParameterDetailUpdated(formattedResponse.parameters);
+        }
+
         setSelectedMode(formattedResponse.mode_selected);
         setClusterSelected(formattedResponse.cluster_name);
         setServerlessSelected(formattedResponse.serverless_name);
@@ -391,7 +404,7 @@ export class SchedulerService {
                 );
               }
             );
-            if(selectedData.length > 0) {
+            if (selectedData.length > 0) {
               setServerlessDataSelected(selectedData[0].serverlessData);
             }
           }
@@ -875,6 +888,13 @@ export class SchedulerService {
       );
       if (data) {
         toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
+      } 
+
+      if(data.error) {
+        toast.error(
+          `Failed to Trigger ${dagId} : ${data.error}`,
+          toastifyCustomStyle
+        );
       }
     } catch (reason) {
       toast.error(

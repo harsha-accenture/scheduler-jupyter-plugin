@@ -27,7 +27,6 @@ import { Input } from '../controls/MuiWrappedInput';
 import CreateNotebookScheduler from './composer/CreateNotebookScheduler';
 import ErrorMessage from './common/ErrorMessage';
 import {
-  CircularProgress,
   FormControl,
   FormControlLabel,
   Radio,
@@ -37,7 +36,6 @@ import {
 import CreateVertexScheduler from './vertex/CreateVertexScheduler';
 import EnableNotifyMessage from './common/EnableNotifyMessage';
 import { iconError } from '../utils/Icons';
-import { KernelSpecAPI } from '@jupyterlab/services';
 
 const NotebookSchedulerComponent = ({
   themeManager,
@@ -65,7 +63,7 @@ const NotebookSchedulerComponent = ({
   const [isApiError, setIsApiError] = useState(false);
   const [apiError, setApiError] = useState('');
   const [isLocalKernel, setIsLocalKernel] = useState<boolean>(true);
-  const [isLoadingKernel, setIsLoadingKernel] = useState<boolean>(true);
+  const [schedulerBtnDisable, setSchedulerBtnDisable] = useState<boolean>(false);
 
   useEffect(() => {
     if (context !== '') {
@@ -104,189 +102,162 @@ const NotebookSchedulerComponent = ({
     setNotebookSelector(newValue);
   };
 
-  const getKernelDetails = async() => {
-    const kernelSpecs: any = await KernelSpecAPI.getSpecs();
-    const kernels = kernelSpecs.kernelspecs;
-    if (kernels && context.sessionContext.kernelPreference.name) {
-      if (context.sessionContext.kernelDisplayName.includes('Remote')) {
-        setIsLocalKernel(false);
-      } else {
-        setIsLocalKernel(true);
-      }
-    }
-    setIsLoadingKernel(false);
-  }
-
-  useEffect(() => {
-    if(isLocalKernel && !createCompleted) {
-      setNotebookSelector('vertex');
-    } else {
+  const getKernelDetails = async () => {
+    if (context.sessionContext.kernelDisplayName.includes('Remote')) {
+      setIsLocalKernel(false);
       setNotebookSelector('composer');
+      setSchedulerBtnDisable(true);
+    } else {
+      setIsLocalKernel(true);
+      setNotebookSelector('vertex');
+      setSchedulerBtnDisable(true);
     }
-  }, [isLocalKernel])
+  };
 
   return (
-    <>
-      {isLoadingKernel && (
-        <div className="spin-loader-main">
-          <CircularProgress
-            className="spin-loader-custom-style"
-            size={18}
-            aria-label="Loading Spinner"
-            data-testid="loader"
-          />
-          Loading...
+    <div className="component-level">
+      {!createCompleted ? (
+        <>
+          <div className="cluster-details-header">
+            <div
+              role="button"
+              className="back-arrow-icon"
+              onClick={handleCancel}
+            >
+              <iconLeftArrow.react
+                tag="div"
+                className="icon-white logo-alignment-style"
+              />
+            </div>
+            <div className="create-job-scheduler-title">
+              {editMode ? 'Update A Scheduled Job' : 'Create A Scheduled Job'}
+            </div>
+          </div>
+          <div className="common-fields">
+            <div className="create-scheduler-form-element">
+              <Input
+                className="create-scheduler-style"
+                value={jobNameSelected}
+                onChange={e => handleJobNameChange(e)}
+                type="text"
+                placeholder=""
+                Label="Job name*"
+                disabled={editMode}
+              />
+            </div>
+            {jobNameSelected === '' && !editMode && (
+              <ErrorMessage message="Job name is required" />
+            )}
+            {jobNameSpecialValidation && jobNameValidation && !editMode && (
+              <ErrorMessage message="Name must contain only letters, numbers, hyphens, and underscores" />
+            )}
+            {!jobNameUniqueValidation && !editMode && (
+              <ErrorMessage message="Job name must be unique for the selected environment" />
+            )}
+
+            <div className="create-scheduler-form-element-input-file">
+              <Input
+                className="create-scheduler-style"
+                value={inputFileSelected}
+                Label="Input file*"
+                disabled={true}
+              />
+            </div>
+          </div>
+        </>
+      ) : (
+        executionPageFlag && (
+          <div className="clusters-list-overlay" role="tab">
+            <div className="cluster-details-title">Scheduled Jobs</div>
+          </div>
+        )
+      )}
+      {executionPageFlag && (
+        <div>
+          <div className="create-scheduler-form-element sub-para">
+            <FormControl>
+              <RadioGroup
+                className="schedule-radio-btn"
+                aria-labelledby="demo-controlled-radio-buttons-group"
+                name="controlled-radio-buttons-group"
+                value={notebookSelector}
+                onChange={handleSchedulerModeChange}
+              >
+                <FormControlLabel
+                  value="vertex"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  disabled={schedulerBtnDisable}
+                  label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
+                />
+                <FormControlLabel
+                  value="composer"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>Composer</Typography>
+                  }
+                />
+              </RadioGroup>
+            </FormControl>
+          </div>
+          <div>
+            {isApiError && (
+              <div className="error-key-parent enable-error-text-label">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">
+                  <EnableNotifyMessage message={apiError} />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {
-        !isLoadingKernel && 
-        <div className="component-level">
-        {!createCompleted ? (
-          <>
-            <div className="cluster-details-header">
-              <div
-                role="button"
-                className="back-arrow-icon"
-                onClick={handleCancel}
-              >
-                <iconLeftArrow.react
-                  tag="div"
-                  className="icon-white logo-alignment-style"
-                />
-              </div>
-              <div className="create-job-scheduler-title">
-                {editMode ? 'Update A Scheduled Job' : 'Create A Scheduled Job'}
-              </div>
-            </div>
-            <div className="common-fields">
-              <div className="create-scheduler-form-element">
-                <Input
-                  className="create-scheduler-style"
-                  value={jobNameSelected}
-                  onChange={e => handleJobNameChange(e)}
-                  type="text"
-                  placeholder=""
-                  Label="Job name*"
-                  disabled={editMode}
-                />
-              </div>
-              {jobNameSelected === '' && !editMode && (
-                <ErrorMessage message="Job name is required" />
-              )}
-              {jobNameSpecialValidation && jobNameValidation && !editMode && (
-                <ErrorMessage message="Name must contain only letters, numbers, hyphens, and underscores" />
-              )}
-              {!jobNameUniqueValidation && !editMode && (
-                <ErrorMessage message="Job name must be unique for the selected environment" />
-              )}
-  
-              <div className="create-scheduler-form-element-input-file">
-                <Input
-                  className="create-scheduler-style"
-                  value={inputFileSelected}
-                  Label="Input file*"
-                  disabled={true}
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          executionPageFlag && (
-            <div className="clusters-list-overlay" role="tab">
-              <div className="cluster-details-title">Scheduled Jobs</div>
-            </div>
-          )
-        )}
-        {executionPageFlag && (
-          <div>
-            <div className="create-scheduler-form-element sub-para">
-              <FormControl>
-                <RadioGroup
-                  className="schedule-radio-btn"
-                  aria-labelledby="demo-controlled-radio-buttons-group"
-                  name="controlled-radio-buttons-group"
-                  value={notebookSelector}
-                  onChange={handleSchedulerModeChange}
-                >
-                  <FormControlLabel
-                    value="vertex"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    disabled={!isLocalKernel}
-                    label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
-                  />
-                  <FormControlLabel
-                    value="composer"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>Composer</Typography>
-                    }
-                  />
-                </RadioGroup>
-              </FormControl>
-            </div>
-            <div>
-              {isApiError && (
-                <div className="error-key-parent enable-error-text-label">
-                  <iconError.react tag="div" className="logo-alignment-style" />
-                  <div className="error-key-missing">
-                    <EnableNotifyMessage message={apiError} />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-  
-        {notebookSelector === 'composer' ? (
-          <CreateNotebookScheduler
-            themeManager={themeManager}
-            app={app}
-            context={context}
-            settingRegistry={settingRegistry}
-            createCompleted={createCompleted}
-            setCreateCompleted={setCreateCompleted}
-            jobNameSelected={jobNameSelected}
-            setJobNameSelected={setJobNameSelected}
-            inputFileSelected={inputFileSelected}
-            setInputFileSelected={setInputFileSelected}
-            editMode={editMode}
-            setEditMode={setEditMode}
-            jobNameValidation={jobNameValidation}
-            jobNameSpecialValidation={jobNameSpecialValidation}
-            jobNameUniqueValidation={jobNameUniqueValidation}
-            setJobNameUniqueValidation={setJobNameUniqueValidation}
-            setIsApiError={setIsApiError}
-            setApiError={setApiError}
-            setExecutionPageFlag={setExecutionPageFlag}
-            isLocalKernel={isLocalKernel}
-            setIsLocalKernel={setIsLocalKernel}
-          />
-        ) : (
-          <CreateVertexScheduler
-            themeManager={themeManager}
-            app={app}
-            settingRegistry={settingRegistry}
-            createCompleted={createCompleted}
-            setCreateCompleted={setCreateCompleted}
-            jobNameSelected={jobNameSelected}
-            setJobNameSelected={setJobNameSelected}
-            inputFileSelected={inputFileSelected}
-            setInputFileSelected={setInputFileSelected}
-            editMode={editMode}
-            setEditMode={setEditMode}
-            setExecutionPageFlag={setExecutionPageFlag}
-            setIsApiError={setIsApiError}
-            setApiError={setApiError}
-            setIsLocalKernel={setIsLocalKernel}
-          />
-        )}
-      </div>
-      }
-    </>
-    
+      {notebookSelector === 'composer' ? (
+        <CreateNotebookScheduler
+          themeManager={themeManager}
+          app={app}
+          context={context}
+          settingRegistry={settingRegistry}
+          createCompleted={createCompleted}
+          setCreateCompleted={setCreateCompleted}
+          jobNameSelected={jobNameSelected}
+          setJobNameSelected={setJobNameSelected}
+          inputFileSelected={inputFileSelected}
+          setInputFileSelected={setInputFileSelected}
+          editMode={editMode}
+          setEditMode={setEditMode}
+          jobNameValidation={jobNameValidation}
+          jobNameSpecialValidation={jobNameSpecialValidation}
+          jobNameUniqueValidation={jobNameUniqueValidation}
+          setJobNameUniqueValidation={setJobNameUniqueValidation}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
+          setExecutionPageFlag={setExecutionPageFlag}
+          isLocalKernel={isLocalKernel}
+          setIsLocalKernel={setIsLocalKernel}
+        />
+      ) : (
+        <CreateVertexScheduler
+          themeManager={themeManager}
+          app={app}
+          settingRegistry={settingRegistry}
+          createCompleted={createCompleted}
+          setCreateCompleted={setCreateCompleted}
+          jobNameSelected={jobNameSelected}
+          setJobNameSelected={setJobNameSelected}
+          inputFileSelected={inputFileSelected}
+          setInputFileSelected={setInputFileSelected}
+          editMode={editMode}
+          setEditMode={setEditMode}
+          setExecutionPageFlag={setExecutionPageFlag}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
+          setIsLocalKernel={setIsLocalKernel}
+        />
+      )}
+    </div>
   );
 };
 

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SchedulerWidget } from '../../controls/SchedulerWidget';
 import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
@@ -109,10 +109,6 @@ const NotebookJobComponent = ({
     setExecutionPageFlag(true);
   };
 
-  useEffect(() => {
-    setIsLocalKernel(true);
-  },[])
-
   return (
     <>
       {showExecutionHistory ? (
@@ -161,6 +157,7 @@ const NotebookJobComponent = ({
                 setIsLoadingKernelDetail={setIsLoadingKernelDetail}
                 setIsApiError={setIsApiError}
                 setApiError={setApiError}
+                setIsLocalKernel={setIsLocalKernel}
               />
             }
           </div>
