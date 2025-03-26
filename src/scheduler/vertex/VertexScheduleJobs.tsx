@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SchedulerWidget } from '../../controls/SchedulerWidget';
 import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
@@ -58,8 +58,7 @@ const VertexScheduleJobs = ({
   setGcsPath,
   setExecutionPageFlag,
   setIsApiError,
-  setApiError,
-  setIsLocalKernel
+  setApiError
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -100,7 +99,6 @@ const VertexScheduleJobs = ({
   setExecutionPageFlag: (value: boolean) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
-  setIsLocalKernel: (value: boolean) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] =
     useState<boolean>(false);
@@ -125,10 +123,6 @@ const VertexScheduleJobs = ({
     setScheduleName(scheduleName);
     setScheduleData(schedulerData);
   };
-
-  useEffect(() => {
-    setIsLocalKernel(true);
-  }, []);
 
   return (
     <>
@@ -220,7 +214,6 @@ export class NotebookJobs extends SchedulerWidget {
   setGcsPath: (value: string) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
-  setIsLocalKernel: (value: boolean) => void;
 
   constructor(
     app: JupyterLab,
@@ -263,7 +256,6 @@ export class NotebookJobs extends SchedulerWidget {
     setGcsPath: (value: string) => void,
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
-    setIsLocalKernel: (value: boolean) => void,
     setJobNameSelected?: (value: string) => void
   ) {
     super(themeManager);
@@ -300,7 +292,6 @@ export class NotebookJobs extends SchedulerWidget {
     this.setIsApiError = setIsApiError;
     this.setApiError = setApiError;
     this.setGcsPath = setGcsPath;
-    this.setIsLocalKernel = setIsLocalKernel;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -337,7 +328,6 @@ export class NotebookJobs extends SchedulerWidget {
         setExecutionPageFlag={this.setExecutionPageFlag}
         setIsApiError={this.setIsApiError}
         setApiError={this.setApiError}
-        setIsLocalKernel={this.setIsLocalKernel}
       />
     );
   }

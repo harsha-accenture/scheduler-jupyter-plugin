@@ -264,7 +264,6 @@ const NotebookSchedulerComponent = ({
           setExecutionPageFlag={setExecutionPageFlag}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
-          setIsLocalKernel={setIsLocalKernel}
         />
       )}
     </div>
