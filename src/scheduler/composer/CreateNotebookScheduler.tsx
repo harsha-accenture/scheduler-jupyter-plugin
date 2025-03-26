@@ -392,12 +392,6 @@ const CreateNotebookScheduler = ({
     const kernels = kernelSpecs.kernelspecs;
 
     if (kernels && context.sessionContext.kernelPreference.name) {
-      // if (context.sessionContext.kernelDisplayName.includes('Remote')) {
-      //   setIsLocalKernel(false);
-      // } else {
-      //   setIsLocalKernel(true);
-      // }
-
       if (
         kernels[context.sessionContext.kernelPreference.name].resources
           .endpointParentResource
