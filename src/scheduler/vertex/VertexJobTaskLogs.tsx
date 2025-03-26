@@ -16,7 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { CircularProgress } from '@mui/material';
-import { IDagRunList } from './VertexInterfaces';
+import { IVertexScheduleRunList } from './VertexInterfaces';
 import { LogEntriesServices } from '../../services/LogEntries';
 import { authApi } from '../../utils/Config';
 import { toast } from 'react-toastify';
@@ -34,7 +34,7 @@ const VertexJobTaskLogs = ({
   jobRunsData
 }: {
   jobRunId: string;
-  jobRunsData: IDagRunList | undefined;
+  jobRunsData: IVertexScheduleRunList | undefined;
 }): JSX.Element => {
   const [dagTaskInstancesList, setDagTaskInstancesList] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(true);

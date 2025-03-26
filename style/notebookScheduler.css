@@ -145,6 +145,15 @@
   overflow-y: auto;
   max-height: 55vh;
 }
+.table-cell-overflow {
+  min-width: 25%; 
+  max-width: 12%; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer; 
+  position: relative; 
+}
 
 .dag-runs-row-data-parent-selected {
   height: 29px;

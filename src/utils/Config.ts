@@ -209,9 +209,10 @@ export interface IVertexCellProps {
       lastScheduledRunResponse: {
         runResponse: string;
       };
-      jobState: string;
+      jobState: string[];
       name: string;
       createTime: string;
+      nextRunTime:string;
     };
   };
   render: (value: string) => React.ReactNode;
