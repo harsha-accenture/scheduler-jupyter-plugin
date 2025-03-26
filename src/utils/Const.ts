@@ -91,4 +91,10 @@ export const DISK_TYPE_VALUE = [
 export type internalScheduleMode = 'cronFormat' | 'userFriendly';
 export const KERNEL_VALUE = ['python3', 'pytorch', 'tensorflow'];
 
-export const KERNEL_LIST_LOCAL = ['PyTorch 1-13', 'TensorFlow 2-11', 'Local', 'Python', 'ipyKernel'];
+export const KERNEL_LIST_LOCAL = [
+  'PyTorch 1-13',
+  'TensorFlow 2-11',
+  'Local',
+  'Python',
+  'ipyKernel'
+];

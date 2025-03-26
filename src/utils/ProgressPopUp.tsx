@@ -14,7 +14,7 @@ export const ProgressPopUp = ({
             size={18}
             aria-label="Loading Spinner"
             data-testid="loader"
-            className='spinner-loader-modal '
+            className="spinner-loader-modal "
           />
         </span>
       </div>

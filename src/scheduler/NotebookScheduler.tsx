@@ -36,6 +36,7 @@ import {
 import CreateVertexScheduler from './vertex/CreateVertexScheduler';
 import EnableNotifyMessage from './common/EnableNotifyMessage';
 import { iconError } from '../utils/Icons';
+import { KERNEL_LIST_LOCAL } from '../utils/Const';
 
 const NotebookSchedulerComponent = ({
   themeManager,
@@ -63,8 +64,9 @@ const NotebookSchedulerComponent = ({
   const [isApiError, setIsApiError] = useState(false);
   const [apiError, setApiError] = useState('');
   const [isLocalKernel, setIsLocalKernel] = useState<boolean>(true);
-  const [schedulerBtnDisable, setSchedulerBtnDisable] = useState<boolean>(false);
-  const [packageEditFlag, setPackageEditFlag ] = useState<boolean>(false);
+  const [schedulerBtnDisable, setSchedulerBtnDisable] =
+    useState<boolean>(false);
+  const [packageEditFlag, setPackageEditFlag] = useState<boolean>(false);
 
   useEffect(() => {
     if (context !== '') {
@@ -105,14 +107,18 @@ const NotebookSchedulerComponent = ({
   };
 
   const getKernelDetails = async () => {
-    if (context.sessionContext.kernelDisplayName.includes('Remote')) {
+    //Check whether kernel Local or Remote
+    const kernelSelected = KERNEL_LIST_LOCAL.some(kernel =>
+      context.sessionContext.kernelDisplayName.includes(kernel)
+    );
+    if (!kernelSelected) {
       setIsLocalKernel(false);
       setNotebookSelector('composer');
       setSchedulerBtnDisable(true);
     } else {
       setIsLocalKernel(true);
       setNotebookSelector('vertex');
-      setSchedulerBtnDisable(true);
+      setSchedulerBtnDisable(false);
     }
   };
 

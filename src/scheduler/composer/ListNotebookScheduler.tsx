@@ -277,7 +277,7 @@ function listNotebookScheduler({
         setStopCluster,
         setTimeZoneSelected,
         setEditMode,
-        setIsLoadingKernelDetail,
+        setIsLoadingKernelDetail
       );
     }
   };

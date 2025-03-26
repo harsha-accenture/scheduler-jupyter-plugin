@@ -334,7 +334,7 @@ export class SchedulerService {
     setStopCluster?: (value: boolean) => void,
     setTimeZoneSelected?: (value: string) => void,
     setEditMode?: (value: boolean) => void,
-    setIsLoadingKernelDetail?: (value: boolean) => void,
+    setIsLoadingKernelDetail?: (value: boolean) => void
   ) => {
     setEditDagLoading(dagId);
     try {
@@ -913,9 +913,9 @@ export class SchedulerService {
       );
       if (data) {
         toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
-      } 
+      }
 
-      if(data.error) {
+      if (data.error) {
         toast.error(
           `Failed to Trigger ${dagId} : ${data.error}`,
           toastifyCustomStyle

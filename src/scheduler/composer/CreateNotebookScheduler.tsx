@@ -494,421 +494,416 @@ const CreateNotebookScheduler = ({
   }, [packageEditFlag]);
 
   return (
-    (
-      <>
-        {createCompleted ? (
-          <NotebookJobComponent
-            app={app}
-            themeManager={themeManager}
-            settingRegistry={settingRegistry}
-            setCreateCompleted={setCreateCompleted}
-            setJobNameSelected={setJobNameSelected}
-            setComposerSelected={setComposerSelected}
-            setScheduleMode={setScheduleMode}
-            setScheduleValue={setScheduleValue}
-            setInputFileSelected={setInputFileSelected}
-            setParameterDetail={setParameterDetail}
-            setParameterDetailUpdated={setParameterDetailUpdated}
-            setSelectedMode={setSelectedMode}
-            setClusterSelected={setClusterSelected}
-            setServerlessSelected={setServerlessSelected}
-            setServerlessDataSelected={setServerlessDataSelected}
-            serverlessDataList={serverlessDataList}
-            setServerlessDataList={setServerlessDataList}
-            setServerlessList={setServerlessList}
-            setRetryCount={setRetryCount}
-            setRetryDelay={setRetryDelay}
-            setEmailOnFailure={setEmailOnFailure}
-            setEmailonRetry={setEmailonRetry}
-            setEmailOnSuccess={setEmailOnSuccess}
-            setEmailList={setEmailList}
-            setStopCluster={setStopCluster}
-            setTimeZoneSelected={setTimeZoneSelected}
-            setEditMode={setEditMode}
-            setIsLoadingKernelDetail={setIsLoadingKernelDetail}
-            setIsApiError={setIsApiError}
-            setApiError={setApiError}
-            setExecutionPageFlag={setExecutionPageFlag}
-            setIsLocalKernel={setIsLocalKernel}
-            setPackageEditFlag={setPackageEditFlag}
-          />
-        ) : (
-          <div>
-            <div className="submit-job-container">
-              <div className="create-scheduler-form-element block-level-seperation ">
-                <Autocomplete
-                  className="create-scheduler-style"
-                  options={composerList}
-                  value={composerSelected}
-                  onChange={(_event, val) => handleComposerSelected(val)}
-                  renderInput={params => (
-                    <TextField {...params} label="Environment*" />
-                  )}
-                  disabled={editMode || disableEnvLocal}
-                />
-              </div>
-              {!composerSelected && (
-                <ErrorMessage message="Environment is required field" />
-              )}
-              {apiErrorMessage && isLocalKernel && (
-                <ErrorMessage message={apiErrorMessage} />
-              )}
-              {packageInstallationMessage && isLocalKernel && (
-                <>
-                  {packageInstalledList.length > 0 ? (
-                    <div className="success-message-package success-message-top">
-                      <iconWarning.react
-                        tag="div"
-                        className="icon-white logo-alignment-style success_icon icon-size-status"
-                      />
-                      <div className="success-message-pack warning-font success-message-cl-package warning-message">
-                        {packageInstallationMessage}
-                      </div>
-                    </div>
-                  ) : (
-                    !apiErrorMessage && (
-                      <div className="success-message-package success-message-top">
-                        <CircularProgress
-                          size={18}
-                          aria-label="Loading Spinner"
-                          data-testid="loader"
-                        />
-                        <div className="success-message-pack warning-font success-message-cl-package enable-error-text-label">
-                          {packageInstallationMessage}
-                        </div>
-                      </div>
-                    )
-                  )}
-                </>
-              )}
-              {packageListFlag && isLocalKernel && (
-                <div className="success-message-package log-icon">
-                  <iconSuccess.react
-                    tag="div"
-                    title="Done !"
-                    className="icon-white logo-alignment-style success_icon icon-size icon-completed"
-                  />
-                  <div className="warning-success-message">
-                    Required packages are already installed
-                  </div>
-                </div>
-              )}
-              <div className="create-scheduler-label block-seperation">
-                Output formats
-              </div>
-              <div className="create-scheduler-form-element block-level-seperation ">
-                <FormGroup row={true}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        readOnly
-                        checked={true}
-                        defaultChecked={true}
-                      />
-                    }
-                    className="create-scheduler-label-style"
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>Notebook</Typography>
-                    }
-                  />
-                </FormGroup>
-              </div>
-              <div className="create-scheduler-label block-seperation">
-                Parameters
-              </div>
+    <>
+      {createCompleted ? (
+        <NotebookJobComponent
+          app={app}
+          themeManager={themeManager}
+          settingRegistry={settingRegistry}
+          setCreateCompleted={setCreateCompleted}
+          setJobNameSelected={setJobNameSelected}
+          setComposerSelected={setComposerSelected}
+          setScheduleMode={setScheduleMode}
+          setScheduleValue={setScheduleValue}
+          setInputFileSelected={setInputFileSelected}
+          setParameterDetail={setParameterDetail}
+          setParameterDetailUpdated={setParameterDetailUpdated}
+          setSelectedMode={setSelectedMode}
+          setClusterSelected={setClusterSelected}
+          setServerlessSelected={setServerlessSelected}
+          setServerlessDataSelected={setServerlessDataSelected}
+          serverlessDataList={serverlessDataList}
+          setServerlessDataList={setServerlessDataList}
+          setServerlessList={setServerlessList}
+          setRetryCount={setRetryCount}
+          setRetryDelay={setRetryDelay}
+          setEmailOnFailure={setEmailOnFailure}
+          setEmailonRetry={setEmailonRetry}
+          setEmailOnSuccess={setEmailOnSuccess}
+          setEmailList={setEmailList}
+          setStopCluster={setStopCluster}
+          setTimeZoneSelected={setTimeZoneSelected}
+          setEditMode={setEditMode}
+          setIsLoadingKernelDetail={setIsLoadingKernelDetail}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
+          setExecutionPageFlag={setExecutionPageFlag}
+          setIsLocalKernel={setIsLocalKernel}
+          setPackageEditFlag={setPackageEditFlag}
+        />
+      ) : (
+        <div>
+          <div className="submit-job-container">
+            <div className="create-scheduler-form-element block-level-seperation ">
+              <Autocomplete
+                className="create-scheduler-style"
+                options={composerList}
+                value={composerSelected}
+                onChange={(_event, val) => handleComposerSelected(val)}
+                renderInput={params => (
+                  <TextField {...params} label="Environment*" />
+                )}
+                disabled={editMode || disableEnvLocal}
+              />
+            </div>
+            {!composerSelected && (
+              <ErrorMessage message="Environment is required field" />
+            )}
+            {apiErrorMessage && isLocalKernel && (
+              <ErrorMessage message={apiErrorMessage} />
+            )}
+            {packageInstallationMessage && isLocalKernel && (
               <>
-                <LabelProperties
-                  labelDetail={parameterDetail}
-                  setLabelDetail={setParameterDetail}
-                  labelDetailUpdated={parameterDetailUpdated}
-                  setLabelDetailUpdated={setParameterDetailUpdated}
-                  buttonText="ADD PARAMETER"
-                  keyValidation={keyValidation}
-                  setKeyValidation={setKeyValidation}
-                  valueValidation={valueValidation}
-                  setValueValidation={setValueValidation}
-                  duplicateKeyError={duplicateKeyError}
-                  setDuplicateKeyError={setDuplicateKeyError}
-                  fromPage="scheduler"
-                />
-              </>
-              {!isLocalKernel && (
-                <>
-                  <div className="create-scheduler-form-element block-seperation">
-                    <FormControl>
-                      <RadioGroup
-                        aria-labelledby="demo-controlled-radio-buttons-group"
-                        name="controlled-radio-buttons-group"
-                        value={selectedMode}
-                        onChange={handleSelectedModeChange}
-                        row={true}
-                      >
-                        <FormControlLabel
-                          value="cluster"
-                          control={<Radio size="small" />}
-                          label={
-                            <Typography sx={{ fontSize: 13 }}>
-                              Cluster
-                            </Typography>
-                          }
-                        />
-                        <FormControlLabel
-                          value="serverless"
-                          className="create-scheduler-label-style"
-                          control={<Radio size="small" />}
-                          label={
-                            <Typography sx={{ fontSize: 13 }}>
-                              Serverless
-                            </Typography>
-                          }
-                        />
-                      </RadioGroup>
-                    </FormControl>
+                {packageInstalledList.length > 0 ? (
+                  <div className="success-message-package success-message-top">
+                    <iconWarning.react
+                      tag="div"
+                      className="icon-white logo-alignment-style success_icon icon-size-status"
+                    />
+                    <div className="success-message-pack warning-font success-message-cl-package warning-message">
+                      {packageInstallationMessage}
+                    </div>
                   </div>
-                  <div className="create-scheduler-form-element">
-                    {isLoadingKernelDetail && selectedMode !== 'local' && (
+                ) : (
+                  !apiErrorMessage && (
+                    <div className="success-message-package success-message-top">
                       <CircularProgress
                         size={18}
                         aria-label="Loading Spinner"
                         data-testid="loader"
                       />
-                    )}
-                    {selectedMode === 'cluster' && !isLoadingKernelDetail && (
-                      <>
-                        <Autocomplete
-                          className="create-scheduler-style"
-                          options={clusterList}
-                          value={clusterSelected}
-                          onChange={(_event, val) => handleClusterSelected(val)}
-                          renderInput={params => (
-                            <TextField {...params} label="Cluster*" />
-                          )}
-                        />
-                        {!clusterSelected && (
-                          <ErrorMessage message="Cluster is required field" />
-                        )}
-                      </>
-                    )}
-
-                    {selectedMode === 'serverless' &&
-                      !isLoadingKernelDetail && (
-                        <>
-                          <Autocomplete
-                            className="create-scheduler-style"
-                            options={serverlessList}
-                            value={serverlessSelected}
-                            onChange={(_event, val) =>
-                              handleServerlessSelected(val)
-                            }
-                            renderInput={params => (
-                              <TextField {...params} label="Serverless*" />
-                            )}
-                          />
-                          {!serverlessSelected && (
-                            <ErrorMessage message="Serverless is required field" />
-                          )}
-                        </>
-                      )}
-                  </div>
-                  {selectedMode === 'cluster' && (
-                    <div className="create-scheduler-form-element input-sub-action">
-                      <FormGroup row={true}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              size="small"
-                              checked={stopCluster}
-                              onChange={handleStopCluster}
-                            />
-                          }
-                          className="create-scheduler-label-style"
-                          label={
-                            <Typography
-                              sx={{ fontSize: 13 }}
-                              title="Stopping cluster abruptly will impact if any other job is running on the cluster at the moment"
-                            >
-                              Stop the cluster after notebook execution
-                            </Typography>
-                          }
-                        />
-                      </FormGroup>
+                      <div className="success-message-pack warning-font success-message-cl-package enable-error-text-label">
+                        {packageInstallationMessage}
+                      </div>
                     </div>
-                  )}
-                </>
-              )}
-              <div className="create-scheduler-form-element block-seperation">
-                <Input
-                  className="create-scheduler-style"
-                  onChange={e => handleRetryCount(Number(e.target.value))}
-                  value={retryCount}
-                  Label="Retry count"
-                  type="number"
+                  )
+                )}
+              </>
+            )}
+            {packageListFlag && isLocalKernel && (
+              <div className="success-message-package log-icon">
+                <iconSuccess.react
+                  tag="div"
+                  title="Done !"
+                  className="icon-white logo-alignment-style success_icon icon-size icon-completed"
                 />
+                <div className="warning-success-message">
+                  Required packages are already installed
+                </div>
               </div>
-              <div className="create-scheduler-form-element">
-                <Input
-                  className="create-scheduler-style"
-                  onChange={e => handleRetryDelay(Number(e.target.value))}
-                  value={retryDelay}
-                  Label="Retry delay (minutes)"
-                  type="number"
+            )}
+            <div className="create-scheduler-label block-seperation">
+              Output formats
+            </div>
+            <div className="create-scheduler-form-element block-level-seperation ">
+              <FormGroup row={true}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      readOnly
+                      checked={true}
+                      defaultChecked={true}
+                    />
+                  }
+                  className="create-scheduler-label-style"
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>Notebook</Typography>
+                  }
                 />
-              </div>
-              <div className="create-scheduler-form-element block-level-seperation">
-                <FormGroup row={true}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={emailOnFailure}
-                        onChange={handleFailureChange}
+              </FormGroup>
+            </div>
+            <div className="create-scheduler-label block-seperation">
+              Parameters
+            </div>
+            <>
+              <LabelProperties
+                labelDetail={parameterDetail}
+                setLabelDetail={setParameterDetail}
+                labelDetailUpdated={parameterDetailUpdated}
+                setLabelDetailUpdated={setParameterDetailUpdated}
+                buttonText="ADD PARAMETER"
+                keyValidation={keyValidation}
+                setKeyValidation={setKeyValidation}
+                valueValidation={valueValidation}
+                setValueValidation={setValueValidation}
+                duplicateKeyError={duplicateKeyError}
+                setDuplicateKeyError={setDuplicateKeyError}
+                fromPage="scheduler"
+              />
+            </>
+            {!isLocalKernel && (
+              <>
+                <div className="create-scheduler-form-element block-seperation">
+                  <FormControl>
+                    <RadioGroup
+                      aria-labelledby="demo-controlled-radio-buttons-group"
+                      name="controlled-radio-buttons-group"
+                      value={selectedMode}
+                      onChange={handleSelectedModeChange}
+                      row={true}
+                    >
+                      <FormControlLabel
+                        value="cluster"
+                        control={<Radio size="small" />}
+                        label={
+                          <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
+                        }
                       />
-                    }
-                    className="create-scheduler-label-style"
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Email on failure
-                      </Typography>
-                    }
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={emailOnRetry}
-                        onChange={handleRetryChange}
+                      <FormControlLabel
+                        value="serverless"
+                        className="create-scheduler-label-style"
+                        control={<Radio size="small" />}
+                        label={
+                          <Typography sx={{ fontSize: 13 }}>
+                            Serverless
+                          </Typography>
+                        }
                       />
-                    }
-                    className="create-scheduler-label-style"
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Email on retry
-                      </Typography>
-                    }
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={emailOnSuccess}
-                        onChange={handleSuccessChange}
-                      />
-                    }
-                    className="create-scheduler-label-style"
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Email on success
-                      </Typography>
-                    }
-                  />
-                </FormGroup>
-              </div>
-              {(emailOnFailure || emailOnRetry || emailOnSuccess) && (
+                    </RadioGroup>
+                  </FormControl>
+                </div>
                 <div className="create-scheduler-form-element">
-                  <MuiChipsInput
-                    className="select-job-style"
-                    onChange={e => handleEmailList(e)}
-                    addOnBlur={true}
-                    value={emailList}
-                    inputProps={{ placeholder: '' }}
-                    label="Email recipients"
+                  {isLoadingKernelDetail && selectedMode !== 'local' && (
+                    <CircularProgress
+                      size={18}
+                      aria-label="Loading Spinner"
+                      data-testid="loader"
+                    />
+                  )}
+                  {selectedMode === 'cluster' && !isLoadingKernelDetail && (
+                    <>
+                      <Autocomplete
+                        className="create-scheduler-style"
+                        options={clusterList}
+                        value={clusterSelected}
+                        onChange={(_event, val) => handleClusterSelected(val)}
+                        renderInput={params => (
+                          <TextField {...params} label="Cluster*" />
+                        )}
+                      />
+                      {!clusterSelected && (
+                        <ErrorMessage message="Cluster is required field" />
+                      )}
+                    </>
+                  )}
+
+                  {selectedMode === 'serverless' && !isLoadingKernelDetail && (
+                    <>
+                      <Autocomplete
+                        className="create-scheduler-style"
+                        options={serverlessList}
+                        value={serverlessSelected}
+                        onChange={(_event, val) =>
+                          handleServerlessSelected(val)
+                        }
+                        renderInput={params => (
+                          <TextField {...params} label="Serverless*" />
+                        )}
+                      />
+                      {!serverlessSelected && (
+                        <ErrorMessage message="Serverless is required field" />
+                      )}
+                    </>
+                  )}
+                </div>
+                {selectedMode === 'cluster' && (
+                  <div className="create-scheduler-form-element input-sub-action">
+                    <FormGroup row={true}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            size="small"
+                            checked={stopCluster}
+                            onChange={handleStopCluster}
+                          />
+                        }
+                        className="create-scheduler-label-style"
+                        label={
+                          <Typography
+                            sx={{ fontSize: 13 }}
+                            title="Stopping cluster abruptly will impact if any other job is running on the cluster at the moment"
+                          >
+                            Stop the cluster after notebook execution
+                          </Typography>
+                        }
+                      />
+                    </FormGroup>
+                  </div>
+                )}
+              </>
+            )}
+            <div className="create-scheduler-form-element block-seperation">
+              <Input
+                className="create-scheduler-style"
+                onChange={e => handleRetryCount(Number(e.target.value))}
+                value={retryCount}
+                Label="Retry count"
+                type="number"
+              />
+            </div>
+            <div className="create-scheduler-form-element">
+              <Input
+                className="create-scheduler-style"
+                onChange={e => handleRetryDelay(Number(e.target.value))}
+                value={retryDelay}
+                Label="Retry delay (minutes)"
+                type="number"
+              />
+            </div>
+            <div className="create-scheduler-form-element block-level-seperation">
+              <FormGroup row={true}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={emailOnFailure}
+                      onChange={handleFailureChange}
+                    />
+                  }
+                  className="create-scheduler-label-style"
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>
+                      Email on failure
+                    </Typography>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={emailOnRetry}
+                      onChange={handleRetryChange}
+                    />
+                  }
+                  className="create-scheduler-label-style"
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>
+                      Email on retry
+                    </Typography>
+                  }
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      size="small"
+                      checked={emailOnSuccess}
+                      onChange={handleSuccessChange}
+                    />
+                  }
+                  className="create-scheduler-label-style"
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>
+                      Email on success
+                    </Typography>
+                  }
+                />
+              </FormGroup>
+            </div>
+            {(emailOnFailure || emailOnRetry || emailOnSuccess) && (
+              <div className="create-scheduler-form-element">
+                <MuiChipsInput
+                  className="select-job-style"
+                  onChange={e => handleEmailList(e)}
+                  addOnBlur={true}
+                  value={emailList}
+                  inputProps={{ placeholder: '' }}
+                  label="Email recipients"
+                />
+              </div>
+            )}
+            {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
+              !emailList.length && (
+                <ErrorMessage message="Email recipients is required field" />
+              )}
+            {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
+              emailError && (
+                <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
+              )}
+            <div className="create-scheduler-label block-seperation">
+              Schedule
+            </div>
+            <div className="create-scheduler-form-element">
+              <FormControl>
+                <RadioGroup
+                  aria-labelledby="demo-controlled-radio-buttons-group"
+                  name="controlled-radio-buttons-group"
+                  value={scheduleMode}
+                  onChange={handleSchedulerModeChange}
+                >
+                  <FormControlLabel
+                    value="runNow"
+                    className="create-scheduler-label-style"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>Run now</Typography>
+                    }
+                  />
+                  <FormControlLabel
+                    value="runSchedule"
+                    className="create-scheduler-label-style"
+                    control={<Radio size="small" />}
+                    label={
+                      <Typography sx={{ fontSize: 13 }}>
+                        Run on a schedule
+                      </Typography>
+                    }
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+            {scheduleMode === 'runSchedule' && (
+              <>
+                <div className="create-scheduler-form-element">
+                  <Cron value={scheduleValue} setValue={setScheduleValue} />
+                </div>
+                <div className="create-scheduler-form-element">
+                  <Autocomplete
+                    className="create-scheduler-style"
+                    options={timezones}
+                    value={timeZoneSelected}
+                    onChange={(_event, val) => handleTimeZoneSelected(val)}
+                    renderInput={params => (
+                      <TextField {...params} label="Time Zone" />
+                    )}
                   />
                 </div>
-              )}
-              {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
-                !emailList.length && (
-                  <ErrorMessage message="Email recipients is required field" />
-                )}
-              {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
-                emailError && (
-                  <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
-                )}
-              <div className="create-scheduler-label block-seperation">
-                Schedule
-              </div>
-              <div className="create-scheduler-form-element">
-                <FormControl>
-                  <RadioGroup
-                    aria-labelledby="demo-controlled-radio-buttons-group"
-                    name="controlled-radio-buttons-group"
-                    value={scheduleMode}
-                    onChange={handleSchedulerModeChange}
-                  >
-                    <FormControlLabel
-                      value="runNow"
-                      className="create-scheduler-label-style"
-                      control={<Radio size="small" />}
-                      label={
-                        <Typography sx={{ fontSize: 13 }}>Run now</Typography>
-                      }
-                    />
-                    <FormControlLabel
-                      value="runSchedule"
-                      className="create-scheduler-label-style"
-                      control={<Radio size="small" />}
-                      label={
-                        <Typography sx={{ fontSize: 13 }}>
-                          Run on a schedule
-                        </Typography>
-                      }
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </div>
-              {scheduleMode === 'runSchedule' && (
-                <>
-                  <div className="create-scheduler-form-element">
-                    <Cron value={scheduleValue} setValue={setScheduleValue} />
-                  </div>
-                  <div className="create-scheduler-form-element">
-                    <Autocomplete
-                      className="create-scheduler-style"
-                      options={timezones}
-                      value={timeZoneSelected}
-                      onChange={(_event, val) => handleTimeZoneSelected(val)}
-                      renderInput={params => (
-                        <TextField {...params} label="Time Zone" />
-                      )}
-                    />
-                  </div>
-                </>
-              )}
-              <div className="save-overlay">
-                <Button
-                  onClick={() => {
-                    if (!isSaveDisabled()) {
-                      handleCreateJobScheduler();
-                    }
-                  }}
-                  variant="contained"
-                  disabled={isSaveDisabled()}
-                  aria-label={editMode ? ' Update Schedule' : 'Create Schedule'}
-                >
-                  <div>
-                    {editMode
-                      ? creatingScheduler
-                        ? 'UPDATING'
-                        : 'UPDATE'
-                      : creatingScheduler
-                        ? 'CREATING'
-                        : 'CREATE'}
-                  </div>
-                </Button>
-                <Button
-                  variant="outlined"
-                  disabled={creatingScheduler}
-                  aria-label="cancel Batch"
-                  onClick={!creatingScheduler ? handleCancel : undefined}
-                >
-                  <div>CANCEL</div>
-                </Button>
-              </div>
+              </>
+            )}
+            <div className="save-overlay">
+              <Button
+                onClick={() => {
+                  if (!isSaveDisabled()) {
+                    handleCreateJobScheduler();
+                  }
+                }}
+                variant="contained"
+                disabled={isSaveDisabled()}
+                aria-label={editMode ? ' Update Schedule' : 'Create Schedule'}
+              >
+                <div>
+                  {editMode
+                    ? creatingScheduler
+                      ? 'UPDATING'
+                      : 'UPDATE'
+                    : creatingScheduler
+                      ? 'CREATING'
+                      : 'CREATE'}
+                </div>
+              </Button>
+              <Button
+                variant="outlined"
+                disabled={creatingScheduler}
+                aria-label="cancel Batch"
+                onClick={!creatingScheduler ? handleCancel : undefined}
+              >
+                <div>CANCEL</div>
+              </Button>
             </div>
           </div>
-        )}
-      </>
-    )
+        </div>
+      )}
+    </>
   );
 };
 

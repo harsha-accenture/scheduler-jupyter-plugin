@@ -128,7 +128,7 @@ const VertexScheduleJobs = ({
 
   useEffect(() => {
     setIsLocalKernel(true);
-  },[])
+  }, []);
 
   return (
     <>
