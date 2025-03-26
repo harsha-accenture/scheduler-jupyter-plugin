@@ -64,6 +64,7 @@ const NotebookSchedulerComponent = ({
   const [apiError, setApiError] = useState('');
   const [isLocalKernel, setIsLocalKernel] = useState<boolean>(true);
   const [schedulerBtnDisable, setSchedulerBtnDisable] = useState<boolean>(false);
+  const [packageEditFlag, setPackageEditFlag ] = useState<boolean>(false);
 
   useEffect(() => {
     if (context !== '') {
@@ -91,6 +92,7 @@ const NotebookSchedulerComponent = ({
       app.shell.activeWidget?.close();
     } else {
       setCreateCompleted(true);
+      setPackageEditFlag(false);
     }
   };
 
@@ -237,6 +239,8 @@ const NotebookSchedulerComponent = ({
           setExecutionPageFlag={setExecutionPageFlag}
           isLocalKernel={isLocalKernel}
           setIsLocalKernel={setIsLocalKernel}
+          packageEditFlag={packageEditFlag}
+          setPackageEditFlag={setPackageEditFlag}
         />
       ) : (
         <CreateVertexScheduler

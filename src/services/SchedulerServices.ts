@@ -233,7 +233,7 @@ export class SchedulerService {
     editMode: boolean,
     selectedMode: string,
     packageInstalledList: string[],
-    toastId: any
+    setPackageEditFlag: (value: boolean) => void
   ) => {
     setCreatingScheduler(true);
     try {
@@ -256,7 +256,7 @@ export class SchedulerService {
               toastifyCustomStyle
             );
           }
-          toast.dismiss(toastId.current);
+          setPackageEditFlag(false);
         } else {
           toast.success(
             'Job scheduler successfully created',
@@ -309,6 +309,7 @@ export class SchedulerService {
     composerSelectedList: string,
     setEditDagLoading: (value: string) => void,
     setIsLocalKernel: (value: boolean) => void,
+    setPackageEditFlag: (value: boolean) => void,
     setCreateCompleted?: (value: boolean) => void,
     setJobNameSelected?: (value: string) => void,
     setComposerSelected?: (value: string) => void,
@@ -333,7 +334,7 @@ export class SchedulerService {
     setStopCluster?: (value: boolean) => void,
     setTimeZoneSelected?: (value: string) => void,
     setEditMode?: (value: boolean) => void,
-    setIsLoadingKernelDetail?: (value: boolean) => void
+    setIsLoadingKernelDetail?: (value: boolean) => void,
   ) => {
     setEditDagLoading(dagId);
     try {
@@ -374,6 +375,7 @@ export class SchedulerService {
 
         if (formattedResponse.mode_selected === 'local') {
           setIsLocalKernel(true);
+          setPackageEditFlag(true);
           if (formattedResponse.parameters.length > 0) {
             const parameterList = formattedResponse.parameters[0]
               .split(',')

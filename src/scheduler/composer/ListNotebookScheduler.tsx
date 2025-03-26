@@ -103,7 +103,8 @@ function listNotebookScheduler({
   setIsLoadingKernelDetail,
   setIsApiError,
   setApiError,
-  setIsLocalKernel
+  setIsLocalKernel,
+  setPackageEditFlag
 }: {
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
@@ -140,6 +141,7 @@ function listNotebookScheduler({
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
   setIsLocalKernel: (value: boolean) => void;
+  setPackageEditFlag: (value: boolean) => void;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [composerList, setComposerList] = useState<string[]>([]);
@@ -250,6 +252,7 @@ function listNotebookScheduler({
         composerSelectedList,
         setEditDagLoading,
         setIsLocalKernel,
+        setPackageEditFlag,
         setCreateCompleted,
         setJobNameSelected,
         setComposerSelected,
@@ -274,7 +277,7 @@ function listNotebookScheduler({
         setStopCluster,
         setTimeZoneSelected,
         setEditMode,
-        setIsLoadingKernelDetail
+        setIsLoadingKernelDetail,
       );
     }
   };

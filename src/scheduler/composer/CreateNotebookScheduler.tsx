@@ -71,7 +71,9 @@ const CreateNotebookScheduler = ({
   setApiError,
   setExecutionPageFlag,
   isLocalKernel,
-  setIsLocalKernel
+  setIsLocalKernel,
+  packageEditFlag,
+  setPackageEditFlag
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -94,6 +96,8 @@ const CreateNotebookScheduler = ({
   setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
   isLocalKernel: boolean;
   setIsLocalKernel: React.Dispatch<React.SetStateAction<boolean>>;
+  packageEditFlag: boolean;
+  setPackageEditFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element => {
   const [composerList, setComposerList] = useState<string[]>([]);
   const [composerSelected, setComposerSelected] = useState('');
@@ -297,8 +301,6 @@ const CreateNotebookScheduler = ({
     setEmailList(data);
   };
 
-  const toastId = React.useRef<any>();
-
   const handleCreateJobScheduler = async () => {
     const outputFormats = [];
     outputFormats.push('ipynb');
@@ -348,7 +350,7 @@ const CreateNotebookScheduler = ({
       editMode,
       selectedMode,
       packageInstalledList,
-      toastId
+      setPackageEditFlag
     );
     setEditMode(false);
   };
@@ -489,7 +491,7 @@ const CreateNotebookScheduler = ({
     if (isLocalKernel && editMode) {
       checkRequiredPackageApiService();
     }
-  }, [editMode, isLocalKernel]);
+  }, [packageEditFlag]);
 
   return (
     (
@@ -528,6 +530,7 @@ const CreateNotebookScheduler = ({
             setApiError={setApiError}
             setExecutionPageFlag={setExecutionPageFlag}
             setIsLocalKernel={setIsLocalKernel}
+            setPackageEditFlag={setPackageEditFlag}
           />
         ) : (
           <div>
