@@ -50,7 +50,9 @@ const VertexJobRuns = ({
   schedulerData: ISchedulerData | undefined;
   scheduleName: string;
   dagId: string;
-  setJobRunsData: React.Dispatch<React.SetStateAction<IVertexScheduleRunList | undefined>>;
+  setJobRunsData: React.Dispatch<
+    React.SetStateAction<IVertexScheduleRunList | undefined>
+  >;
   setJobRunId: (value: string) => void;
   selectedMonth: Dayjs | null;
   selectedDate: Dayjs | null;

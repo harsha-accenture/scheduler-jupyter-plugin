@@ -508,7 +508,10 @@ function ListVertexScheduler({
   const tableDataCondition = (cell: IVertexCellProps) => {
     if (cell.column.Header === 'Actions') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
           {renderActions(cell.row.original)}
         </td>
       );
@@ -524,19 +527,28 @@ function ListVertexScheduler({
       );
     } else if (cell.column.Header === 'Created') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
           {dayjs(cell.row.original.createTime).format('lll')}
         </td>
       );
     } else if (cell.column.Header === 'Next Run Date') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
           {dayjs(cell.row.original.nextRunTime).format('lll')}
         </td>
       );
     } else if (cell.column.Header === 'Latest Execution Jobs') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
           {cell.row.original.jobState ? (
             cell.row.original.jobState.length > 0 ? (
               <div className="execution-history-main-wrapper">
@@ -567,7 +579,10 @@ function ListVertexScheduler({
                 })}
               </div>
             ) : (
-              <iconPending.react tag="div" className="logo-alignment-style success_icon icon-size icon-completed"/>
+              <iconPending.react
+                tag="div"
+                className="logo-alignment-style success_icon icon-size icon-completed"
+              />
             )
           ) : (
             <CircularProgress
