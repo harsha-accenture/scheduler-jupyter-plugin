@@ -214,29 +214,6 @@ export class VertexServices {
     }
   };
 
-  static handleListingScheduleNotebookExecutionApiService = async (
-    scheduleId: string | undefined,
-    region: string,
-    setLastRunException: (value: string[]) => void
-  ) => {
-    const serviceURL = 'api/vertex/listNotebookExecutionJobs';
-    const formattedResponse: any = await requestAPI(
-      serviceURL + `?region_id=${region}&schedule_id=${scheduleId}`
-    );
-    let jobState = [];
-    if (formattedResponse.length > 5) {
-      jobState = formattedResponse
-        .split(1, 5)
-        .map((item: any) => item.jobState);
-    }
-
-    if (formattedResponse.length < 5) {
-      jobState = formattedResponse.map((item: any) => item.jobState);
-    }
-
-    setLastRunException(jobState);
-  };
-
   static handleUpdateSchedulerPauseAPIService = async (
     scheduleId: string,
     region: string,

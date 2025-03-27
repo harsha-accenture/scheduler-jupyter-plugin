@@ -494,17 +494,6 @@ function ListVertexScheduler({
     );
   };
 
-  //const [lastRunException, setLastRunException] = useState<string[]>([]);
-
-  // const notebookExecutionApi = async (name: string) => {
-  //   const scheduleId = name.split('/').pop();
-  //   await VertexServices.handleListingScheduleNotebookExecutionApiService(
-  //     scheduleId,
-  //     region,
-  //     setLastRunException
-  //   );
-  // };
-
   const tableDataCondition = (cell: IVertexCellProps) => {
     if (cell.column.Header === 'Actions') {
       return (
@@ -712,13 +701,6 @@ function ListVertexScheduler({
     }
   };
 
-  // useEffect (() => {
-  //   const obj = {column: {Header: 'Latest Execution Jobs'}}
-  //   tableDataCondition(obj);
-  // } , [dagList])
-  /**
-   * Opens edit notebook
-   */
   const openEditDagNotebookFile = async () => {
     const filePath = inputNotebookFilePath.replace('gs://', 'gs:');
     const openNotebookFile = await app.commands.execute('docmanager:open', {
