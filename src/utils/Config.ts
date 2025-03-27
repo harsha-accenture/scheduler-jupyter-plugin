@@ -212,7 +212,7 @@ export interface IVertexCellProps {
       jobState: string[];
       name: string;
       createTime: string;
-      nextRunTime:string;
+      nextRunTime: string;
     };
   };
   render: (value: string) => React.ReactNode;

@@ -46,7 +46,9 @@ const VertexExecutionHistory = ({
 
   const [jobRunId, setJobRunId] = useState<string>('');
   const [dagRunsList, setDagRunsList] = useState<IVertexScheduleRunList[]>([]);
-  const [jobRunsData, setJobRunsData] = useState<IVertexScheduleRunList | undefined>();
+  const [jobRunsData, setJobRunsData] = useState<
+    IVertexScheduleRunList | undefined
+  >();
   const currentDate = new Date().toLocaleDateString();
   const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);

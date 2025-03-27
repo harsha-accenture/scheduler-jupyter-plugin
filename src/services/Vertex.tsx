@@ -761,9 +761,7 @@ async function fetchLastFiveRunStatus(
           : prevItem
       )
     );
-
   } catch (lastRunError: any) {
-  
     setVertexScheduleList((prevItems: IVertexScheduleList[]) =>
       prevItems.map(prevItem =>
         prevItem.displayName === schedule.name
@@ -773,6 +771,7 @@ async function fetchLastFiveRunStatus(
     );
     SchedulerLoggingService.log(
       'Error fetching last five job executions',
-      LOG_LEVEL.ERROR);
+      LOG_LEVEL.ERROR
+    );
   }
 }
