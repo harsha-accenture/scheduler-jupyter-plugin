@@ -264,6 +264,8 @@ class Client:
                         )  # Extract project_id from the line
                     elif "submit_pyspark_job" in line:
                         mode_selected = "cluster"
+                    elif "execute_notebook_task" in line:
+                        mode_selected = "local"
                     elif "'retries'" in line:
                         retries = line.split(":")[-1].strip().strip("'\"},")
                         retry_count = int(

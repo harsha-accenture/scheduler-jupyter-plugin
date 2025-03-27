@@ -822,7 +822,7 @@ const CreateVertexScheduler = ({
         />
       ) : (
         <div className="submit-job-container text-enable-warning">
-          <div className="region-overlay create-scheduler-form-element">
+          <div className="create-scheduler-form-element">
             <RegionDropdown
               projectId={projectId}
               region={region}

@@ -231,10 +231,9 @@ export class SchedulerService {
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
     editMode: boolean,
-    setInstallationInProgressMessage: (value: boolean) => void,
     selectedMode: string,
-    setCreateApiKernelErrorFlag: (value: boolean) => void,
-    packageInstalledList: string[]
+    packageInstalledList: string[],
+    setPackageEditFlag: (value: boolean) => void
   ) => {
     setCreatingScheduler(true);
     try {
@@ -245,7 +244,6 @@ export class SchedulerService {
       if (data?.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);
-        setCreateApiKernelErrorFlag(true);
       } else {
         if (editMode) {
           toast.success(
@@ -258,6 +256,7 @@ export class SchedulerService {
               toastifyCustomStyle
             );
           }
+          setPackageEditFlag(false);
         } else {
           toast.success(
             'Job scheduler successfully created',
@@ -269,7 +268,6 @@ export class SchedulerService {
               toastifyCustomStyle
             );
           }
-          setInstallationInProgressMessage(false);
         }
         setCreatingScheduler(false);
         setCreateCompleted(true);
@@ -310,12 +308,13 @@ export class SchedulerService {
     dagId: string,
     composerSelectedList: string,
     setEditDagLoading: (value: string) => void,
+    setIsLocalKernel: (value: boolean) => void,
+    setPackageEditFlag: (value: boolean) => void,
     setCreateCompleted?: (value: boolean) => void,
     setJobNameSelected?: (value: string) => void,
     setComposerSelected?: (value: string) => void,
     setScheduleMode?: (value: scheduleMode) => void,
     setScheduleValue?: (value: string) => void,
-
     setInputFileSelected?: (value: string) => void,
     setParameterDetail?: (value: string[]) => void,
     setParameterDetailUpdated?: (value: string[]) => void,
@@ -373,8 +372,22 @@ export class SchedulerService {
         setJobNameSelected(dagId);
         setComposerSelected(composerSelectedList);
         setInputFileSelected(formattedResponse.input_filename);
-        setParameterDetail(formattedResponse.parameters);
-        setParameterDetailUpdated(formattedResponse.parameters);
+
+        if (formattedResponse.mode_selected === 'local') {
+          setIsLocalKernel(true);
+          setPackageEditFlag(true);
+          if (formattedResponse.parameters.length > 0) {
+            const parameterList = formattedResponse.parameters[0]
+              .split(',')
+              .map((item: any) => item.trim());
+            setParameterDetail(parameterList);
+            setParameterDetailUpdated(parameterList);
+          }
+        } else {
+          setParameterDetail(formattedResponse.parameters);
+          setParameterDetailUpdated(formattedResponse.parameters);
+        }
+
         setSelectedMode(formattedResponse.mode_selected);
         setClusterSelected(formattedResponse.cluster_name);
         setServerlessSelected(formattedResponse.serverless_name);
@@ -393,7 +406,9 @@ export class SchedulerService {
                 );
               }
             );
-            setServerlessDataSelected(selectedData[0].serverlessData);
+            if (selectedData.length > 0) {
+              setServerlessDataSelected(selectedData[0].serverlessData);
+            }
           }
         }
         setRetryCount(formattedResponse.retry_count);
@@ -898,7 +913,9 @@ export class SchedulerService {
       );
       if (data) {
         toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
-      } else {
+      }
+
+      if (data.error) {
         toast.error(
           `Failed to trigger ${dagId} : ${data?.error}`,
           toastifyCustomStyle
@@ -927,7 +944,8 @@ export class SchedulerService {
     setPackageInstalledList: (value: string[]) => void,
     setPackageListFlag: (value: boolean) => void,
     setapiErrorMessage: (value: string) => void,
-    setCheckRequiredPackagesInstalledFlag: (value: boolean) => void
+    setCheckRequiredPackagesInstalledFlag: (value: boolean) => void,
+    setDisabaleEnvLocal: (value: boolean) => void
   ) => {
     try {
       setPackageInstallationMessage(
@@ -936,22 +954,25 @@ export class SchedulerService {
       const installedPackageList: any = await requestAPI(
         `checkRequiredPackages?composer_environment_name=${selectedComposer}`
       );
-      console.log('installed packages', installedPackageList);
+
       if (installedPackageList.length > 0) {
         setPackageInstallationMessage(
           installedPackageList.join(', ') +
             ' packages will get installed on creation of schedule'
         );
         setPackageInstalledList(installedPackageList);
+        setPackageListFlag(false);
       } else if (Object.hasOwn(installedPackageList, 'error')) {
         setPackageInstallationMessage('');
         setapiErrorMessage(installedPackageList.error);
       } else {
         setPackageInstallationMessage('');
+        setPackageInstalledList([]);
         setPackageListFlag(true);
       }
 
       setCheckRequiredPackagesInstalledFlag(true);
+      setDisabaleEnvLocal(false);
     } catch (reason) {
       toast.error(
         `Failed to installation package list : ${reason}`,

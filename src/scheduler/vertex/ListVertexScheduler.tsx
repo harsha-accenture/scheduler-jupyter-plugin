@@ -560,7 +560,7 @@ function ListVertexScheduler({
     <div>
       <div className="select-text-overlay-scheduler">
         <div className="enable-text-label">
-          <div className="region-overlay create-scheduler-form-element content-pd-space ">
+          <div className="create-scheduler-form-element content-pd-space ">
             <RegionDropdown
               projectId={projectId}
               region={region}

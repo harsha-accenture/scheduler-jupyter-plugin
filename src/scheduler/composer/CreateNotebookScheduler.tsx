@@ -47,6 +47,8 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
 import { iconSuccess, iconWarning } from '../../utils/Icons';
+import { ProgressPopUp } from '../../utils/ProgressPopUp';
+import { toast } from 'react-toastify';
 
 const CreateNotebookScheduler = ({
   themeManager,
@@ -67,7 +69,11 @@ const CreateNotebookScheduler = ({
   setJobNameUniqueValidation,
   setIsApiError,
   setApiError,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  isLocalKernel,
+  setIsLocalKernel,
+  packageEditFlag,
+  setPackageEditFlag
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -88,6 +94,10 @@ const CreateNotebookScheduler = ({
   setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
   setApiError: React.Dispatch<React.SetStateAction<string>>;
   setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  isLocalKernel: boolean;
+  setIsLocalKernel: React.Dispatch<React.SetStateAction<boolean>>;
+  packageEditFlag: boolean;
+  setPackageEditFlag: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element => {
   const [composerList, setComposerList] = useState<string[]>([]);
   const [composerSelected, setComposerSelected] = useState('');
@@ -98,7 +108,7 @@ const CreateNotebookScheduler = ({
   const [valueValidation, setValueValidation] = useState(-1);
   const [duplicateKeyError, setDuplicateKeyError] = useState(-1);
 
-  const [selectedMode, setSelectedMode] = useState('local');
+  const [selectedMode, setSelectedMode] = useState('cluster');
   const [clusterList, setClusterList] = useState<string[]>([]);
   const [serverlessList, setServerlessList] = useState<string[]>([]);
   const [serverlessDataList, setServerlessDataList] = useState<string[]>([]);
@@ -138,12 +148,7 @@ const CreateNotebookScheduler = ({
     checkRequiredPackagesInstalledFlag,
     setCheckRequiredPackagesInstalledFlag
   ] = useState<boolean>(false);
-
-  const [installationInProgressMessage, setInstallationInProgressMessage] =
-    useState<boolean>(false);
-
-  const [createApiKernelErrorFlag, setCreateApiKernelErrorFlag] =
-    useState<boolean>(false);
+  const [disableEnvLocal, setDisabaleEnvLocal] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -170,6 +175,7 @@ const CreateNotebookScheduler = ({
 
   const handleComposerSelected = async (data: string | null) => {
     setPackageListFlag(false);
+    setPackageInstalledList([]);
     setapiErrorMessage('');
     if (data) {
       const selectedComposer = data.toString();
@@ -180,14 +186,16 @@ const CreateNotebookScheduler = ({
           setJobNameUniqueValidation(true);
         }
 
-        if (selectedMode === 'local') {
+        if (isLocalKernel) {
+          setDisabaleEnvLocal(true);
           await SchedulerService.checkRequiredPackagesInstalled(
             selectedComposer,
             setPackageInstallationMessage,
             setPackageInstalledList,
             setPackageListFlag,
             setapiErrorMessage,
-            setCheckRequiredPackagesInstalledFlag
+            setCheckRequiredPackagesInstalledFlag,
+            setDisabaleEnvLocal
           );
         }
       }
@@ -298,13 +306,13 @@ const CreateNotebookScheduler = ({
     outputFormats.push('ipynb');
 
     const randomDagId = uuidv4();
-
     const payload = {
       input_filename: inputFileSelected,
       composer_environment_name: composerSelected,
       output_formats: outputFormats,
       parameters: parameterDetailUpdated,
-      mode_selected: selectedMode,
+      local_kernel: isLocalKernel,
+      mode_selected: isLocalKernel ? '' : selectedMode,
       retry_count: retryCount,
       retry_delay: retryDelay,
       email_failure: emailOnFailure,
@@ -320,10 +328,18 @@ const CreateNotebookScheduler = ({
         selectedMode === 'cluster' ? clusterSelected : serverlessDataSelected
     };
 
-    if (packageInstalledList.length > 0 && selectedMode === 'local') {
-      payload['local_kernel'] = selectedMode === 'local' ? true : false;
+    if (packageInstalledList.length > 0 && isLocalKernel) {
       payload['packages_to_install'] = packageInstalledList;
-      setInstallationInProgressMessage(true);
+      {
+        toast(ProgressPopUp, {
+          autoClose: false,
+          closeButton: true,
+          data: {
+            message:
+              'Installing packages taking longer than usual. Scheduled job starts post installation. Please wait....'
+          }
+        });
+      }
     }
 
     await SchedulerService.createJobSchedulerService(
@@ -332,10 +348,9 @@ const CreateNotebookScheduler = ({
       setCreateCompleted,
       setCreatingScheduler,
       editMode,
-      setInstallationInProgressMessage,
       selectedMode,
-      setCreateApiKernelErrorFlag,
-      packageInstalledList
+      packageInstalledList,
+      setPackageEditFlag
     );
     setEditMode(false);
   };
@@ -345,15 +360,19 @@ const CreateNotebookScheduler = ({
       emailError ||
       dagListCall ||
       creatingScheduler ||
-      (!checkRequiredPackagesInstalledFlag && selectedMode === 'local') ||
+      (!checkRequiredPackagesInstalledFlag && isLocalKernel && !editMode) ||
       jobNameSelected === '' ||
       (!jobNameValidation && !editMode) ||
       (jobNameSpecialValidation && !editMode) ||
       (!jobNameUniqueValidation && !editMode) ||
       inputFileSelected === '' ||
       composerSelected === '' ||
-      (selectedMode === 'cluster' && clusterSelected === '') ||
-      (selectedMode === 'serverless' && serverlessSelected === '') ||
+      (selectedMode === 'cluster' &&
+        clusterSelected === '' &&
+        !isLocalKernel) ||
+      (selectedMode === 'serverless' &&
+        serverlessSelected === '' &&
+        !isLocalKernel) ||
       ((emailOnFailure || emailOnRetry || emailOnSuccess) &&
         emailList.length === 0)
     );
@@ -382,6 +401,7 @@ const CreateNotebookScheduler = ({
             context.sessionContext.kernelPreference.name
           ].resources.endpointParentResource.includes('/sessions')
         ) {
+          setSelectedMode('serverless');
           const selectedData: any = serverlessDataList.filter(
             (serverless: any) => {
               return context.sessionContext.kernelDisplayName.includes(
@@ -446,6 +466,27 @@ const CreateNotebookScheduler = ({
     }
   }, [selectedMode]);
 
+  useEffect(() => {
+    const checkRequiredPackageApiService = async () => {
+      setPackageListFlag(false);
+      setPackageInstalledList([]);
+      setapiErrorMessage('');
+      await SchedulerService.checkRequiredPackagesInstalled(
+        composerSelected,
+        setPackageInstallationMessage,
+        setPackageInstalledList,
+        setPackageListFlag,
+        setapiErrorMessage,
+        setCheckRequiredPackagesInstalledFlag,
+        setDisabaleEnvLocal
+      );
+    };
+
+    if (isLocalKernel && editMode) {
+      checkRequiredPackageApiService();
+    }
+  }, [packageEditFlag]);
+
   return (
     <>
       {createCompleted ? (
@@ -481,11 +522,13 @@ const CreateNotebookScheduler = ({
           setIsApiError={setIsApiError}
           setApiError={setApiError}
           setExecutionPageFlag={setExecutionPageFlag}
+          setIsLocalKernel={setIsLocalKernel}
+          setPackageEditFlag={setPackageEditFlag}
         />
       ) : (
         <div>
           <div className="submit-job-container">
-            <div className="create-scheduler-form-element">
+            <div className="create-scheduler-form-element block-level-seperation ">
               <Autocomplete
                 className="create-scheduler-style"
                 options={composerList}
@@ -494,19 +537,16 @@ const CreateNotebookScheduler = ({
                 renderInput={params => (
                   <TextField {...params} label="Environment*" />
                 )}
-                disabled={editMode}
+                disabled={editMode || disableEnvLocal}
               />
             </div>
-
             {!composerSelected && (
               <ErrorMessage message="Environment is required field" />
             )}
-
-            {apiErrorMessage && selectedMode === 'local' && (
+            {apiErrorMessage && isLocalKernel && (
               <ErrorMessage message={apiErrorMessage} />
             )}
-
-            {packageInstallationMessage && selectedMode === 'local' && (
+            {packageInstallationMessage && isLocalKernel && (
               <>
                 {packageInstalledList.length > 0 ? (
                   <div className="success-message-package success-message-top">
@@ -534,8 +574,7 @@ const CreateNotebookScheduler = ({
                 )}
               </>
             )}
-
-            {packageListFlag && selectedMode === 'local' && (
+            {packageListFlag && isLocalKernel && (
               <div className="success-message-package log-icon">
                 <iconSuccess.react
                   tag="div"
@@ -547,9 +586,10 @@ const CreateNotebookScheduler = ({
                 </div>
               </div>
             )}
-
-            <div className="create-scheduler-label">Output formats</div>
-            <div className="create-scheduler-form-element">
+            <div className="create-scheduler-label block-seperation">
+              Output formats
+            </div>
+            <div className="create-scheduler-form-element block-level-seperation ">
               <FormGroup row={true}>
                 <FormControlLabel
                   control={
@@ -567,7 +607,9 @@ const CreateNotebookScheduler = ({
                 />
               </FormGroup>
             </div>
-            <div className="create-scheduler-label">Parameters</div>
+            <div className="create-scheduler-label block-seperation">
+              Parameters
+            </div>
             <>
               <LabelProperties
                 labelDetail={parameterDetail}
@@ -584,109 +626,108 @@ const CreateNotebookScheduler = ({
                 fromPage="scheduler"
               />
             </>
-            <div className="create-scheduler-form-element">
-              <FormControl>
-                <RadioGroup
-                  aria-labelledby="demo-controlled-radio-buttons-group"
-                  name="controlled-radio-buttons-group"
-                  value={selectedMode}
-                  onChange={handleSelectedModeChange}
-                  row={true}
-                >
-                  <FormControlLabel
-                    value="local"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>
-                        Composer Environment
-                      </Typography>
-                    }
-                  />
-                  <FormControlLabel
-                    value="cluster"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
-                    }
-                  />
-                  <FormControlLabel
-                    value="serverless"
-                    className="create-scheduler-label-style"
-                    control={<Radio size="small" />}
-                    label={
-                      <Typography sx={{ fontSize: 13 }}>Serverless</Typography>
-                    }
-                  />
-                </RadioGroup>
-              </FormControl>
-            </div>
-            <div className="create-scheduler-form-element">
-              {isLoadingKernelDetail && selectedMode !== 'local' && (
-                <CircularProgress
-                  size={18}
-                  aria-label="Loading Spinner"
-                  data-testid="loader"
-                />
-              )}
-              {selectedMode === 'cluster' && !isLoadingKernelDetail && (
-                <>
-                  <Autocomplete
-                    className="create-scheduler-style"
-                    options={clusterList}
-                    value={clusterSelected}
-                    onChange={(_event, val) => handleClusterSelected(val)}
-                    renderInput={params => (
-                      <TextField {...params} label="Cluster*" />
-                    )}
-                  />
-                  {!clusterSelected && (
-                    <ErrorMessage message="Cluster is required field" />
-                  )}
-                </>
-              )}
-
-              {selectedMode === 'serverless' && !isLoadingKernelDetail && (
-                <>
-                  <Autocomplete
-                    className="create-scheduler-style"
-                    options={serverlessList}
-                    value={serverlessSelected}
-                    onChange={(_event, val) => handleServerlessSelected(val)}
-                    renderInput={params => (
-                      <TextField {...params} label="Serverless*" />
-                    )}
-                  />
-                  {!serverlessSelected && (
-                    <ErrorMessage message="Serverless is required field" />
-                  )}
-                </>
-              )}
-            </div>
-            {selectedMode === 'cluster' && (
-              <div className="create-scheduler-form-element">
-                <FormGroup row={true}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size="small"
-                        checked={stopCluster}
-                        onChange={handleStopCluster}
+            {!isLocalKernel && (
+              <>
+                <div className="create-scheduler-form-element block-seperation">
+                  <FormControl>
+                    <RadioGroup
+                      aria-labelledby="demo-controlled-radio-buttons-group"
+                      name="controlled-radio-buttons-group"
+                      value={selectedMode}
+                      onChange={handleSelectedModeChange}
+                      row={true}
+                    >
+                      <FormControlLabel
+                        value="cluster"
+                        control={<Radio size="small" />}
+                        label={
+                          <Typography sx={{ fontSize: 13 }}>Cluster</Typography>
+                        }
                       />
-                    }
-                    className="create-scheduler-label-style"
-                    label={
-                      <Typography
-                        sx={{ fontSize: 13 }}
-                        title="Stopping cluster abruptly will impact if any other job is running on the cluster at the moment"
-                      >
-                        Stop the cluster after notebook execution
-                      </Typography>
-                    }
-                  />
-                </FormGroup>
-              </div>
+                      <FormControlLabel
+                        value="serverless"
+                        className="create-scheduler-label-style"
+                        control={<Radio size="small" />}
+                        label={
+                          <Typography sx={{ fontSize: 13 }}>
+                            Serverless
+                          </Typography>
+                        }
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </div>
+                <div className="create-scheduler-form-element">
+                  {isLoadingKernelDetail && selectedMode !== 'local' && (
+                    <CircularProgress
+                      size={18}
+                      aria-label="Loading Spinner"
+                      data-testid="loader"
+                    />
+                  )}
+                  {selectedMode === 'cluster' && !isLoadingKernelDetail && (
+                    <>
+                      <Autocomplete
+                        className="create-scheduler-style"
+                        options={clusterList}
+                        value={clusterSelected}
+                        onChange={(_event, val) => handleClusterSelected(val)}
+                        renderInput={params => (
+                          <TextField {...params} label="Cluster*" />
+                        )}
+                      />
+                      {!clusterSelected && (
+                        <ErrorMessage message="Cluster is required field" />
+                      )}
+                    </>
+                  )}
+
+                  {selectedMode === 'serverless' && !isLoadingKernelDetail && (
+                    <>
+                      <Autocomplete
+                        className="create-scheduler-style"
+                        options={serverlessList}
+                        value={serverlessSelected}
+                        onChange={(_event, val) =>
+                          handleServerlessSelected(val)
+                        }
+                        renderInput={params => (
+                          <TextField {...params} label="Serverless*" />
+                        )}
+                      />
+                      {!serverlessSelected && (
+                        <ErrorMessage message="Serverless is required field" />
+                      )}
+                    </>
+                  )}
+                </div>
+                {selectedMode === 'cluster' && (
+                  <div className="create-scheduler-form-element input-sub-action">
+                    <FormGroup row={true}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            size="small"
+                            checked={stopCluster}
+                            onChange={handleStopCluster}
+                          />
+                        }
+                        className="create-scheduler-label-style"
+                        label={
+                          <Typography
+                            sx={{ fontSize: 13 }}
+                            title="Stopping cluster abruptly will impact if any other job is running on the cluster at the moment"
+                          >
+                            Stop the cluster after notebook execution
+                          </Typography>
+                        }
+                      />
+                    </FormGroup>
+                  </div>
+                )}
+              </>
             )}
-            <div className="create-scheduler-form-element">
+            <div className="create-scheduler-form-element block-seperation">
               <Input
                 className="create-scheduler-style"
                 onChange={e => handleRetryCount(Number(e.target.value))}
@@ -704,7 +745,7 @@ const CreateNotebookScheduler = ({
                 type="number"
               />
             </div>
-            <div className="create-scheduler-form-element">
+            <div className="create-scheduler-form-element block-level-seperation">
               <FormGroup row={true}>
                 <FormControlLabel
                   control={
@@ -753,8 +794,8 @@ const CreateNotebookScheduler = ({
                 />
               </FormGroup>
             </div>
-            <div className="create-scheduler-form-element">
-              {(emailOnFailure || emailOnRetry || emailOnSuccess) && (
+            {(emailOnFailure || emailOnRetry || emailOnSuccess) && (
+              <div className="create-scheduler-form-element">
                 <MuiChipsInput
                   className="select-job-style"
                   onChange={e => handleEmailList(e)}
@@ -763,8 +804,8 @@ const CreateNotebookScheduler = ({
                   inputProps={{ placeholder: '' }}
                   label="Email recipients"
                 />
-              )}
-            </div>
+              </div>
+            )}
             {(emailOnFailure || emailOnRetry || emailOnSuccess) &&
               !emailList.length && (
                 <ErrorMessage message="Email recipients is required field" />
@@ -773,7 +814,9 @@ const CreateNotebookScheduler = ({
               emailError && (
                 <ErrorMessage message="Please enter a valid email address. E.g username@domain.com" />
               )}
-            <div className="create-scheduler-label">Schedule</div>
+            <div className="create-scheduler-label block-seperation">
+              Schedule
+            </div>
             <div className="create-scheduler-form-element">
               <FormControl>
                 <RadioGroup
@@ -821,7 +864,6 @@ const CreateNotebookScheduler = ({
                 </div>
               </>
             )}
-
             <div className="save-overlay">
               <Button
                 onClick={() => {
@@ -852,22 +894,6 @@ const CreateNotebookScheduler = ({
                 <div>CANCEL</div>
               </Button>
             </div>
-
-            {installationInProgressMessage &&
-              selectedMode === 'local' &&
-              !createApiKernelErrorFlag && (
-                <div className="success-message-package log-icon">
-                  <CircularProgress
-                    size={18}
-                    aria-label="Loading Spinner"
-                    data-testid="loader"
-                  />
-                  <div className="warning-font enable-error-text-label">
-                    Installing packages taking longer than usual. Scheduled job
-                    starts post installation. Please wait....
-                  </div>
-                </div>
-              )}
           </div>
         </div>
       )}
