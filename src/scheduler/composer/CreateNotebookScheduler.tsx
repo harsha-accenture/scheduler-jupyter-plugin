@@ -276,14 +276,26 @@ const CreateNotebookScheduler = ({
 
   const handleFailureChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmailOnFailure(event.target.checked);
+    if (!event.target.checked) {
+      setEmailError(false);
+      setEmailList([]);
+    }
   };
 
   const handleRetryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmailonRetry(event.target.checked);
+    if (!event.target.checked) {
+      setEmailError(false);
+      setEmailList([]);
+    }
   };
 
   const handleSuccessChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmailOnSuccess(event.target.checked);
+    if (!event.target.checked) {
+      setEmailError(false);
+      setEmailList([]);
+    }
   };
 
   const handleEmailList = (data: string[]) => {
