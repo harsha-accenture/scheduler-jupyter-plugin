@@ -552,3 +552,19 @@
   width: 14px !important;
   height: 14px !important;
 }
+
+.date-box-shadow {
+  box-shadow: 0 3px 10px rgb(0 0 0 / 20%);
+}
+
+.execution-wrapper-border-none {
+  border: none;
+}
+
+.execution-top-border {
+  border-top: 1px solid var(--jp-layout-color3);
+}
+
+.action-btn-execution {
+  padding-left: 35px;
+}

@@ -18,13 +18,13 @@ import React, { useEffect, useState } from 'react';
 import { useTable, useGlobalFilter } from 'react-table';
 import { CircularProgress } from '@mui/material';
 import { Dayjs } from 'dayjs';
-
 import TableData from '../../utils/TableData';
-import { ICellProps, handleDebounce } from '../../utils/Config';
+import { ICellProps } from '../../utils/Config';
 import { iconDownload } from '../../utils/Icons';
 import { IDagRunList, ISchedulerData } from './VertexInterfaces';
 import { VertexServices } from '../../services/Vertex';
 import { StorageServices } from '../../services/Storage';
+import { iconDash } from '../../utils/Icons';
 
 const VertexJobRuns = ({
   region,
@@ -69,27 +69,6 @@ const VertexJobRuns = ({
   const [downloadOutputDagRunId, setDownloadOutputDagRunId] = useState<
     string | undefined
   >('');
-  const [listDagRunHeight, setListDagRunHeight] = useState(
-    window.innerHeight - 485
-  );
-
-  function handleUpdateHeight() {
-    const updateHeight = window.innerHeight - 485;
-    setListDagRunHeight(updateHeight);
-  }
-
-  // Debounce the handleUpdateHeight function
-  const debouncedHandleUpdateHeight = handleDebounce(handleUpdateHeight, 500);
-
-  // Add event listener for window resize using useEffect
-  useEffect(() => {
-    window.addEventListener('resize', debouncedHandleUpdateHeight);
-
-    // Cleanup function to remove event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', debouncedHandleUpdateHeight);
-    };
-  }, []);
 
   /**
    * Filters dagRunsList based on the selected date.
@@ -125,6 +104,14 @@ const VertexJobRuns = ({
       {
         Header: 'Time',
         accessor: 'time'
+      },
+      {
+        Header: 'Code',
+        accessor: 'code'
+      },
+      {
+        Header: 'Status Message',
+        accessor: 'statusMessage'
       },
       {
         Header: 'Actions',
@@ -209,6 +196,21 @@ const VertexJobRuns = ({
           </div>
         );
       }
+    } else if (
+      cell.column.Header === 'Code' ||
+      cell.column.Header === 'Status Message'
+    ) {
+      if (cell.value === '-') {
+        return (
+          <td {...cell.getCellProps()} className="notebook-template-table-data">
+            <iconDash.react tag="div" />
+          </td>
+        );
+      } else {
+        <td {...cell.getCellProps()} className="notebook-template-table-data">
+          {cell.render('Cell')}
+        </td>;
+      }
     }
     return (
       <td {...cell.getCellProps()} className="notebook-template-table-data">
@@ -270,7 +272,7 @@ const VertexJobRuns = ({
     state?: string;
   }) => {
     return (
-      <div className="actions-icon">
+      <div className="action-btn-execution">
         {jobDownloadLoading && data.jobRunId === downloadOutputDagRunId ? (
           <div className="icon-buttons-style">
             <CircularProgress
@@ -332,10 +334,7 @@ const VertexJobRuns = ({
       <>
         {!isLoading && filteredData && filteredData.length > 0 ? (
           <div>
-            <div
-              className="dag-runs-list-table-parent"
-              style={{ maxHeight: listDagRunHeight }}
-            >
+            <div className="dag-runs-list-table-parent">
               <TableData
                 getTableProps={getTableProps}
                 headerGroups={headerGroups}
