@@ -21,7 +21,7 @@ import { Dayjs } from 'dayjs';
 import TableData from '../../utils/TableData';
 import { ICellProps } from '../../utils/Config';
 import { iconDownload } from '../../utils/Icons';
-import { IDagRunList, ISchedulerData } from './VertexInterfaces';
+import { IVertexScheduleRunList, ISchedulerData } from './VertexInterfaces';
 import { VertexServices } from '../../services/Vertex';
 import { StorageServices } from '../../services/Storage';
 import { iconDash } from '../../utils/Icons';
@@ -50,7 +50,9 @@ const VertexJobRuns = ({
   schedulerData: ISchedulerData | undefined;
   scheduleName: string;
   dagId: string;
-  setJobRunsData: React.Dispatch<React.SetStateAction<IDagRunList | undefined>>;
+  setJobRunsData: React.Dispatch<
+    React.SetStateAction<IVertexScheduleRunList | undefined>
+  >;
   setJobRunId: (value: string) => void;
   selectedMonth: Dayjs | null;
   selectedDate: Dayjs | null;
@@ -62,8 +64,8 @@ const VertexJobRuns = ({
   setDarkGreenListDates: (value: string[]) => void;
   setIsLoading: (value: boolean) => void;
   isLoading: boolean;
-  dagRunsList: IDagRunList[];
-  setDagRunsList: (value: IDagRunList[]) => void;
+  dagRunsList: IVertexScheduleRunList[];
+  setDagRunsList: (value: IVertexScheduleRunList[]) => void;
 }): JSX.Element => {
   const [jobDownloadLoading, setJobDownloadLoading] = useState(false);
   const [downloadOutputDagRunId, setDownloadOutputDagRunId] = useState<
@@ -142,7 +144,10 @@ const VertexJobRuns = ({
   const tableDataCondition = (cell: ICellProps) => {
     if (cell.column.Header === 'Actions') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data sub-title-heading"
+        >
           {renderActions(cell.row.original)}
         </td>
       );
@@ -286,8 +291,8 @@ const VertexJobRuns = ({
             role="button"
             className={
               data.state === 'succeeded'
-                ? 'icon-buttons-style'
-                : 'icon-buttons-style-disable'
+                ? 'icon-buttons-style sub-title-heading'
+                : 'icon-buttons-style-disable sub-title-heading'
             }
             title="Download Output"
             data-dag-run-id={data}
@@ -297,10 +302,7 @@ const VertexJobRuns = ({
                 : undefined
             }
           >
-            <iconDownload.react
-              tag="div"
-              className="icon-white logo-alignment-style"
-            />
+            <iconDownload.react tag="div" />
           </div>
         )}
       </div>

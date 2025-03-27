@@ -566,5 +566,15 @@
 }
 
 .action-btn-execution {
-  padding-left: 35px;
+  padding-left: 15px;
+}
+
+.table-cell-overflow {
+  min-width: 25%;
+  max-width: 12%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
 }

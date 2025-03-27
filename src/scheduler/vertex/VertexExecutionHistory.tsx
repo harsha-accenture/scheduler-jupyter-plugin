@@ -21,10 +21,10 @@ import { PickersDayProps, PickersDay } from '@mui/x-date-pickers/PickersDay';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { Box, LinearProgress } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
-import { authApi, handleDebounce } from '../../utils/Config';
+import { authApi } from '../../utils/Config';
 import VertexJobRuns from './VertexJobRuns';
 import { iconLeftArrow, iconCreateCluster } from '../../utils/Icons';
-import { IDagRunList, ISchedulerData } from './VertexInterfaces';
+import { ISchedulerData, IVertexScheduleRunList } from './VertexInterfaces';
 import { LOG_EXPLORER_BASE_URL } from '../../utils/Const';
 import { toast } from 'react-toastify';
 
@@ -46,8 +46,10 @@ const VertexExecutionHistory = ({
   const today = dayjs();
 
   const [jobRunId, setJobRunId] = useState<string>('');
-  const [dagRunsList, setDagRunsList] = useState<IDagRunList[]>([]);
-  const [jobRunsData, setJobRunsData] = useState<IDagRunList | undefined>();
+  const [dagRunsList, setDagRunsList] = useState<IVertexScheduleRunList[]>([]);
+  const [jobRunsData, setJobRunsData] = useState<
+    IVertexScheduleRunList | undefined
+  >();
   const currentDate = new Date().toLocaleDateString();
   const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
@@ -58,27 +60,7 @@ const VertexExecutionHistory = ({
   const [redListDates, setRedListDates] = useState<string[]>([]);
   const [greenListDates, setGreenListDates] = useState<string[]>([]);
   const [darkGreenListDates, setDarkGreenListDates] = useState<string[]>([]);
-
-  const [height, setHeight] = useState(window.innerHeight - 145);
   const [projectId, setProjectId] = useState<string>('');
-
-  function handleUpdateHeight() {
-    const updateHeight = window.innerHeight - 145;
-    setHeight(updateHeight);
-  }
-
-  // Debounce the handleUpdateHeight function
-  const debouncedHandleUpdateHeight = handleDebounce(handleUpdateHeight, 500);
-
-  // Add event listener for window resize using useEffect
-  useEffect(() => {
-    window.addEventListener('resize', debouncedHandleUpdateHeight);
-
-    // Cleanup function to remove event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', debouncedHandleUpdateHeight);
-    };
-  }, []);
 
   useEffect(() => {
     authApi()
@@ -295,10 +277,7 @@ const VertexExecutionHistory = ({
             Execution History: {scheduleName}
           </div>
         </div>
-        <div
-          className="execution-history-main-wrapper execution-top-border"
-          style={{ height: height }}
-        >
+        <div className="execution-history-main-wrapper execution-top-border">
           <div
             className={
               isLoading

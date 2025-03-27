@@ -39,6 +39,7 @@ import downloadIcon from '../../style/icons/scheduler_download.svg';
 import warningIcon from '../../style/icons/warning.svg';
 import createClusterIcon from '../../style/icons/create_cluster_icon.svg';
 import dashIcon from '../../style/icons/dash_icon_jupyter.svg';
+import pendingIcon from '../../style/icons/pending_icon.svg';
 
 export const iconCluster = new LabIcon({
   name: 'launcher:clusters-icon',
@@ -151,4 +152,9 @@ export const iconCreateCluster = new LabIcon({
 export const iconDash = new LabIcon({
   name: 'launcher:dash-icon',
   svgstr: dashIcon
+});
+
+export const iconPending = new LabIcon({
+  name: 'launcher:pending-icon',
+  svgstr: pendingIcon
 });
