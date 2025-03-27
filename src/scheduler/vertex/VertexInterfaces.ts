@@ -47,10 +47,11 @@ export interface ICreatePayload {
   end_time: dayjs.Dayjs | null;
   gcs_notebook_source?: string;
 }
-export interface IDagList {
+export interface IVertexScheduleList {
   displayName: string;
   schedule: string;
   status: string;
+  jobState?: any[];
 }
 export interface IUpdateSchedulerAPIResponse {
   status: number;
@@ -66,7 +67,7 @@ export interface IDeleteSchedulerAPIResponse {
   name: string;
   response: object;
 }
-export interface IDagRunList {
+export interface IVertexScheduleRunList {
   jobRunId: string;
   startDate: string;
   endDate: string;

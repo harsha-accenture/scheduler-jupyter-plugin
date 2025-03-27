@@ -22,7 +22,7 @@ import { Dayjs } from 'dayjs';
 import TableData from '../../utils/TableData';
 import { ICellProps, handleDebounce } from '../../utils/Config';
 import { iconDownload } from '../../utils/Icons';
-import { IDagRunList, ISchedulerData } from './VertexInterfaces';
+import { IVertexScheduleRunList, ISchedulerData } from './VertexInterfaces';
 import { VertexServices } from '../../services/Vertex';
 import { StorageServices } from '../../services/Storage';
 
@@ -50,7 +50,9 @@ const VertexJobRuns = ({
   schedulerData: ISchedulerData | undefined;
   scheduleName: string;
   dagId: string;
-  setJobRunsData: React.Dispatch<React.SetStateAction<IDagRunList | undefined>>;
+  setJobRunsData: React.Dispatch<
+    React.SetStateAction<IVertexScheduleRunList | undefined>
+  >;
   setJobRunId: (value: string) => void;
   selectedMonth: Dayjs | null;
   selectedDate: Dayjs | null;
@@ -62,8 +64,8 @@ const VertexJobRuns = ({
   setDarkGreenListDates: (value: string[]) => void;
   setIsLoading: (value: boolean) => void;
   isLoading: boolean;
-  dagRunsList: IDagRunList[];
-  setDagRunsList: (value: IDagRunList[]) => void;
+  dagRunsList: IVertexScheduleRunList[];
+  setDagRunsList: (value: IVertexScheduleRunList[]) => void;
 }): JSX.Element => {
   const [jobDownloadLoading, setJobDownloadLoading] = useState(false);
   const [downloadOutputDagRunId, setDownloadOutputDagRunId] = useState<

@@ -37,6 +37,7 @@ import CompletedIcon from '../../style/icons/dag_task_success_icon.svg';
 import triggerIcon from '../../style/icons/scheduler_trigger.svg';
 import downloadIcon from '../../style/icons/scheduler_download.svg';
 import warningIcon from '../../style/icons/warning.svg';
+import pendingIcon from '../../style/icons/pending_icon.svg';
 
 export const iconCluster = new LabIcon({
   name: 'launcher:clusters-icon',
@@ -139,4 +140,9 @@ export const iconDownload = new LabIcon({
 export const iconWarning = new LabIcon({
   name: 'launcher:warning-icon',
   svgstr: warningIcon
+});
+
+export const iconPending = new LabIcon({
+  name: 'launcher:pending-icon',
+  svgstr: pendingIcon
 });
