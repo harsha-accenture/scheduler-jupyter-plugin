@@ -25,7 +25,7 @@ import { authApi, handleDebounce } from '../../utils/Config';
 import VertexJobRuns from './VertexJobRuns';
 import VertexJobTaskLogs from './VertexJobTaskLogs';
 import { iconLeftArrow } from '../../utils/Icons';
-import { IDagRunList, ISchedulerData } from './VertexInterfaces';
+import { IVertexScheduleRunList, ISchedulerData } from './VertexInterfaces';
 
 const VertexExecutionHistory = ({
   region,
@@ -45,8 +45,8 @@ const VertexExecutionHistory = ({
   const today = dayjs();
 
   const [jobRunId, setJobRunId] = useState<string>('');
-  const [dagRunsList, setDagRunsList] = useState<IDagRunList[]>([]);
-  const [jobRunsData, setJobRunsData] = useState<IDagRunList | undefined>();
+  const [dagRunsList, setDagRunsList] = useState<IVertexScheduleRunList[]>([]);
+  const [jobRunsData, setJobRunsData] = useState<IVertexScheduleRunList | undefined>();
   const currentDate = new Date().toLocaleDateString();
   const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);

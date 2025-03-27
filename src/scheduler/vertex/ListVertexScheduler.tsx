@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationView } from '../../utils/PaginationView';
@@ -28,15 +28,21 @@ import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/Config';
 import {
+  iconActive,
   iconDelete,
   iconEditDag,
   iconEditNotebook,
+  iconFailed,
+  iconListComplete,
+  iconListPause,
   iconPause,
   iconPlay,
-  iconTrigger
+  iconSuccess,
+  iconTrigger,
+  iconPending
 } from '../../utils/Icons';
 import { VertexServices } from '../../services/Vertex';
-import { IDagList } from './VertexInterfaces';
+import { IVertexScheduleList } from './VertexInterfaces';
 import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
 
@@ -114,8 +120,10 @@ function ListVertexScheduler({
   setApiError: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [dagList, setDagList] = useState<IDagList[]>([]);
-  const data = dagList;
+  const [vertexScheduleList, setScheduleList] = useState<IVertexScheduleList[]>(
+    []
+  );
+  const data = vertexScheduleList;
   const [deletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
   const [editDagLoading, setEditDagLoading] = useState('');
   const [triggerLoading, setTriggerLoading] = useState('');
@@ -129,22 +137,30 @@ function ListVertexScheduler({
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
   const isPreview = false;
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
-        Header: 'Job Name',
+        Header: 'Schedule Name',
         accessor: 'displayName'
       },
       {
-        Header: 'Schedule',
+        Header: 'Frequency',
         accessor: 'schedule'
       },
       {
-        Header: 'Last Run Status',
+        Header: 'Next Run Date',
+        accessor: 'nextRunTime'
+      },
+      {
+        Header: 'Created',
+        accessor: 'createTime'
+      },
+      {
+        Header: 'Latest Execution Jobs',
         accessor: 'jobState'
       },
       {
-        Header: 'State',
+        Header: 'Status',
         accessor: 'status'
       },
       {
@@ -158,10 +174,10 @@ function ListVertexScheduler({
   /**
    * Get list of schedules
    */
-  const listDagInfoAPI = async () => {
+  const listVertexScheduleInfoAPI = async () => {
     setIsLoading(true);
     await VertexServices.listVertexSchedules(
-      setDagList,
+      setScheduleList,
       region,
       setIsLoading,
       setIsApiError,
@@ -184,7 +200,7 @@ function ListVertexScheduler({
       await VertexServices.handleUpdateSchedulerPauseAPIService(
         scheduleId,
         region,
-        setDagList,
+        setScheduleList,
         setIsLoading,
         displayName,
         setResumeLoading,
@@ -195,7 +211,7 @@ function ListVertexScheduler({
       await VertexServices.handleUpdateSchedulerResumeAPIService(
         scheduleId,
         region,
-        setDagList,
+        setScheduleList,
         setIsLoading,
         displayName,
         setResumeLoading,
@@ -252,7 +268,7 @@ function ListVertexScheduler({
       region,
       uniqueScheduleId,
       scheduleDisplayName,
-      setDagList,
+      setScheduleList,
       setIsLoading,
       setIsApiError,
       setApiError
@@ -478,44 +494,217 @@ function ListVertexScheduler({
     );
   };
 
+  //const [lastRunException, setLastRunException] = useState<string[]>([]);
+
+  // const notebookExecutionApi = async (name: string) => {
+  //   const scheduleId = name.split('/').pop();
+  //   await VertexServices.handleListingScheduleNotebookExecutionApiService(
+  //     scheduleId,
+  //     region,
+  //     setLastRunException
+  //   );
+  // };
+
   const tableDataCondition = (cell: IVertexCellProps) => {
     if (cell.column.Header === 'Actions') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data">
+        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
           {renderActions(cell.row.original)}
         </td>
       );
-    } else if (cell.column.Header === 'Job Name') {
+    } else if (cell.column.Header === 'Schedule Name') {
       return (
         <td
           {...cell.getCellProps()}
-          className="clusters-table-data"
+          className="clusters-table-data table-cell-overflow"
           onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
         >
           {cell.value}
         </td>
       );
+    } else if (cell.column.Header === 'Created') {
+      return (
+        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
+          {dayjs(cell.row.original.createTime).format('lll')}
+        </td>
+      );
+    } else if (cell.column.Header === 'Next Run Date') {
+      return (
+        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
+          {dayjs(cell.row.original.nextRunTime).format('lll')}
+        </td>
+      );
+    } else if (cell.column.Header === 'Latest Execution Jobs') {
+      return (
+        <td {...cell.getCellProps()} className="clusters-table-data table-cell-overflow">
+          {cell.row.original.jobState ? (
+            cell.row.original.jobState.length > 0 ? (
+              <div className="execution-history-main-wrapper">
+                {cell.row.original.jobState.map(job => {
+                  return (
+                    <>
+                      {job === 'JOB_STATE_SUCCEEDED' ? (
+                        <iconSuccess.react
+                          tag="div"
+                          title="Done !"
+                          className="icon-white logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      ) : job === 'JOB_STATE_FAILED' ||
+                        job === 'JOB_STATE_EXPIRED' ||
+                        job === 'JOB_STATE_PARTIALLY_SUCCEEDED' ? (
+                        <iconFailed.react
+                          tag="div"
+                          className="logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      ) : (
+                        <iconPending.react
+                          tag="div"
+                          className="logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      )}
+                    </>
+                  );
+                })}
+              </div>
+            ) : (
+              <iconPending.react tag="div" className="logo-alignment-style success_icon icon-size icon-completed"/>
+            )
+          ) : (
+            <CircularProgress
+              className="spin-loader-custom-style"
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          )}
+        </td>
+      );
     } else {
+      const alignIcon =
+        cell.row.original.status === 'ACTIVE' ||
+        cell.row.original.status === 'PAUSED' ||
+        cell.row.original.status === 'COMPLETED';
+
+      let pauseTitle = '';
+
+      if (
+        cell.row.original.status === 'ACTIVE' &&
+        cell.row.original.lastScheduledRunResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse === 'OK'
+      ) {
+        pauseTitle = 'ACTIVE';
+      }
+
+      if (
+        cell.row.original.status === 'PAUSED' &&
+        cell.row.original.lastScheduledRunResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse &&
+        cell.row.original.lastScheduledRunResponse.runResponse === 'OK'
+      ) {
+        pauseTitle = 'PAUSED';
+      }
+
       return (
         <td
           {...cell.getCellProps()}
           className={
             cell.column.Header === 'Schedule'
-              ? 'clusters-table-data table-cell-width'
+              ? 'clusters-table-data table-cell-overflow'
               : 'clusters-table-data'
           }
         >
-          {cell.render('Cell')}
+          {cell.column.Header === 'Status' ? (
+            <>
+              <div className="execution-history-main-wrapper">
+                {cell.row.original.lastScheduledRunResponse === null ? (
+                  cell.row.original.status === 'ACTIVE' ? (
+                    <iconActive.react
+                      tag="div"
+                      title="ACTIVE"
+                      className="icon-white logo-alignment-style success_icon icon-size-status"
+                    />
+                  ) : (
+                    <iconListPause.react
+                      tag="div"
+                      title="PAUSE"
+                      className="icon-white logo-alignment-style success_icon icon-size"
+                    />
+                  )
+                ) : cell.row.original.lastScheduledRunResponse &&
+                  cell.row.original.lastScheduledRunResponse.runResponse ? (
+                  cell.row.original.status === 'COMPLETED' ? (
+                    cell.row.original.lastScheduledRunResponse.runResponse ===
+                    'OK' ? (
+                      <div>
+                        <iconSuccess.react
+                          tag="div"
+                          title="Done !"
+                          className="icon-white logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <iconListComplete.react
+                          tag="div"
+                          title={
+                            cell.row.original.lastScheduledRunResponse &&
+                            cell.row.original.lastScheduledRunResponse
+                              .runResponse
+                          }
+                          className="icon-white logo-alignment-style success_icon icon-size-status"
+                        />
+                      </div>
+                    )
+                  ) : cell.row.original.status === 'ACTIVE' ? (
+                    <iconActive.react
+                      tag="div"
+                      title={pauseTitle}
+                      className="icon-white logo-alignment-style success_icon icon-size-status"
+                    />
+                  ) : (
+                    <iconListPause.react
+                      tag="div"
+                      title={pauseTitle}
+                      className="icon-white logo-alignment-style success_icon icon-size"
+                    />
+                  )
+                ) : (
+                  <div>
+                    <iconFailed.react
+                      tag="div"
+                      title={
+                        !cell.row.original.lastScheduledRunResponse
+                          ? 'Not started'
+                          : cell.row.original.lastScheduledRunResponse &&
+                            cell.row.original.lastScheduledRunResponse
+                              .runResponse
+                      }
+                      className="icon-white logo-alignment-style success_icon icon-size"
+                    />
+                  </div>
+                )}
+                <div className={alignIcon ? 'text-icon' : ''}>
+                  {cell.render('Cell')}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>{cell.render('Cell')}</>
+          )}
         </td>
       );
     }
   };
 
+  // useEffect (() => {
+  //   const obj = {column: {Header: 'Latest Execution Jobs'}}
+  //   tableDataCondition(obj);
+  // } , [dagList])
   /**
    * Opens edit notebook
    */
   const openEditDagNotebookFile = async () => {
-    console.log('inputNotebookFilePath', inputNotebookFilePath);
     const filePath = inputNotebookFilePath.replace('gs://', 'gs:');
     const openNotebookFile = await app.commands.execute('docmanager:open', {
       path: filePath
@@ -539,7 +728,7 @@ function ListVertexScheduler({
   useEffect(() => {
     if (region !== '') {
       setIsLoading(true);
-      listDagInfoAPI();
+      listVertexScheduleInfoAPI();
     }
   }, [region]);
 
@@ -578,14 +767,14 @@ function ListVertexScheduler({
             className="btn-refresh-text"
             variant="outlined"
             aria-label="cancel Batch"
-            onClick={listDagInfoAPI}
+            onClick={listVertexScheduleInfoAPI}
           >
             <div>REFRESH</div>
           </Button>
         </div>
       </div>
 
-      {dagList.length > 0 ? (
+      {vertexScheduleList.length > 0 ? (
         <>
           <div className="notebook-templates-list-table-parent">
             <TableData
@@ -599,12 +788,12 @@ function ListVertexScheduler({
               tableDataCondition={tableDataCondition}
               fromPage="Vertex schedulers"
             />
-            {dagList.length > 100 && (
+            {vertexScheduleList.length > 100 && (
               <PaginationView
                 pageSize={pageSize}
                 setPageSize={setPageSize}
                 pageIndex={pageIndex}
-                allData={dagList}
+                allData={vertexScheduleList}
                 previousPage={previousPage}
                 nextPage={nextPage}
                 canPreviousPage={canPreviousPage}
