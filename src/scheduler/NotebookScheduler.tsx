@@ -195,13 +195,17 @@ const NotebookSchedulerComponent = ({
                   value="vertex"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
-                  disabled={schedulerBtnDisable}
+                  disabled={
+                    schedulerBtnDisable ||
+                    (editMode && notebookSelector === 'composer')
+                  }
                   label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
                 />
                 <FormControlLabel
                   value="composer"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode && notebookSelector === 'vertex'}
                   label={
                     <Typography sx={{ fontSize: 13 }}>Composer</Typography>
                   }
