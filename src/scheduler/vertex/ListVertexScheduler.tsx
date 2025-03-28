@@ -18,7 +18,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
-// import { PaginationComponent } from '../../utils/PaginationComponent';
+import { PaginationComponent } from '../../utils/PaginationComponent';
 import { IVertexCellProps } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { CircularProgress, Button } from '@mui/material';
@@ -45,7 +45,6 @@ import { VertexServices } from '../../services/Vertex';
 import { IVertexScheduleList } from './VertexInterfaces';
 import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
-import { PaginationView } from '../../utils/PaginationView';
 
 function ListVertexScheduler({
   region,
@@ -756,17 +755,17 @@ function ListVertexScheduler({
       });
   }, [projectId]);
 
-  // const handleNext = async() => {
-  //   await VertexServices.listVertexSchedules(
-  //     setDagList,
-  //     region,
-  //     setIsLoading,
-  //     setIsApiError,
-  //     setApiError,
-  //     setNextPageTokenList,
-  //     nextPageTokenList
-  //   );
-  // }
+  const handleNext = async() => {
+    await VertexServices.listVertexSchedules(
+      setScheduleList,
+      region,
+      setIsLoading,
+      setIsApiError,
+      setApiError,
+      setNextPageTokenList,
+      nextPageTokenList
+    );
+  }
 
   return (
     console.log('nextpage token list', nextPageTokenList),
@@ -813,7 +812,7 @@ function ListVertexScheduler({
               fromPage="Vertex schedulers"
             />
             {vertexScheduleList.length > 100 && (
-              <PaginationView
+              <PaginationComponent
                 pageSize={pageSize}
                 setPageSize={setPageSize}
                 pageIndex={pageIndex}
@@ -822,8 +821,8 @@ function ListVertexScheduler({
                 nextPage={nextPage}
                 canPreviousPage={canPreviousPage}
                 canNextPage={canNextPage}
-                // nextPageTokenList={nextPageTokenList}
-                // handleNext={handleNext}
+                nextPageTokenList={nextPageTokenList}
+                handleNext={handleNext}
               />
             )}
             {deletePopupOpen && (
