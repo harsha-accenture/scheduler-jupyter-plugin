@@ -36,6 +36,7 @@ import {
 import CreateVertexScheduler from './vertex/CreateVertexScheduler';
 import EnableNotifyMessage from './common/EnableNotifyMessage';
 import { iconError } from '../utils/Icons';
+import { KERNEL_LIST_LOCAL } from '../utils/Const';
 
 const NotebookSchedulerComponent = ({
   themeManager,
@@ -63,10 +64,15 @@ const NotebookSchedulerComponent = ({
   const [isApiError, setIsApiError] = useState(false);
   const [apiError, setApiError] = useState('');
   const [nextPageTokenList, setNextPageTokenList] = useState<string[]>([]);
+  const [isLocalKernel, setIsLocalKernel] = useState<boolean>(true);
+  const [schedulerBtnDisable, setSchedulerBtnDisable] =
+    useState<boolean>(false);
+  const [packageEditFlag, setPackageEditFlag] = useState<boolean>(false);
 
   useEffect(() => {
     if (context !== '') {
       setInputFileSelected(context.path);
+      getKernelDetails();
     }
     console.log('inside main parent component')
   }, []);
@@ -90,6 +96,7 @@ const NotebookSchedulerComponent = ({
       app.shell.activeWidget?.close();
     } else {
       setCreateCompleted(true);
+      setPackageEditFlag(false);
     }
   };
 
@@ -99,6 +106,22 @@ const NotebookSchedulerComponent = ({
     setIsApiError(false);
     const newValue = (event.target as HTMLInputElement).value;
     setNotebookSelector(newValue);
+  };
+
+  const getKernelDetails = async () => {
+    //Check whether kernel Local or Remote
+    const kernelSelected = KERNEL_LIST_LOCAL.some(kernel =>
+      context.sessionContext.kernelDisplayName.includes(kernel)
+    );
+    if (!kernelSelected) {
+      setIsLocalKernel(false);
+      setNotebookSelector('composer');
+      setSchedulerBtnDisable(true);
+    } else {
+      setIsLocalKernel(true);
+      setNotebookSelector('vertex');
+      setSchedulerBtnDisable(false);
+    }
   };
 
   return (
@@ -174,12 +197,17 @@ const NotebookSchedulerComponent = ({
                   value="vertex"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={
+                    schedulerBtnDisable ||
+                    (editMode && notebookSelector === 'composer')
+                  }
                   label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
                 />
                 <FormControlLabel
                   value="composer"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode && notebookSelector === 'vertex'}
                   label={
                     <Typography sx={{ fontSize: 13 }}>Composer</Typography>
                   }
@@ -221,6 +249,10 @@ const NotebookSchedulerComponent = ({
           setIsApiError={setIsApiError}
           setApiError={setApiError}
           setExecutionPageFlag={setExecutionPageFlag}
+          isLocalKernel={isLocalKernel}
+          setIsLocalKernel={setIsLocalKernel}
+          packageEditFlag={packageEditFlag}
+          setPackageEditFlag={setPackageEditFlag}
         />
       ) : (
         <CreateVertexScheduler

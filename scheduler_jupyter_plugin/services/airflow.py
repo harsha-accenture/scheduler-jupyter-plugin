@@ -80,7 +80,7 @@ class Client:
                     return resp, bucket
                 else:
                     raise Exception(
-                        f"Error lsiting scheduled jobs: {response.reason} {await response.text()}"
+                        f"Error listing scheduled jobs: {response.reason} {await response.text()}"
                     )
         except Exception as e:
             self.log.exception(f"Error getting dag list: {str(e)}")
@@ -264,6 +264,8 @@ class Client:
                         )  # Extract project_id from the line
                     elif "submit_pyspark_job" in line:
                         mode_selected = "cluster"
+                    elif "execute_notebook_task" in line:
+                        mode_selected = "local"
                     elif "'retries'" in line:
                         retries = line.split(":")[-1].strip().strip("'\"},")
                         retry_count = int(
@@ -284,7 +286,7 @@ class Client:
                             line.split("=")[-1]
                             .strip()
                             .strip("'\"")
-                            .split(",")[0]
+                            .rsplit(",", 1)[0]
                             .rstrip("'\"")
                         )  # Extract schedule_interval from the line
                     elif "stop_cluster_check" in line:

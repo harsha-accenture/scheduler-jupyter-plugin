@@ -53,7 +53,9 @@ class DescribeJob(BaseModel):
     dag_id: str = None
     stop_cluster: bool = False
     time_zone: str = None
+    local_kernel: bool = False
     email_success: bool = False
+    packages_to_install: Optional[List[str]] = None
 
     @classmethod
     def from_dict(cls, data):

@@ -213,25 +213,31 @@ class Client:
                     if not resp:
                         return uiconfig
                     else:
-                        for machineconfig in resp.get("notebookRuntimeConfig").get(
-                            "machineConfigs"
+                        if (
+                            "notebookRuntimeConfig" in resp
+                            and "machineConfigs" in resp["notebookRuntimeConfig"]
                         ):
-                            ramBytes_in_gb = round(
-                                int(machineconfig.get("ramBytes")) / 1000000000, 2
-                            )
-                            formatted_config = {
-                                "machineType": f"{machineconfig.get('machineType')} ({machineconfig.get('cpuCount')} CPUs, {ramBytes_in_gb} GB RAM)",
-                                "acceleratorConfigs": machineconfig.get(
-                                    "acceleratorConfigs"
-                                ),
-                            }
-                            uiconfig.append(formatted_config)
+                            for machineconfig in resp["notebookRuntimeConfig"][
+                                "machineConfigs"
+                            ]:
+                                ramBytes_in_gb = round(
+                                    int(machineconfig.get("ramBytes")) / 1000000000, 2
+                                )
+                                formatted_config = {
+                                    "machineType": f"{machineconfig.get('machineType')} ({machineconfig.get('cpuCount')} CPUs, {ramBytes_in_gb} GB RAM)",
+                                    "acceleratorConfigs": machineconfig.get(
+                                        "acceleratorConfigs"
+                                    ),
+                                }
+                                uiconfig.append(formatted_config)
                         return uiconfig
                 elif response.status == 403:
                     resp = await response.json()
                     return resp
                 else:
-                    self.log.exception("Error listing ui config")
+                    self.log.exception(
+                        f"Error getting vertex ui config: {response.reason} {await response.text()}"
+                    )
                     raise Exception(
                         f"Error getting vertex ui config: {response.reason} {await response.text()}"
                     )
@@ -275,6 +281,7 @@ class Client:
                                 "schedule": schedule_value,
                                 "status": schedule.get("state"),
                                 "createTime": schedule.get("createTime"),
+                                "nextRunTime": schedule.get("nextRunTime"),
                                 "gcsNotebookSourceUri": schedule.get(
                                     "createNotebookExecutionJobRequest"
                                 )
@@ -516,11 +523,16 @@ class Client:
         except Exception as e:
             self.log.exception(f"Error updating schedule: {str(e)}")
             return {"Error updating schedule": str(e)}
-          
-    async def list_notebook_execution_jobs(self, region_id, schedule_id, start_date):
+
+    async def list_notebook_execution_jobs(
+        self, region_id, schedule_id, order_by, page_size=None, start_date=None
+    ):
         try:
             execution_jobs = []
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy=createTime desc"
+            if page_size:
+                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&pageSize={page_size}&orderBy={order_by}"
+            else:
+                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy={order_by}"
 
             headers = self.create_headers()
             async with self.client_session.get(
@@ -536,9 +548,12 @@ class Client:
                             # getting only the jobs whose create time is equal to start date
                             # splitting it in order to get only the date part from the values which is in zulu format (2011-08-12T20:17:46.384Z)
                             if (
-                                start_date.rsplit("-", 1)[0]
+                                start_date
+                                and start_date.rsplit("-", 1)[0]
                                 == job.get("createTime").rsplit("-", 1)[0]
                             ):
+                                execution_jobs.append(job)
+                            else:
                                 execution_jobs.append(job)
                         return execution_jobs
                 else:

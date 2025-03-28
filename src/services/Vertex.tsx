@@ -20,8 +20,8 @@ import { SchedulerLoggingService, LOG_LEVEL } from './LoggingService';
 import { showToast, toastifyCustomStyle } from '../utils/Config';
 import {
   ICreatePayload,
-  IDagList,
-  IDagRunList,
+  IVertexScheduleList,
+  IVertexScheduleRunList,
   IDeleteSchedulerAPIResponse,
   IMachineType,
   ISchedulerData,
@@ -143,7 +143,11 @@ export class VertexServices {
     }
   };
   static listVertexSchedules = async (
-    setDagList: (value: IDagList[]) => void,
+    setVertexScheduleList: (
+      value:
+        | IVertexScheduleList[]
+        | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
+    ) => void,
     region: string,
     setIsLoading: (value: boolean) => void,
     setIsApiError: (value: boolean) => void,
@@ -151,7 +155,11 @@ export class VertexServices {
     setNextPageTokenList: (value: string[]) => void,
     nextPageTokenList: string[]
   ) => {
+    setIsLoading(true);
+    setIsApiError(false);
+    setApiError('');
     try {
+      //First render the list of scheduled jobs with all details (except job run statuses).
       const serviceURL = 'api/vertex/listSchedules';
       let formattedResponse: any = {};
       if(nextPageTokenList.length > 0) {
@@ -174,7 +182,7 @@ export class VertexServices {
       if (Object.keys(formattedResponse).length !== 0) {
         if (
           Object.hasOwn(formattedResponse, 'error') &&
-          formattedResponse.error.code === 403
+          formattedResponse.error?.code === 403
         ) {
           setIsApiError(true);
           setApiError(formattedResponse.error.message);
@@ -184,49 +192,53 @@ export class VertexServices {
             Object.hasOwn(formattedResponse, 'schedules') &&
             formattedResponse.schedules.length > 0
           ) {
-            const currentDate = new Date().toISOString();
-            await Promise.all(
-              formattedResponse.schedules.map(async (schedule: any) => {
-                // This will extract schedule id from name ex: name: "projects/411524708443/locations/us-central1/notebookExecutionJobs/7978550051863527424" will return 7978550051863527424
-                const scheduleId = schedule.name.split('/').pop();
-                const serviceURLLastRunResponse =
-                  'api/vertex/listNotebookExecutionJobs';
-                const lastRunResponse: any = await requestAPI(
-                  serviceURLLastRunResponse +
-                    `?region_id=${region}&schedule_id=${scheduleId}&start_date=${currentDate}`
-                );
-                schedule.jobState = Object.hasOwn(lastRunResponse, 'error')
-                  ? 'Status Error'
-                  : lastRunResponse.length > 0 && lastRunResponse[0].jobState
-                    ? lastRunResponse[0].jobState
-                    : 'No runs';
-                return schedule;
-              })
+            // Initial schedule list is set without last run status.
+            setVertexScheduleList(formattedResponse.schedules);
+            setIsLoading(false);
+
+            // Adding a slight delay to ensure the initial render to give time for DOM refresh
+            await new Promise(resolve => requestAnimationFrame(resolve));
+
+            //Fetching Last run status seperately
+            const fetchPromises = formattedResponse.schedules.map(
+              (schedule: IVertexScheduleList) =>
+                fetchLastFiveRunStatus(schedule, region, setVertexScheduleList)
             );
-            setDagList(formattedResponse.schedules);
+            // Execute all fetchLastRunStatus calls in parallel.
+            await Promise.all(fetchPromises);
+            setVertexScheduleList(formattedResponse.schedules);
             setIsLoading(false);
           } else {
-            setDagList([]);
+            // Set an empty array is no JobExecutions were found.
+            setVertexScheduleList([]);
             setIsLoading(false);
           }
         }
       } else {
-        setDagList([]);
+        //In case no schedule List was found.
+        setVertexScheduleList([]);
         setIsLoading(false);
       }
-    } catch (error) {
-      setDagList([]);
+    } catch (error: any) {
+      setVertexScheduleList([]);
       SchedulerLoggingService.log(
         'Error listing vertex schedules',
         LOG_LEVEL.ERROR
       );
+    } finally {
+      // To make sure loader stops.
+      setIsLoading(false);
     }
   };
 
   static handleUpdateSchedulerPauseAPIService = async (
     scheduleId: string,
     region: string,
-    setDagList: (value: IDagList[]) => void,
+    setVertexScheduleList: (
+      value:
+        | IVertexScheduleList[]
+        | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
+    ) => void,
     setIsLoading: (value: boolean) => void,
     displayName: string,
     setResumeLoading: (value: string) => void,
@@ -247,7 +259,7 @@ export class VertexServices {
           toastifyCustomStyle
         );
         await VertexServices.listVertexSchedules(
-          setDagList,
+          setVertexScheduleList,
           region,
           setIsLoading,
           setIsApiError,
@@ -271,7 +283,11 @@ export class VertexServices {
   static handleUpdateSchedulerResumeAPIService = async (
     scheduleId: string,
     region: string,
-    setDagList: (value: IDagList[]) => void,
+    setVertexScheduleList: (
+      value:
+        | IVertexScheduleList[]
+        | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
+    ) => void,
     setIsLoading: (value: boolean) => void,
     displayName: string,
     setResumeLoading: (value: string) => void,
@@ -292,7 +308,7 @@ export class VertexServices {
           toastifyCustomStyle
         );
         await VertexServices.listVertexSchedules(
-          setDagList,
+          setVertexScheduleList,
           region,
           setIsLoading,
           setIsApiError,
@@ -351,7 +367,11 @@ export class VertexServices {
     region: string,
     scheduleId: string,
     displayName: string,
-    setDagList: (value: IDagList[]) => void,
+    setVertexScheduleList: (
+      value:
+        | IVertexScheduleList[]
+        | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
+    ) => void,
     setIsLoading: (value: boolean) => void,
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
@@ -366,7 +386,7 @@ export class VertexServices {
       );
       if (deleteResponse.done) {
         await VertexServices.listVertexSchedules(
-          setDagList,
+          setVertexScheduleList,
           region,
           setIsLoading,
           setIsApiError,
@@ -607,7 +627,7 @@ export class VertexServices {
     schedulerData: ISchedulerData | undefined,
     selectedMonth: Dayjs | null,
     setIsLoading: (value: boolean) => void,
-    setDagRunsList: (value: IDagRunList[]) => void,
+    setDagRunsList: (value: IVertexScheduleRunList[]) => void,
     setBlueListDates: (value: string[]) => void,
     setGreyListDates: (value: string[]) => void,
     setOrangeListDates: (value: string[]) => void,
@@ -621,7 +641,7 @@ export class VertexServices {
     const serviceURL = 'api/vertex/listNotebookExecutionJobs';
     const formattedResponse: any = await requestAPI(
       serviceURL +
-        `?region_id=${region}&schedule_id=${schedule_id}&start_date=${selected_month}`
+        `?region_id=${region}&schedule_id=${schedule_id}&start_date=${selected_month}&order_by=createTime desc`
     );
     try {
       let transformDagRunListDataCurrent = [];
@@ -635,6 +655,13 @@ export class VertexServices {
             const totalSeconds = Math.floor(timeDifferenceMilliseconds / 1000); // Convert to seconds
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
+
+            let codeValue = '',
+              statusMessage = '';
+            if (Object.hasOwn(jobRun, 'status')) {
+              codeValue = jobRun.status.code;
+              statusMessage = jobRun.status.message;
+            }
             return {
               jobRunId: jobRun.name.split('/').pop(),
               startDate: jobRun.createTime,
@@ -643,7 +670,15 @@ export class VertexServices {
               state: jobRun.jobState.split('_')[2].toLowerCase(),
               date: new Date(jobRun.createTime).toDateString(),
               fileName: jobRun.gcsNotebookSource.uri.split('/').pop(),
-              time: `${minutes} min ${seconds} sec`
+              time: `${minutes} min ${seconds} sec`,
+              code:
+                jobRun.jobState === 'JOB_STATE_FAILED'
+                  ? (codeValue ?? '')
+                  : '-',
+              statusMessage:
+                jobRun.jobState === 'JOB_STATE_FAILED'
+                  ? (statusMessage ?? '')
+                  : '-'
             };
           }
         );
@@ -716,4 +751,48 @@ export class VertexServices {
     }
     setIsLoading(false);
   };
+}
+
+//Funtion to fetch last five run status for Scheduler Listing screen.
+async function fetchLastFiveRunStatus(
+  schedule: any,
+  region: string,
+  setVertexScheduleList: (
+    value:
+      | IVertexScheduleList[]
+      | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
+  ) => void
+) {
+  //Extract Schedule id from schedule name.
+  const scheduleId = schedule.name.split('/').pop();
+  const serviceURLLastRunResponse = 'api/vertex/listNotebookExecutionJobs';
+  try {
+    const jobExecutionList: any[] = await requestAPI(
+      serviceURLLastRunResponse +
+        `?region_id=${region}&schedule_id=${scheduleId}&page_size=5&order_by=createTime desc`
+    );
+
+    const lastFiveRun = jobExecutionList.map((job: any) => job.jobState);
+    schedule.jobState = lastFiveRun;
+
+    setVertexScheduleList((prevItems: IVertexScheduleList[]) =>
+      prevItems.map(prevItem =>
+        prevItem.displayName === schedule.name
+          ? { ...prevItem, jobState: lastFiveRun }
+          : prevItem
+      )
+    );
+  } catch (lastRunError: any) {
+    setVertexScheduleList((prevItems: IVertexScheduleList[]) =>
+      prevItems.map(prevItem =>
+        prevItem.displayName === schedule.name
+          ? { ...prevItem, jobState: [] }
+          : prevItem
+      )
+    );
+    SchedulerLoggingService.log(
+      'Error fetching last five job executions',
+      LOG_LEVEL.ERROR
+    );
+  }
 }

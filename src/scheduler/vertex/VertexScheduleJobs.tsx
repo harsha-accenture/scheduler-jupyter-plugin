@@ -127,6 +127,7 @@ const VertexScheduleJobs = ({
     setScheduleName(scheduleName);
     setScheduleData(schedulerData);
   };
+
   return (
     <>
       {showExecutionHistory ? (

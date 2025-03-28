@@ -496,3 +496,85 @@
 .text-enable-warning {
   padding-top: 13px;
 }
+
+.success-message-package {
+  display: flex;
+  color: #34a853;
+}
+
+.success-message-pack {
+  padding-top: 5px;
+}
+
+.success-message-cl-package {
+  color: #f57c00;
+}
+
+.success-message-top {
+  padding-top: 15px;
+}
+
+.warning-message {
+  padding-top: 3px;
+}
+
+.warning-font {
+  font-size: 10px;
+}
+
+.warning-success-message {
+  padding-top: 6px;
+}
+
+.block-seperation {
+  margin-top: 0;
+  padding-top: 25px;
+}
+
+.progress-message {
+  text-align: justify;
+}
+
+.progress-main {
+  padding-right: 27px;
+}
+
+.input-sub-action {
+  margin: 0;
+}
+
+.block-level-seperation {
+  padding-top: 8px;
+  margin-top: 0;
+}
+
+.spinner-loader-modal {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.date-box-shadow {
+  box-shadow: 0 3px 10px rgb(0 0 0 / 20%);
+}
+
+.execution-wrapper-border-none {
+  border: none;
+}
+
+.execution-top-border {
+  border-top: 1px solid var(--jp-layout-color3);
+}
+
+.action-btn-execution {
+  padding-left: 15px;
+}
+
+.table-cell-overflow {
+  min-width: 25%;
+  max-width: 12%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+}
