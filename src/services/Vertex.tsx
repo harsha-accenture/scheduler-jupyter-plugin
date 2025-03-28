@@ -626,6 +626,13 @@ export class VertexServices {
             const totalSeconds = Math.floor(timeDifferenceMilliseconds / 1000); // Convert to seconds
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
+
+            let codeValue = '',
+              statusMessage = '';
+            if (Object.hasOwn(jobRun, 'status')) {
+              codeValue = jobRun.status.code;
+              statusMessage = jobRun.status.message;
+            }
             return {
               jobRunId: jobRun.name.split('/').pop(),
               startDate: jobRun.createTime,
@@ -634,7 +641,15 @@ export class VertexServices {
               state: jobRun.jobState.split('_')[2].toLowerCase(),
               date: new Date(jobRun.createTime).toDateString(),
               fileName: jobRun.gcsNotebookSource.uri.split('/').pop(),
-              time: `${minutes} min ${seconds} sec`
+              time: `${minutes} min ${seconds} sec`,
+              code:
+                jobRun.jobState === 'JOB_STATE_FAILED'
+                  ? (codeValue ?? '')
+                  : '-',
+              statusMessage:
+                jobRun.jobState === 'JOB_STATE_FAILED'
+                  ? (statusMessage ?? '')
+                  : '-'
             };
           }
         );
