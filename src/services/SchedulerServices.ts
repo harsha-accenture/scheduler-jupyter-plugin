@@ -911,15 +911,39 @@ export class SchedulerService {
         `triggerDag?dag_id=${dagId}&composer=${composerSelectedList}`,
         { method: 'POST' }
       );
-      if (data) {
-        toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
-      }
+      if (data?.error) {
+        let errorObject: any = {};
+        if (data?.error.includes('Bad Request')) {
+          const jsonstr = data?.error.slice(
+            data?.error.indexOf('{'),
+            data?.error.lastIndexOf('}') + 1
+          );
+          errorObject = JSON.parse(jsonstr);
+        }
 
-      if (data.error) {
-        toast.error(
-          `Failed to trigger ${dagId} : ${data?.error}`,
-          toastifyCustomStyle
-        );
+        if (errorObject?.status === 400) {
+          const installedPackageList: any = await requestAPI(
+            `checkRequiredPackages?composer_environment_name=${composerSelectedList}`
+          );
+          if (installedPackageList.length > 0) {
+            toast.error(
+              `Failed to trigger ${dagId} : required packages are not installed`,
+              toastifyCustomStyle
+            );
+          } else {
+            toast.error(
+              `Failed to trigger ${dagId} : ${data?.error}`,
+              toastifyCustomStyle
+            );
+          }
+        } else {
+          toast.error(
+            `Failed to trigger ${dagId} : ${data?.error}`,
+            toastifyCustomStyle
+          );
+        }
+      } else {
+        toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
       }
     } catch (reason) {
       toast.error(
