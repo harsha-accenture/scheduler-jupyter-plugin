@@ -56,7 +56,8 @@ const NotebookJobComponent = ({
   setApiError,
   setExecutionPageFlag,
   setIsLocalKernel,
-  setPackageEditFlag
+  setPackageEditFlag,
+  composerSelected
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -92,6 +93,7 @@ const NotebookJobComponent = ({
   setExecutionPageFlag: (value: boolean) => void;
   setIsLocalKernel: (value: boolean) => void;
   setPackageEditFlag: (value: boolean) => void;
+  composerSelected?: string;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -161,6 +163,7 @@ const NotebookJobComponent = ({
                 setApiError={setApiError}
                 setIsLocalKernel={setIsLocalKernel}
                 setPackageEditFlag={setPackageEditFlag}
+                composerSelected={composerSelected}
               />
             }
           </div>
