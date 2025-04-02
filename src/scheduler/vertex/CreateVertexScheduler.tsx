@@ -42,6 +42,10 @@ import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/Config';
 import {
   CORN_EXP_DOC_URL,
+  DEFAULT_CLOUD_STORAGE_BUCKET,
+  DEFAULT_KERNEL,
+  DEFAULT_MACHINE_TYPE,
+  DEFAULT_PRIMARY_NETWORK,
   DISK_TYPE_VALUE,
   internalScheduleMode,
   KERNEL_VALUE,
@@ -62,6 +66,7 @@ import VertexScheduleJobs from './VertexScheduleJobs';
 const CreateVertexScheduler = ({
   themeManager,
   app,
+  context,
   settingRegistry,
   createCompleted,
   setCreateCompleted,
@@ -77,6 +82,7 @@ const CreateVertexScheduler = ({
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
+  context: any;
   settingRegistry: ISettingRegistry;
   createCompleted: boolean;
   setCreateCompleted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -113,7 +119,11 @@ const CreateVertexScheduler = ({
   const [hostProject, setHostProject] = useState<string>('');
   const [region, setRegion] = useState<string>('');
   const [projectId, setProjectId] = useState<string>('');
-  const [kernelSelected, setKernelSelected] = useState<string | null>(null);
+  const [kernelSelected, setKernelSelected] = useState<string | null>(
+    KERNEL_VALUE.find(
+      option => option === context.sessionContext._kernelPreference?.name
+    ) || DEFAULT_KERNEL
+  );
   const [machineTypeList, setMachineTypeList] = useState<IMachineType[]>([]);
   const [machineTypeSelected, setMachineTypeSelected] = useState<string | null>(
     null
@@ -781,6 +791,36 @@ const CreateVertexScheduler = ({
       machineTypeAPI();
     }
   }, [region]);
+
+  useEffect(() => {
+    setSubNetworkSelected(subNetworkList[0]);
+  }, [subNetworkList]);
+
+  useEffect(() => {
+    const primaryNetwork =
+      primaryNetworkList.find(
+        option => option.name === DEFAULT_PRIMARY_NETWORK
+      ) || null;
+    setPrimaryNetworkSelected(primaryNetwork);
+    if (primaryNetwork) {
+      subNetworkAPI(DEFAULT_PRIMARY_NETWORK);
+    }
+  }, [primaryNetworkList]);
+
+  useEffect(() => {
+    setCloudStorage(
+      cloudStorageList.find(
+        option => option === DEFAULT_CLOUD_STORAGE_BUCKET
+      ) || null
+    );
+  }, [cloudStorageList]);
+
+  useEffect(() => {
+    const machineTypeOptions = machineTypeList.map(item => item.machineType);
+    setMachineTypeSelected(
+      machineTypeOptions.find(option => option === DEFAULT_MACHINE_TYPE) || null
+    );
+  }, [machineTypeList]);
 
   return (
     <>
