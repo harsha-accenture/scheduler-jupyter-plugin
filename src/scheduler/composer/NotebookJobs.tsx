@@ -56,7 +56,8 @@ const NotebookJobComponent = ({
   setApiError,
   setExecutionPageFlag,
   setIsLocalKernel,
-  setPackageEditFlag
+  setPackageEditFlag,
+  setSchedulerBtnDisable
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -92,6 +93,7 @@ const NotebookJobComponent = ({
   setExecutionPageFlag: (value: boolean) => void;
   setIsLocalKernel: (value: boolean) => void;
   setPackageEditFlag: (value: boolean) => void;
+  setSchedulerBtnDisable: (value: boolean) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -161,6 +163,7 @@ const NotebookJobComponent = ({
                 setApiError={setApiError}
                 setIsLocalKernel={setIsLocalKernel}
                 setPackageEditFlag={setPackageEditFlag}
+                setSchedulerBtnDisable={setSchedulerBtnDisable}
               />
             }
           </div>
@@ -178,6 +181,7 @@ export class NotebookJobs extends SchedulerWidget {
   setExecutionPageFlag: (value: boolean) => void;
   setIsLocalKernel: (value: boolean) => void;
   setPackageEditFlag: (value: boolean) => void;
+  setSchedulerBtnDisable: (value: boolean) => void;
 
   constructor(
     app: JupyterLab,
@@ -187,7 +191,8 @@ export class NotebookJobs extends SchedulerWidget {
     setApiError: (value: string) => void,
     setExecutionPageFlag: (value: boolean) => void,
     setIsLocalKernel: (value: boolean) => void,
-    setPackageEditFlag: (value: boolean) => void
+    setPackageEditFlag: (value: boolean) => void,
+    setSchedulerBtnDisable: (value: boolean) => void
   ) {
     super(themeManager);
     this.app = app;
@@ -197,6 +202,7 @@ export class NotebookJobs extends SchedulerWidget {
     this.setExecutionPageFlag = setExecutionPageFlag;
     this.setIsLocalKernel = setIsLocalKernel;
     this.setPackageEditFlag = setPackageEditFlag;
+    this.setSchedulerBtnDisable = setSchedulerBtnDisable;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -209,6 +215,7 @@ export class NotebookJobs extends SchedulerWidget {
         setExecutionPageFlag={this.setExecutionPageFlag}
         setIsLocalKernel={this.setIsLocalKernel}
         setPackageEditFlag={this.setPackageEditFlag}
+        setSchedulerBtnDisable={this.setSchedulerBtnDisable}
       />
     );
   }
