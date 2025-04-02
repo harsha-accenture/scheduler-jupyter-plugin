@@ -536,6 +536,7 @@ const CreateNotebookScheduler = ({
           setExecutionPageFlag={setExecutionPageFlag}
           setIsLocalKernel={setIsLocalKernel}
           setPackageEditFlag={setPackageEditFlag}
+          composerSelected={composerSelected}
         />
       ) : (
         <div>
