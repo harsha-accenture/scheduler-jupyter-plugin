@@ -525,25 +525,18 @@ function ListVertexScheduler({
         </td>
       );
     } else if (cell.column.Header === 'Next Run Date') {
-      if (cell.row.original.status === 'COMPLETED') {
-        return (
-          <td
-            {...cell.getCellProps()}
-            className="clusters-table-data table-cell-overflow"
-          >
+      return (
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
+          {cell.row.original.status === 'COMPLETED' ? (
             <iconDash.react tag="div" />
-          </td>
-        );
-      } else {
-        return (
-          <td
-            {...cell.getCellProps()}
-            className="clusters-table-data table-cell-overflow"
-          >
-            {dayjs(cell.row.original.nextRunTime).format('lll')}
-          </td>
-        );
-      }
+          ) : (
+            dayjs(cell.row.original.nextRunTime).format('lll')
+          )}
+        </td>
+      );
     } else if (cell.column.Header === 'Latest Execution Jobs') {
       return (
         <td
