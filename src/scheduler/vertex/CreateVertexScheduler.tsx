@@ -43,6 +43,7 @@ import { authApi } from '../../utils/Config';
 import {
   CORN_EXP_DOC_URL,
   DISK_TYPE_VALUE,
+  initialPageSize,
   internalScheduleMode,
   KERNEL_VALUE,
   scheduleMode,
@@ -180,6 +181,8 @@ const CreateVertexScheduler = ({
   const [endDateError, setEndDateError] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>('');
   const [gcsPath, setGcsPath] = useState('');
+  const [startIndex, setStartIndex] = useState<number>(1);
+  const [pageTotalSize, setPageTotalSize] = useState<number>(initialPageSize);
 
   /**
    * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
@@ -825,6 +828,10 @@ const CreateVertexScheduler = ({
           setApiError={setApiError}
           setNextPageTokenList={setNextPageTokenList}
           nextPageTokenList={nextPageTokenList}
+          startIndex={startIndex}
+          setStartIndex={setStartIndex}
+          pageTotalSize={pageTotalSize}
+          setPageTotalSize={setPageTotalSize}
         />
       ) : (
         <div className="submit-job-container text-enable-warning">

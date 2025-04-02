@@ -21,7 +21,7 @@ import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
 import ListVertexScheduler from '../vertex/ListVertexScheduler';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
-import { initialPageSize, scheduleMode } from '../../utils/Const';
+import { scheduleMode } from '../../utils/Const';
 import dayjs from 'dayjs';
 import { ISchedulerData } from './VertexInterfaces';
 import VertexExecutionHistory from './VertexExecutionHistory';
@@ -60,7 +60,11 @@ const VertexScheduleJobs = ({
   setIsApiError,
   setApiError,
   setNextPageTokenList,
-  nextPageTokenList
+  nextPageTokenList,
+  startIndex,
+  setStartIndex,
+  pageTotalSize,
+  setPageTotalSize
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -103,13 +107,15 @@ const VertexScheduleJobs = ({
   setApiError: (value: string) => void;
   setNextPageTokenList: (value: string[]) => void;
   nextPageTokenList: string[];
+  startIndex: number;
+  setStartIndex: (value: number) => void;
+  pageTotalSize: number;
+  setPageTotalSize: (value: number) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] =
     useState<boolean>(false);
   const [schedulerData, setScheduleData] = useState<ISchedulerData>();
   const [scheduleName, setScheduleName] = useState('');
-  const [startIndex, setStartIndex] = useState<number>(1);
-  const [pageTotalSize, setPageTotalSize] = useState<number>(initialPageSize);
 
   /**
    * Handles the back button click event.
@@ -222,12 +228,16 @@ export class NotebookJobs extends SchedulerWidget {
   setEndDate: (value: dayjs.Dayjs | null) => void;
   setMaxRuns: (value: string) => void;
   setEditMode: (value: boolean) => void;
-  setJobNameSelected?: (value: string) => void;
   setGcsPath: (value: string) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
   setNextPageTokenList: (value: string[]) => void;
-    nextPageTokenList: string[];
+  nextPageTokenList: string[];
+  startIndex: number;
+  setStartIndex: (value: number) => void;
+  pageTotalSize: number;
+  setPageTotalSize: (value: number) => void;
+  setJobNameSelected?: (value: string) => void;
 
   constructor(
     app: JupyterLab,
@@ -272,8 +282,11 @@ export class NotebookJobs extends SchedulerWidget {
     setApiError: (value: string) => void,
     setNextPageTokenList: (value: string[]) => void,
     nextPageTokenList: string[],
-    setJobNameSelected?: (value: string) => void,
-    
+    startIndex: number,
+    setStartIndex: (value: number) => void,
+    pageTotalSize: number,
+    setPageTotalSize: (value: number) => void,
+    setJobNameSelected?: (value: string) => void
   ) {
     super(themeManager);
     this.app = app;
@@ -311,6 +324,10 @@ export class NotebookJobs extends SchedulerWidget {
     this.setGcsPath = setGcsPath;
     this.setNextPageTokenList = setNextPageTokenList;
     this.nextPageTokenList = nextPageTokenList;
+    this.startIndex = startIndex;
+    this.setStartIndex = setStartIndex;
+    this.pageTotalSize = pageTotalSize;
+    this.setPageTotalSize = setPageTotalSize;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -349,6 +366,10 @@ export class NotebookJobs extends SchedulerWidget {
         setApiError={this.setApiError}
         setNextPageTokenList={this.setNextPageTokenList}
         nextPageTokenList={this.nextPageTokenList}
+        startIndex={this.startIndex}
+        setStartIndex={this.setStartIndex}
+        pageTotalSize={this.pageTotalSize}
+        setPageTotalSize={this.setPageTotalSize}
       />
     );
   }

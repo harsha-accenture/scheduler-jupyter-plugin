@@ -80,6 +80,7 @@ interface IPaginationViewProps {
   pageTotalSize: number;
   notebookApiBufferingFlag: boolean;
   handlePrevious: () => void;
+  scheduleListLength: number;
 }
 const iconPrevious = new LabIcon({
   name: 'launcher:previous-icon',
@@ -106,76 +107,81 @@ export const PaginationComponent = ({
   startIndex,
   pageTotalSize,
   notebookApiBufferingFlag,
-  handlePrevious
+  handlePrevious,
+  scheduleListLength
 }: IPaginationViewProps) => {
   return (
-    console.log(
-      'nextpagetokenlist',
-      nextPageTokenList,
-      'nextpagetokenflag',
-      nextTokenPresentFlag
-    ),
-    (
-      <div className="pagination-parent-view">
-        <>
-          {nextPageTokenList.length > 0 ? (
+    <div className="pagination-parent-view">
+      {startIndex} - {pageTotalSize}
+      <>
+        {nextPageTokenList.length > 0 ? (
+          startIndex === 1 ? (
             nextTokenPresentFlag ? (
               <div className="page-display-part">
-                {startIndex} - {pageTotalSize} of many
+                {startIndex} - {scheduleListLength} of many
               </div>
             ) : (
               <div className="page-display-part">
-                {startIndex} - {pageTotalSize} of {pageTotalSize}
+                {startIndex} - {scheduleListLength} of {scheduleListLength}
               </div>
             )
+          ) : nextTokenPresentFlag ? (
+            <div className="page-display-part">
+              {startIndex} - {pageTotalSize} of many
+            </div>
           ) : (
             <div className="page-display-part">
               {startIndex} - {pageTotalSize} of {pageTotalSize}
             </div>
-          )}
-        </>
-
-        <Button
-          className={
-            !canPreviousPage ? 'page-move-button disabled' : 'page-move-button'
-          }
-          onClick={() => handlePrevious()}
-        >
-          {notebookApiBufferingFlag ? (
-            <iconPrevious.react
-              tag="div"
-              className="icon-white logo-alignment-style"
-            />
-          ) : (
-            <iconPrevious.react
-              tag="div"
-              className="icon-white logo-alignment-style"
-            />
-          )}
-        </Button>
-        <Button
-          onClick={() => {
-            //nextPage();
-            if (!(!nextTokenPresentFlag || notebookApiBufferingFlag))
-              handleNext();
-          }}
-          className={
-            !canNextPage ? 'page-move-button disabled' : 'page-move-button'
-          }
-        >
-          {!nextTokenPresentFlag || notebookApiBufferingFlag ? (
-            <iconNext.react
-              tag="div"
-              className="icon-white logo-alignment-style icon-buttons-style-disable"
-            />
-          ) : (
-            <iconNext.react
-              tag="div"
-              className="icon-white logo-alignment-style"
-            />
-          )}
-        </Button>
-      </div>
-    )
+          )
+        ) : (
+          <div className="page-display-part">
+            {startIndex} - {scheduleListLength} of {scheduleListLength}
+          </div>
+        )}
+      </>
+      <Button
+        className={
+          !canPreviousPage ? 'page-move-button disabled' : 'page-move-button'
+        }
+        onClick={() => {
+          if (!(notebookApiBufferingFlag || startIndex === 1)) handlePrevious();
+        }}
+      >
+        {notebookApiBufferingFlag || startIndex === 1 ? (
+          <iconPrevious.react
+            tag="div"
+            className="icon-white logo-alignment-style icon-buttons-style-disable"
+          />
+        ) : (
+          <iconPrevious.react
+            tag="div"
+            className="icon-white logo-alignment-style"
+          />
+        )}
+      </Button>
+      <Button
+        onClick={() => {
+          //nextPage();
+          if (!(!nextTokenPresentFlag || notebookApiBufferingFlag))
+            handleNext();
+        }}
+        className={
+          !canNextPage ? 'page-move-button disabled' : 'page-move-button'
+        }
+      >
+        {!nextTokenPresentFlag || notebookApiBufferingFlag ? (
+          <iconNext.react
+            tag="div"
+            className="icon-white logo-alignment-style icon-buttons-style-disable"
+          />
+        ) : (
+          <iconNext.react
+            tag="div"
+            className="icon-white logo-alignment-style"
+          />
+        )}
+      </Button>
+    </div>
   );
 };

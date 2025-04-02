@@ -156,9 +156,12 @@ export class VertexServices {
     nextPageTokenList: string[],
     setNextTokenPresentFlag: (value: boolean) => void,
     setNotebookApiBufferingFlag: (value: boolean) => void,
-    handleNextFlag?: boolean,
-    
-    // setPageTotalSize?: (value: number) => void,
+    setScheduleListLength: (value: number) => void,
+    pageTotalSize: number,
+    setStartIndex: (value: number) => void,
+    setPageTotalSize: (value: number) => void,
+    startIndex: number,
+    handleNextFlag?: boolean
   ) => {
     setIsLoading(true);
     setIsApiError(false);
@@ -167,38 +170,75 @@ export class VertexServices {
       //First render the list of scheduled jobs with all details (except job run statuses).
       const serviceURL = 'api/vertex/listSchedules';
       let formattedResponse: any = {};
+      console.log('nextPageTokenList', nextPageTokenList);
       if (nextPageTokenList.length > 0) {
+        // if(handleNextFlag) {
         formattedResponse = await requestAPI(
           serviceURL +
             `?region_id=${region}&next_page_token=${nextPageTokenList[nextPageTokenList.length - 1]}`
         );
+        // }
+        //  else {
+        //   formattedResponse = await requestAPI(
+        //     serviceURL +
+        //       `?region_id=${region}&next_page_token=${nextPageTokenList[nextPageTokenList.length - 1]}`
+        //   );
+        //   const refreshToken = nextPageTokenList.slice( 0, nextPageTokenList.length - 1);
+        //   setNextPageTokenList(refreshToken);
+        // }
 
-        if (handleNextFlag) {
-          setNextPageTokenList(nextPageTokenList);
-        } else {
-          const refreshPageTokenList = nextPageTokenList.slice(
-            0,
-            nextPageTokenList.length - 1
-          );
-          console.log('refreshPageTokenList', refreshPageTokenList);
-          setNextPageTokenList(refreshPageTokenList);
+        if (formattedResponse.schedules.length > 0) {
+          const scheduleListLength = formattedResponse.schedules.length;
+          if (handleNextFlag) {
+            console.log(
+              'inside handle nect pageTotalSize',
+              pageTotalSize,
+              'scheduleListLength',
+              scheduleListLength
+            );
+            setStartIndex(pageTotalSize + 1);
+            setPageTotalSize(pageTotalSize + scheduleListLength);
+            if (Object.hasOwn(formattedResponse, 'nextPageToken')) {
+              setNextTokenPresentFlag(true);
+              const tokenList = [
+                ...nextPageTokenList,
+                formattedResponse.nextPageToken
+              ];
+              setNextPageTokenList(tokenList);
+            } else {
+              setNextTokenPresentFlag(false);
+            }
+            // setNextPageTokenList(nextPageTokenList);
+          } else {
+            console.log(
+              'inside else startIndex',
+              startIndex,
+              'scheduleListLength',
+              scheduleListLength
+            );
+
+            setStartIndex(startIndex - scheduleListLength);
+            setPageTotalSize(startIndex - 1);
+          }
         }
       } else {
         formattedResponse = await requestAPI(
           serviceURL + `?region_id=${region}`
         );
-      }
 
-      if (Object.hasOwn(formattedResponse, 'nextPageToken')) {
-        setNextTokenPresentFlag(true);
-        const tokenList = [
-          ...nextPageTokenList,
-          formattedResponse.nextPageToken
-        ];
-        setNextPageTokenList(tokenList);
-      } else {
-        setNextTokenPresentFlag(false);
+        if (Object.hasOwn(formattedResponse, 'nextPageToken')) {
+          setNextTokenPresentFlag(true);
+          const tokenList = [
+            ...nextPageTokenList,
+            formattedResponse.nextPageToken
+          ];
+          setNextPageTokenList(tokenList);
+        } else {
+          setNextTokenPresentFlag(false);
+        }
       }
+      console.log('from services', formattedResponse.schedules.length);
+      setScheduleListLength(formattedResponse.schedules.length);
 
       if (Object.keys(formattedResponse).length !== 0) {
         if (
@@ -271,6 +311,11 @@ export class VertexServices {
     nextPageTokenList: string[],
     setNextTokenPresentFlag: (value: boolean) => void,
     setNotebookApiBufferingFlag: (value: boolean) => void,
+    setScheduleListLength: (value: number) => void,
+    pageTotalSize: number,
+    setStartIndex: (value: number) => void,
+    setPageTotalSize: (value: number) => void,
+    startIndex: number
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -292,7 +337,12 @@ export class VertexServices {
           setNextPageTokenList,
           nextPageTokenList,
           setNextTokenPresentFlag,
-          setNotebookApiBufferingFlag
+          setNotebookApiBufferingFlag,
+          setScheduleListLength,
+          pageTotalSize,
+          setStartIndex,
+          setPageTotalSize,
+          startIndex
         );
         setResumeLoading('');
       } else {
@@ -323,7 +373,12 @@ export class VertexServices {
     setNextPageTokenList: (value: string[]) => void,
     nextPageTokenList: string[],
     setNextTokenPresentFlag: (value: boolean) => void,
-    setNotebookApiBufferingFlag: (value: boolean) => void
+    setNotebookApiBufferingFlag: (value: boolean) => void,
+    setScheduleListLength: (value: number) => void,
+    pageTotalSize: number,
+    setStartIndex: (value: number) => void,
+    setPageTotalSize: (value: number) => void,
+    startIndex: number
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -345,7 +400,12 @@ export class VertexServices {
           setNextPageTokenList,
           nextPageTokenList,
           setNextTokenPresentFlag,
-          setNotebookApiBufferingFlag
+          setNotebookApiBufferingFlag,
+          setScheduleListLength,
+          pageTotalSize,
+          setStartIndex,
+          setPageTotalSize,
+          startIndex
         );
         setResumeLoading('');
       } else {
@@ -409,7 +469,12 @@ export class VertexServices {
     setNextPageTokenList: (value: string[]) => void,
     nextPageTokenList: string[],
     setNextTokenPresentFlag: (value: boolean) => void,
-    setNotebookApiBufferingFlag: (value: boolean) => void
+    setNotebookApiBufferingFlag: (value: boolean) => void,
+    setScheduleListLength: (value: number) => void,
+    pageTotalSize: number,
+    setStartIndex: (value: number) => void,
+    setPageTotalSize: (value: number) => void,
+    startIndex: number
   ) => {
     try {
       const serviceURL = 'api/vertex/deleteSchedule';
@@ -427,7 +492,12 @@ export class VertexServices {
           setNextPageTokenList,
           nextPageTokenList,
           setNextTokenPresentFlag,
-          setNotebookApiBufferingFlag
+          setNotebookApiBufferingFlag,
+          setScheduleListLength,
+          pageTotalSize,
+          setStartIndex,
+          setPageTotalSize,
+          startIndex
         );
         toast.success(
           `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
