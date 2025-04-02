@@ -26,6 +26,7 @@ import DeletePopup from '../../utils/DeletePopup';
 import { initialPageSize, scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
+import { iconDash } from '../../utils/Icons';
 import { authApi } from '../../utils/Config';
 import {
   iconActive,
@@ -563,7 +564,11 @@ function ListVertexScheduler({
           {...cell.getCellProps()}
           className="clusters-table-data table-cell-overflow"
         >
-          {dayjs(cell.row.original.nextRunTime).format('lll')}
+          {cell.row.original.status === 'COMPLETED' ? (
+            <iconDash.react tag="div" />
+          ) : (
+            dayjs(cell.row.original.nextRunTime).format('lll')
+          )}
         </td>
       );
     } else if (cell.column.Header === 'Latest Execution Jobs') {
@@ -581,7 +586,7 @@ function ListVertexScheduler({
                       {job === 'JOB_STATE_SUCCEEDED' ? (
                         <iconSuccess.react
                           tag="div"
-                          title="Done !"
+                          title={job}
                           className="icon-white logo-alignment-style success_icon icon-size icon-completed"
                         />
                       ) : job === 'JOB_STATE_FAILED' ||
@@ -589,11 +594,13 @@ function ListVertexScheduler({
                         job === 'JOB_STATE_PARTIALLY_SUCCEEDED' ? (
                         <iconFailed.react
                           tag="div"
+                          title={job}
                           className="logo-alignment-style success_icon icon-size icon-completed"
                         />
                       ) : (
                         <iconPending.react
                           tag="div"
+                          title={job}
                           className="logo-alignment-style success_icon icon-size icon-completed"
                         />
                       )}
@@ -604,6 +611,7 @@ function ListVertexScheduler({
             ) : (
               <iconPending.react
                 tag="div"
+                title="No Job State Found"
                 className="logo-alignment-style success_icon icon-size icon-completed"
               />
             )
@@ -735,7 +743,7 @@ function ListVertexScheduler({
     }
   };
 
-  const openEditDagNotebookFile = async () => {
+  const openEditVertexNotebookFile = async () => {
     const filePath = inputNotebookFilePath.replace('gs://', 'gs:');
     const openNotebookFile = await app.commands.execute('docmanager:open', {
       path: filePath
@@ -748,7 +756,7 @@ function ListVertexScheduler({
 
   useEffect(() => {
     if (inputNotebookFilePath !== '') {
-      openEditDagNotebookFile();
+      openEditVertexNotebookFile();
     }
   }, [inputNotebookFilePath]);
 

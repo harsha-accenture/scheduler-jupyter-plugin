@@ -73,7 +73,8 @@ const CreateNotebookScheduler = ({
   isLocalKernel,
   setIsLocalKernel,
   packageEditFlag,
-  setPackageEditFlag
+  setPackageEditFlag,
+  setSchedulerBtnDisable
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -98,9 +99,10 @@ const CreateNotebookScheduler = ({
   setIsLocalKernel: React.Dispatch<React.SetStateAction<boolean>>;
   packageEditFlag: boolean;
   setPackageEditFlag: React.Dispatch<React.SetStateAction<boolean>>;
+  setSchedulerBtnDisable: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element => {
   const [composerList, setComposerList] = useState<string[]>([]);
-  const [composerSelected, setComposerSelected] = useState('');
+  const [composerSelected, setComposerSelected] = useState<string>('');
 
   const [parameterDetail, setParameterDetail] = useState(['']);
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState(['']);
@@ -536,6 +538,8 @@ const CreateNotebookScheduler = ({
           setExecutionPageFlag={setExecutionPageFlag}
           setIsLocalKernel={setIsLocalKernel}
           setPackageEditFlag={setPackageEditFlag}
+          setSchedulerBtnDisable={setSchedulerBtnDisable}
+          composerSelected={composerSelected}
         />
       ) : (
         <div>

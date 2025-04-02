@@ -249,6 +249,7 @@ const NotebookSchedulerComponent = ({
           setIsLocalKernel={setIsLocalKernel}
           packageEditFlag={packageEditFlag}
           setPackageEditFlag={setPackageEditFlag}
+          setSchedulerBtnDisable={setSchedulerBtnDisable}
         />
       ) : (
         <CreateVertexScheduler
