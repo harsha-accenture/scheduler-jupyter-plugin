@@ -23,7 +23,7 @@ import { IVertexCellProps } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { CircularProgress, Button } from '@mui/material';
 import DeletePopup from '../../utils/DeletePopup';
-import { scheduleMode } from '../../utils/Const';
+import { initialPageSize, scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/Config';
@@ -80,7 +80,11 @@ function ListVertexScheduler({
   setIsApiError,
   setApiError,
   setNextPageTokenList,
-  nextPageTokenList
+  nextPageTokenList,
+  startIndex,
+  setStartIndex,
+  pageTotalSize,
+  setPageTotalSize
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -122,6 +126,10 @@ function ListVertexScheduler({
   setApiError: (value: string) => void;
   setNextPageTokenList: (value: string[]) => void;
   nextPageTokenList: string[];
+  startIndex: number;
+  setStartIndex: (value: number) => void;
+  pageTotalSize: number;
+  setPageTotalSize: (value: number) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [vertexScheduleList, setScheduleList] = useState<IVertexScheduleList[]>(
@@ -139,7 +147,11 @@ function ListVertexScheduler({
   const [projectId, setProjectId] = useState<string>('');
   const [uniqueScheduleId, setUniqueScheduleId] = useState<string>('');
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
-  // const [pageToken, setPageToken] = useState<string>('');
+  const [nextTokenPresentFlag, setNextTokenPresentFlag] =
+    useState<boolean>(true);
+  const [handleNextFlag, setHandleNextFlag] = useState<boolean>(false);
+  const [notebookApiBufferingFlag, setNotebookApiBufferingFlag] = useState<boolean>(true);
+
   const isPreview = false;
 
   const columns = useMemo(
@@ -188,7 +200,10 @@ function ListVertexScheduler({
       setIsApiError,
       setApiError,
       setNextPageTokenList,
-      nextPageTokenList
+      nextPageTokenList,
+      setNextTokenPresentFlag,
+      setNotebookApiBufferingFlag
+      // setPageTotalSize
     );
   };
 
@@ -214,7 +229,9 @@ function ListVertexScheduler({
         setIsApiError,
         setApiError,
         setNextPageTokenList,
-        nextPageTokenList
+        nextPageTokenList,
+        setNextTokenPresentFlag,
+        setNotebookApiBufferingFlag
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
@@ -227,7 +244,9 @@ function ListVertexScheduler({
         setIsApiError,
         setApiError,
         setNextPageTokenList,
-        nextPageTokenList
+        nextPageTokenList,
+        setNextTokenPresentFlag,
+        setNotebookApiBufferingFlag
       );
     }
   };
@@ -284,7 +303,9 @@ function ListVertexScheduler({
       setIsApiError,
       setApiError,
       setNextPageTokenList,
-      nextPageTokenList
+      nextPageTokenList,
+      setNextTokenPresentFlag,
+      setNotebookApiBufferingFlag
     );
     setDeletePopupOpen(false);
     setDeletingSchedule(false);
@@ -755,7 +776,10 @@ function ListVertexScheduler({
       });
   }, [projectId]);
 
-  const handleNext = async() => {
+  const handleNext = async () => {
+    setHandleNextFlag(true);
+    setStartIndex(startIndex + pageTotalSize);
+    setPageTotalSize(pageTotalSize + initialPageSize);
     await VertexServices.listVertexSchedules(
       setScheduleList,
       region,
@@ -763,98 +787,127 @@ function ListVertexScheduler({
       setIsApiError,
       setApiError,
       setNextPageTokenList,
-      nextPageTokenList
+      nextPageTokenList,
+      setNextTokenPresentFlag,
+      setNotebookApiBufferingFlag,
+      handleNextFlag
+    );
+  };
+
+  const handlePrevious = async() => {
+    setHandleNextFlag(false);
+    setStartIndex(startIndex - pageTotalSize);
+    setPageTotalSize(pageTotalSize - initialPageSize);
+    await VertexServices.listVertexSchedules(
+      setScheduleList,
+      region,
+      setIsLoading,
+      setIsApiError,
+      setApiError,
+      setNextPageTokenList,
+      nextPageTokenList,
+      setNextTokenPresentFlag,
+      setNotebookApiBufferingFlag,
+      handleNextFlag
     );
   }
 
   return (
     console.log('nextpage token list', nextPageTokenList),
-    <div>
-      <div className="select-text-overlay-scheduler">
-        <div className="enable-text-label">
-          <div className="create-scheduler-form-element content-pd-space ">
-            <RegionDropdown
-              projectId={projectId}
-              region={region}
-              onRegionChange={region => setRegion(region)}
-            />
-            {!isLoading && !region && (
-              <ErrorMessage message="Region is required" />
-            )}
-          </div>
-        </div>
-
-        <div className="btn-refresh">
-          <Button
-            disabled={isLoading}
-            className="btn-refresh-text"
-            variant="outlined"
-            aria-label="cancel Batch"
-            onClick={listVertexScheduleInfoAPI}
-          >
-            <div>REFRESH</div>
-          </Button>
-        </div>
-      </div>
-
-      {vertexScheduleList.length > 0 ? (
-        <>
-          <div className="notebook-templates-list-table-parent">
-            <TableData
-              getTableProps={getTableProps}
-              headerGroups={headerGroups}
-              getTableBodyProps={getTableBodyProps}
-              isLoading={isLoading}
-              rows={rows}
-              page={page}
-              prepareRow={prepareRow}
-              tableDataCondition={tableDataCondition}
-              fromPage="Vertex schedulers"
-            />
-            {vertexScheduleList.length > 100 && (
-              <PaginationComponent
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-                pageIndex={pageIndex}
-                allData={vertexScheduleList}
-                previousPage={previousPage}
-                nextPage={nextPage}
-                canPreviousPage={canPreviousPage}
-                canNextPage={canNextPage}
-                nextPageTokenList={nextPageTokenList}
-                handleNext={handleNext}
+    (
+      <div>
+        <div className="select-text-overlay-scheduler">
+          <div className="enable-text-label">
+            <div className="create-scheduler-form-element content-pd-space ">
+              <RegionDropdown
+                projectId={projectId}
+                region={region}
+                onRegionChange={region => setRegion(region)}
               />
-            )}
-            {deletePopupOpen && (
-              <DeletePopup
-                onCancel={() => handleCancelDelete()}
-                onDelete={() => handleDeleteScheduler()}
-                deletePopupOpen={deletePopupOpen}
-                DeleteMsg={`This will delete ${scheduleDisplayName} and cannot be undone.`}
-                deletingSchedule={deletingSchedule}
-              />
-            )}
-          </div>
-        </>
-      ) : (
-        <div>
-          {isLoading && (
-            <div className="spin-loader-main">
-              <CircularProgress
-                className="spin-loader-custom-style"
-                size={18}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-              />
-              Loading Vertex Schedules
+              {!isLoading && !region && (
+                <ErrorMessage message="Region is required" />
+              )}
             </div>
-          )}
-          {!isLoading && (
-            <div className="no-data-style">No rows to display</div>
-          )}
+          </div>
+
+          <div className="btn-refresh">
+            <Button
+              disabled={isLoading}
+              className="btn-refresh-text"
+              variant="outlined"
+              aria-label="cancel Batch"
+              onClick={listVertexScheduleInfoAPI}
+            >
+              <div>REFRESH</div>
+            </Button>
+          </div>
         </div>
-      )}
-    </div>
+
+        {vertexScheduleList.length > 0 ? (
+          <>
+            <div className="notebook-templates-list-table-parent">
+              <TableData
+                getTableProps={getTableProps}
+                headerGroups={headerGroups}
+                getTableBodyProps={getTableBodyProps}
+                isLoading={isLoading}
+                rows={rows}
+                page={page}
+                prepareRow={prepareRow}
+                tableDataCondition={tableDataCondition}
+                fromPage="Vertex schedulers"
+              />
+              {!isLoading && (
+                <PaginationComponent
+                  pageSize={pageSize}
+                  setPageSize={setPageSize}
+                  pageIndex={pageIndex}
+                  allData={vertexScheduleList}
+                  previousPage={previousPage}
+                  nextPage={nextPage}
+                  canPreviousPage={canPreviousPage}
+                  canNextPage={canNextPage}
+                  nextPageTokenList={nextPageTokenList}
+                  handleNext={handleNext}
+                  nextTokenPresentFlag={nextTokenPresentFlag}
+                  handleNextFlag={handleNextFlag}
+                  startIndex={startIndex}
+                  pageTotalSize={pageTotalSize}
+                  notebookApiBufferingFlag={notebookApiBufferingFlag}
+                  handlePrevious={handlePrevious}
+                />
+              )}
+              {deletePopupOpen && (
+                <DeletePopup
+                  onCancel={() => handleCancelDelete()}
+                  onDelete={() => handleDeleteScheduler()}
+                  deletePopupOpen={deletePopupOpen}
+                  DeleteMsg={`This will delete ${scheduleDisplayName} and cannot be undone.`}
+                  deletingSchedule={deletingSchedule}
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          <div>
+            {isLoading && (
+              <div className="spin-loader-main">
+                <CircularProgress
+                  className="spin-loader-custom-style"
+                  size={18}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+                Loading Vertex Schedules
+              </div>
+            )}
+            {!isLoading && (
+              <div className="no-data-style">No rows to display</div>
+            )}
+          </div>
+        )}
+      </div>
+    )
   );
 }
 export default ListVertexScheduler;

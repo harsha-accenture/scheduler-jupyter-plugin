@@ -98,3 +98,5 @@ export const KERNEL_LIST_LOCAL = [
   'Python',
   'ipyKernel'
 ];
+
+export const initialPageSize = 100;

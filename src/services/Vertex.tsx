@@ -153,7 +153,12 @@ export class VertexServices {
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
     setNextPageTokenList: (value: string[]) => void,
-    nextPageTokenList: string[]
+    nextPageTokenList: string[],
+    setNextTokenPresentFlag: (value: boolean) => void,
+    setNotebookApiBufferingFlag: (value: boolean) => void,
+    handleNextFlag?: boolean,
+    
+    // setPageTotalSize?: (value: number) => void,
   ) => {
     setIsLoading(true);
     setIsApiError(false);
@@ -162,21 +167,37 @@ export class VertexServices {
       //First render the list of scheduled jobs with all details (except job run statuses).
       const serviceURL = 'api/vertex/listSchedules';
       let formattedResponse: any = {};
-      if(nextPageTokenList.length > 0) {
+      if (nextPageTokenList.length > 0) {
         formattedResponse = await requestAPI(
-          serviceURL + `?region_id=${region}&next_page_token=${nextPageTokenList[nextPageTokenList.length - 1]}`
+          serviceURL +
+            `?region_id=${region}&next_page_token=${nextPageTokenList[nextPageTokenList.length - 1]}`
         );
-        const refreshPageTokenList = nextPageTokenList.slice(0, nextPageTokenList.length - 1)
-        setNextPageTokenList(refreshPageTokenList);
+
+        if (handleNextFlag) {
+          setNextPageTokenList(nextPageTokenList);
+        } else {
+          const refreshPageTokenList = nextPageTokenList.slice(
+            0,
+            nextPageTokenList.length - 1
+          );
+          console.log('refreshPageTokenList', refreshPageTokenList);
+          setNextPageTokenList(refreshPageTokenList);
+        }
       } else {
-         formattedResponse = await requestAPI(
+        formattedResponse = await requestAPI(
           serviceURL + `?region_id=${region}`
         );
       }
 
-      if(Object.hasOwn(formattedResponse, 'nextPageToken')) {
-        const tokenList = [...nextPageTokenList, formattedResponse.nextPageToken];
+      if (Object.hasOwn(formattedResponse, 'nextPageToken')) {
+        setNextTokenPresentFlag(true);
+        const tokenList = [
+          ...nextPageTokenList,
+          formattedResponse.nextPageToken
+        ];
         setNextPageTokenList(tokenList);
+      } else {
+        setNextTokenPresentFlag(false);
       }
 
       if (Object.keys(formattedResponse).length !== 0) {
@@ -192,6 +213,7 @@ export class VertexServices {
             Object.hasOwn(formattedResponse, 'schedules') &&
             formattedResponse.schedules.length > 0
           ) {
+            // setPageTotalSize(formattedResponse.schedules.length);
             // Initial schedule list is set without last run status.
             setVertexScheduleList(formattedResponse.schedules);
             setIsLoading(false);
@@ -208,6 +230,7 @@ export class VertexServices {
             await Promise.all(fetchPromises);
             setVertexScheduleList(formattedResponse.schedules);
             setIsLoading(false);
+            setNotebookApiBufferingFlag(false);
           } else {
             // Set an empty array is no JobExecutions were found.
             setVertexScheduleList([]);
@@ -245,7 +268,9 @@ export class VertexServices {
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
     setNextPageTokenList: (value: string[]) => void,
-    nextPageTokenList: string[]
+    nextPageTokenList: string[],
+    setNextTokenPresentFlag: (value: boolean) => void,
+    setNotebookApiBufferingFlag: (value: boolean) => void,
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -265,7 +290,9 @@ export class VertexServices {
           setIsApiError,
           setApiError,
           setNextPageTokenList,
-          nextPageTokenList
+          nextPageTokenList,
+          setNextTokenPresentFlag,
+          setNotebookApiBufferingFlag
         );
         setResumeLoading('');
       } else {
@@ -294,7 +321,9 @@ export class VertexServices {
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
     setNextPageTokenList: (value: string[]) => void,
-    nextPageTokenList: string[]
+    nextPageTokenList: string[],
+    setNextTokenPresentFlag: (value: boolean) => void,
+    setNotebookApiBufferingFlag: (value: boolean) => void
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -314,7 +343,9 @@ export class VertexServices {
           setIsApiError,
           setApiError,
           setNextPageTokenList,
-          nextPageTokenList
+          nextPageTokenList,
+          setNextTokenPresentFlag,
+          setNotebookApiBufferingFlag
         );
         setResumeLoading('');
       } else {
@@ -376,7 +407,9 @@ export class VertexServices {
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
     setNextPageTokenList: (value: string[]) => void,
-    nextPageTokenList: string[]
+    nextPageTokenList: string[],
+    setNextTokenPresentFlag: (value: boolean) => void,
+    setNotebookApiBufferingFlag: (value: boolean) => void
   ) => {
     try {
       const serviceURL = 'api/vertex/deleteSchedule';
@@ -392,7 +425,9 @@ export class VertexServices {
           setIsApiError,
           setApiError,
           setNextPageTokenList,
-          nextPageTokenList
+          nextPageTokenList,
+          setNextTokenPresentFlag,
+          setNotebookApiBufferingFlag
         );
         toast.success(
           `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,

@@ -21,7 +21,7 @@ import { JupyterLab } from '@jupyterlab/application';
 import { IThemeManager } from '@jupyterlab/apputils';
 import ListVertexScheduler from '../vertex/ListVertexScheduler';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
-import { scheduleMode } from '../../utils/Const';
+import { initialPageSize, scheduleMode } from '../../utils/Const';
 import dayjs from 'dayjs';
 import { ISchedulerData } from './VertexInterfaces';
 import VertexExecutionHistory from './VertexExecutionHistory';
@@ -108,6 +108,8 @@ const VertexScheduleJobs = ({
     useState<boolean>(false);
   const [schedulerData, setScheduleData] = useState<ISchedulerData>();
   const [scheduleName, setScheduleName] = useState('');
+  const [startIndex, setStartIndex] = useState<number>(1);
+  const [pageTotalSize, setPageTotalSize] = useState<number>(initialPageSize);
 
   /**
    * Handles the back button click event.
@@ -175,6 +177,10 @@ const VertexScheduleJobs = ({
           setApiError={setApiError}
           setNextPageTokenList={setNextPageTokenList}
           nextPageTokenList={nextPageTokenList}
+          startIndex={startIndex}
+          setStartIndex={setStartIndex}
+          pageTotalSize={pageTotalSize}
+          setPageTotalSize={setPageTotalSize}
         />
       )}
     </>

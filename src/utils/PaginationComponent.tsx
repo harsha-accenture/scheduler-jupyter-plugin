@@ -20,6 +20,7 @@ import { ISessionTemplateDisplay } from './ListRuntimeTemplateInterface';
 import { LabIcon } from '@jupyterlab/ui-components';
 import PreviousIcon from '../../style/icons/previous_page.svg';
 import NextIcon from '../../style/icons/next_page.svg';
+import { Button } from '@mui/material';
 interface IBatch {
   batchID: string;
   status: string;
@@ -73,6 +74,12 @@ interface IPaginationViewProps {
   canNextPage: boolean;
   nextPageTokenList: string[];
   handleNext: () => void;
+  nextTokenPresentFlag: boolean;
+  handleNextFlag: boolean;
+  startIndex: number;
+  pageTotalSize: number;
+  notebookApiBufferingFlag: boolean;
+  handlePrevious: () => void;
 }
 const iconPrevious = new LabIcon({
   name: 'launcher:previous-icon',
@@ -93,72 +100,81 @@ export const PaginationComponent = ({
   canPreviousPage,
   canNextPage,
   nextPageTokenList,
-  handleNext
+  handleNext,
+  nextTokenPresentFlag,
+  handleNextFlag,
+  startIndex,
+  pageTotalSize,
+  notebookApiBufferingFlag,
+  handlePrevious
 }: IPaginationViewProps) => {
   return (
     console.log(
-      'pageSize',
-      pageSize,
-      'pageIndex',
-      pageIndex,
-      'allData',
-      allData,
-      'previousPage',
-      previousPage,
-      'nextPage',
-      nextPage,
-      'canPreviousPage',
-      canPreviousPage,
-      'canNextPage',
-      canNextPage
+      'nextpagetokenlist',
+      nextPageTokenList,
+      'nextpagetokenflag',
+      nextTokenPresentFlag
     ),
     (
       <div className="pagination-parent-view">
         <>
           {nextPageTokenList.length > 0 ? (
-            <div className="page-display-part">
-              {pageIndex * pageSize + 1} - {(pageIndex + 1) * pageSize} of many
-            </div>
-          ) : (
-            <div className="page-display-part">1 - {allData.length + 1}</div>
-          )}
-
-          {(pageIndex + 1) * pageSize > allData.length ? (
-            <div className="page-display-part">
-              {pageIndex * pageSize + 1} - {allData.length} of {allData.length}
-            </div>
+            nextTokenPresentFlag ? (
+              <div className="page-display-part">
+                {startIndex} - {pageTotalSize} of many
+              </div>
+            ) : (
+              <div className="page-display-part">
+                {startIndex} - {pageTotalSize} of {pageTotalSize}
+              </div>
+            )
           ) : (
             <div className="page-display-part">
-              {pageIndex * pageSize + 1} - {(pageIndex + 1) * pageSize} of{' '}
-              {allData.length}
+              {startIndex} - {pageTotalSize} of {pageTotalSize}
             </div>
           )}
         </>
 
-        <div
-          role="button"
+        <Button
           className={
             !canPreviousPage ? 'page-move-button disabled' : 'page-move-button'
           }
-          onClick={() => previousPage()}
+          onClick={() => handlePrevious()}
         >
-          <iconPrevious.react
-            tag="div"
-            className="icon-white logo-alignment-style"
-          />
-        </div>
-        <div
-          role="button"
-          onClick={() => {nextPage(); handleNext()}}
+          {notebookApiBufferingFlag ? (
+            <iconPrevious.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          ) : (
+            <iconPrevious.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          )}
+        </Button>
+        <Button
+          onClick={() => {
+            //nextPage();
+            if (!(!nextTokenPresentFlag || notebookApiBufferingFlag))
+              handleNext();
+          }}
           className={
             !canNextPage ? 'page-move-button disabled' : 'page-move-button'
           }
         >
-          <iconNext.react
-            tag="div"
-            className="icon-white logo-alignment-style"
-          />
-        </div>
+          {!nextTokenPresentFlag || notebookApiBufferingFlag ? (
+            <iconNext.react
+              tag="div"
+              className="icon-white logo-alignment-style icon-buttons-style-disable"
+            />
+          ) : (
+            <iconNext.react
+              tag="div"
+              className="icon-white logo-alignment-style"
+            />
+          )}
+        </Button>
       </div>
     )
   );
