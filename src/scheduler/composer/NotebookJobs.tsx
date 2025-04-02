@@ -57,7 +57,8 @@ const NotebookJobComponent = ({
   setExecutionPageFlag,
   setIsLocalKernel,
   setPackageEditFlag,
-  setSchedulerBtnDisable
+  setSchedulerBtnDisable,
+  composerSelected
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -94,6 +95,7 @@ const NotebookJobComponent = ({
   setIsLocalKernel: (value: boolean) => void;
   setPackageEditFlag: (value: boolean) => void;
   setSchedulerBtnDisable: (value: boolean) => void;
+  composerSelected?: string;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');
@@ -164,6 +166,7 @@ const NotebookJobComponent = ({
                 setIsLocalKernel={setIsLocalKernel}
                 setPackageEditFlag={setPackageEditFlag}
                 setSchedulerBtnDisable={setSchedulerBtnDisable}
+                composerSelected={composerSelected}
               />
             }
           </div>

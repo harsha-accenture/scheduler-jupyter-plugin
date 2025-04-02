@@ -105,7 +105,8 @@ function listNotebookScheduler({
   setApiError,
   setIsLocalKernel,
   setPackageEditFlag,
-  setSchedulerBtnDisable
+  setSchedulerBtnDisable,
+  composerSelected
 }: {
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
@@ -144,10 +145,13 @@ function listNotebookScheduler({
   setIsLocalKernel: (value: boolean) => void;
   setPackageEditFlag: (value: boolean) => void;
   setSchedulerBtnDisable: (value: boolean) => void;
+  composerSelected?: string;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [composerList, setComposerList] = useState<string[]>([]);
-  const [composerSelectedList, setComposerSelectedList] = useState('');
+  const [composerSelectedList, setComposerSelectedList] = useState(
+    composerSelected ? composerSelected : ''
+  );
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const backselectedEnvironment = backButtonComposerName;
@@ -531,7 +535,11 @@ function listNotebookScheduler({
   }, []);
 
   useEffect(() => {
-    if (composerList.length > 0 && backselectedEnvironment === '') {
+    if (
+      composerList.length > 0 &&
+      backselectedEnvironment === '' &&
+      composerSelected === ''
+    ) {
       setComposerSelectedList(composerList[0]);
     }
     if (composerList.length > 0 && backselectedEnvironment !== '') {

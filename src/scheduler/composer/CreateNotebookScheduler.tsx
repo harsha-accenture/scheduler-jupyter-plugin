@@ -102,7 +102,7 @@ const CreateNotebookScheduler = ({
   setSchedulerBtnDisable: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element => {
   const [composerList, setComposerList] = useState<string[]>([]);
-  const [composerSelected, setComposerSelected] = useState('');
+  const [composerSelected, setComposerSelected] = useState<string>('');
 
   const [parameterDetail, setParameterDetail] = useState(['']);
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState(['']);
@@ -539,6 +539,7 @@ const CreateNotebookScheduler = ({
           setIsLocalKernel={setIsLocalKernel}
           setPackageEditFlag={setPackageEditFlag}
           setSchedulerBtnDisable={setSchedulerBtnDisable}
+          composerSelected={composerSelected}
         />
       ) : (
         <div>
