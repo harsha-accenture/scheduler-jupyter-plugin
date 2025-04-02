@@ -36,7 +36,6 @@ import {
 import CreateVertexScheduler from './vertex/CreateVertexScheduler';
 import EnableNotifyMessage from './common/EnableNotifyMessage';
 import { iconError } from '../utils/Icons';
-import { KERNEL_LIST_LOCAL } from '../utils/Const';
 
 const NotebookSchedulerComponent = ({
   themeManager,
@@ -108,10 +107,7 @@ const NotebookSchedulerComponent = ({
 
   const getKernelDetails = async () => {
     //Check whether kernel Local or Remote
-    const kernelSelected = KERNEL_LIST_LOCAL.some(kernel =>
-      context.sessionContext.kernelDisplayName.includes(kernel)
-    );
-    if (!kernelSelected) {
+    if (context?.sessionContext?.kernelDisplayName?.includes('(Remote)')) {
       setIsLocalKernel(false);
       setNotebookSelector('composer');
       setSchedulerBtnDisable(true);
