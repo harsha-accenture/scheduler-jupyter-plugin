@@ -118,6 +118,11 @@
   border: 1px solid var(--jp-layout-color3);
 }
 
+.execution-history-full-wrapper {
+  width: 100%;
+  border: 1px solid var(--jp-layout-color3);
+}
+
 .execution-history-main-wrapper {
   display: flex;
 }
@@ -127,6 +132,11 @@
   border: 1px solid var(--jp-layout-color3);
   border-left: none;
   overflow: auto;
+}
+
+.execution-history-main-full-wrapper {
+  display: flex;
+  flex-direction: column;
 }
 
 .dag-runs-list-table-parent {
