@@ -277,70 +277,74 @@ const VertexExecutionHistory = ({
             Execution History: {scheduleName}
           </div>
         </div>
-        <div className="execution-history-main-wrapper execution-top-border">
-          <div
-            className={
-              isLoading
-                ? 'execution-history-left-wrapper execution-wrapper-border-none'
-                : 'execution-history-left-wrapper text-enable-warning execution-wrapper-border-none'
-            }
-          >
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              {isLoading ? (
-                <div className="spin-loader-main-calender">
-                  <Box sx={{ width: '100%' }}>
-                    <LinearProgress />
-                  </Box>
-                </div>
-              ) : (
-                <div
-                  className="spin-loader-main-calender"
-                  style={{ height: '4px' }}
-                ></div>
-              )}
-              <DateCalendar
-                minDate={dayjs(schedulerData?.createTime)}
-                maxDate={dayjs(currentDate)}
-                defaultValue={today}
-                onChange={newValue => handleDateSelection(newValue)}
-                onMonthChange={handleMonthChange}
-                slots={{
-                  day: CustomDay
-                }}
-                className="date-box-shadow"
-              />
-            </LocalizationProvider>
-          </div>
-          <div className="execution-history-right-wrapper execution-wrapper-border-none">
-            <div role="button" className="log-btn" onClick={handleLogs}>
-              <div className="create-icon log-icon cursor-icon">
-                <iconCreateCluster.react
-                  tag="div"
-                  className="logo-alignment-style"
-                />
+        <div className="execution-history-main-full-wrapper execution-top-border">
+          <div className="execution-history-full-wrapper execution-wrapper-border-none">
+            {isLoading ? (
+              <div className="spin-loader-main-execution-history">
+                <Box sx={{ width: '100%', height: '1px' }}>
+                  <LinearProgress />
+                </Box>
               </div>
-              <div className="create-text cursor-icon">VIEW CLOUD LOGS</div>
+            ) : (
+              <div
+                className="spin-loader-main-execution-history"
+                style={{ height: '4px' }}
+              ></div>
+            )}
+          </div>
+          <div className="execution-history-main-wrapper">
+            <div
+              className={
+                isLoading
+                  ? 'execution-history-left-wrapper execution-wrapper-border-none'
+                  : 'execution-history-left-wrapper text-enable-warning execution-wrapper-border-none'
+              }
+            >
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  minDate={dayjs(schedulerData?.createTime)}
+                  maxDate={dayjs(currentDate)}
+                  defaultValue={today}
+                  onChange={newValue => handleDateSelection(newValue)}
+                  onMonthChange={handleMonthChange}
+                  slots={{
+                    day: CustomDay
+                  }}
+                  className="date-box-shadow"
+                />
+              </LocalizationProvider>
             </div>
-            <VertexJobRuns
-              region={region}
-              schedulerData={schedulerData}
-              scheduleName={scheduleName}
-              dagId={scheduleName}
-              setJobRunsData={setJobRunsData}
-              setJobRunId={setJobRunId}
-              selectedMonth={selectedMonth}
-              selectedDate={selectedDate}
-              setBlueListDates={setBlueListDates}
-              setGreyListDates={setGreyListDates}
-              setOrangeListDates={setOrangeListDates}
-              setRedListDates={setRedListDates}
-              setGreenListDates={setGreenListDates}
-              setDarkGreenListDates={setDarkGreenListDates}
-              setIsLoading={setIsLoading}
-              isLoading={isLoading}
-              dagRunsList={dagRunsList}
-              setDagRunsList={setDagRunsList}
-            />
+            <div className="execution-history-right-wrapper execution-wrapper-border-none">
+              <div role="button" className="log-btn" onClick={handleLogs}>
+                <div className="create-icon log-icon cursor-icon">
+                  <iconCreateCluster.react
+                    tag="div"
+                    className="logo-alignment-style"
+                  />
+                </div>
+                <div className="create-text cursor-icon">VIEW CLOUD LOGS</div>
+              </div>
+              <VertexJobRuns
+                region={region}
+                schedulerData={schedulerData}
+                scheduleName={scheduleName}
+                dagId={scheduleName}
+                setJobRunsData={setJobRunsData}
+                setJobRunId={setJobRunId}
+                selectedMonth={selectedMonth}
+                selectedDate={selectedDate}
+                setBlueListDates={setBlueListDates}
+                setGreyListDates={setGreyListDates}
+                setOrangeListDates={setOrangeListDates}
+                setRedListDates={setRedListDates}
+                setGreenListDates={setGreenListDates}
+                setDarkGreenListDates={setDarkGreenListDates}
+                setIsLoading={setIsLoading}
+                isLoading={isLoading}
+                dagRunsList={dagRunsList}
+                setDagRunsList={setDagRunsList}
+              />
+            </div>
           </div>
         </div>
       </>
