@@ -83,9 +83,7 @@ const NotebookSchedulerComponent = ({
     if (context !== '') {
       const currentTime = new Date().getTime();
       const formattedCurrentTime = formatTimestamp(currentTime);
-      setJobNameSelected(
-        `job_${formattedCurrentTime}`
-      );
+      setJobNameSelected(`job_${formattedCurrentTime}`);
       setInputFileSelected(context.path);
       getKernelDetails();
     }
