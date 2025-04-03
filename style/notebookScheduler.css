@@ -588,3 +588,7 @@
   cursor: pointer;
   position: relative;
 }
+
+.execution-task-log-outline {
+  outline: 1px solid var(--jp-layout-color3);
+}
