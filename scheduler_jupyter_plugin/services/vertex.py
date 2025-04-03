@@ -114,14 +114,14 @@ class Client:
                 param.split(":")[0]: param.split(":")[1] for param in job.parameters
             }
 
-            api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
+            api_endpoint = f"https://{job.region}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{job.region}/schedules"
             headers = self.create_headers()
             payload = {
                 "displayName": job.display_name,
                 "cron": cron,
                 "maxConcurrentRunCount": "1",
                 "createNotebookExecutionJobRequest": {
-                    "parent": f"projects/{self.project_id}/locations/{self.region_id}",
+                    "parent": f"projects/{self.project_id}/locations/{job.region}",
                     "notebookExecutionJob": {
                         "displayName": job.display_name,
                         "parameters": parameters,
