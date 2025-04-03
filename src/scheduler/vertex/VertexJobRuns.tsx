@@ -154,31 +154,27 @@ const VertexJobRuns = ({
     } else if (cell.column.Header === 'State') {
       if (cell.value === 'succeeded') {
         return (
-          <div className="dag-run-state-parent">
-            <td
-              {...cell.getCellProps()}
-              className="dag-runs-table-data-state-success"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
-            >
-              {cell.render('Cell')}
-            </td>
-          </div>
+          <td
+            {...cell.getCellProps()}
+            className="dag-runs-table-data-state-success"
+            onClick={() => handleDagRunStateClick(cell.row.original)}
+          >
+            {cell.render('Cell')}
+          </td>
         );
       } else if (cell.value === 'failed') {
         return (
-          <div className="dag-run-state-parent">
-            <td
-              {...cell.getCellProps()}
-              className="dag-runs-table-data-state-failure"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
-            >
-              {cell.render('Cell')}
-            </td>
-          </div>
+          <td
+            {...cell.getCellProps()}
+            className="dag-runs-table-data-state-failure"
+            onClick={() => handleDagRunStateClick(cell.row.original)}
+          >
+            {cell.render('Cell')}
+          </td>
         );
       } else if (cell.value === 'running') {
         return (
-          <div className="dag-run-state-parent">
+          <div>
             <td
               {...cell.getCellProps()}
               className="dag-runs-table-data-state-running"
@@ -190,7 +186,7 @@ const VertexJobRuns = ({
         );
       } else if (cell.value === 'queued') {
         return (
-          <div className="dag-run-state-parent">
+          <div>
             <td
               {...cell.getCellProps()}
               className="dag-runs-table-data-state-queued"
@@ -345,7 +341,7 @@ const VertexJobRuns = ({
                 page={page}
                 prepareRow={prepareRow}
                 tableDataCondition={tableDataCondition}
-                fromPage="Dag Runs"
+                fromPage="vertexTaskLog"
               />
             </div>
           </div>
