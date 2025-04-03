@@ -123,7 +123,7 @@ const CreateVertexScheduler = ({
   const [projectId, setProjectId] = useState<string>('');
   const [kernelSelected, setKernelSelected] = useState<string | null>(
     KERNEL_VALUE.find(
-      option => option === context.sessionContext._kernelPreference?.name
+      option => option === context?.sessionContext?.kernelPreference?.name
     ) || DEFAULT_KERNEL
   );
   const [machineTypeList, setMachineTypeList] = useState<IMachineType[]>([]);
