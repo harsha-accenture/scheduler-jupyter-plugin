@@ -77,7 +77,11 @@ function TableData({
       <tbody
         {...getTableBodyProps()}
         className={'clusters-table-body'}
-        style={fromPage === 'Dag Runs' ? { maxHeight: listDagRunHeight } : null}
+        style={
+          fromPage === 'Dag Runs' || fromPage === 'vertexTaskLog'
+            ? { maxHeight: listDagRunHeight }
+            : null
+        }
       >
         {isLoading ? (
           <div
@@ -99,7 +103,14 @@ function TableData({
           displayData.map((row: Row, index: number) => {
             prepareRow(row);
             return (
-              <tr {...row.getRowProps()} className={'cluster-list-data-parent'}>
+              <tr
+                {...row.getRowProps()}
+                className={
+                  fromPage === 'vertexTaskLog'
+                    ? 'execution-task-log-outline cluster-list-data-parent'
+                    : 'cluster-list-data-parent'
+                }
+              >
                 {row.cells.map((cell: Cell) => {
                   return tableDataCondition(cell);
                 })}
