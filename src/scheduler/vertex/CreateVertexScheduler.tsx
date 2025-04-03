@@ -78,7 +78,8 @@ const CreateVertexScheduler = ({
   setEditMode,
   setExecutionPageFlag,
   setIsApiError,
-  setApiError
+  setApiError,
+  jobNameSpecialValidation
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -95,6 +96,7 @@ const CreateVertexScheduler = ({
   setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
   setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
   setApiError: React.Dispatch<React.SetStateAction<string>>;
+  jobNameSpecialValidation: boolean;
 }) => {
   const [parameterDetail, setParameterDetail] = useState<string[]>([]);
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState<
@@ -620,6 +622,7 @@ const CreateVertexScheduler = ({
     return (
       !selectedMachineType ||
       jobNameSelected === '' ||
+      jobNameSpecialValidation ||
       region === null ||
       creatingVertexScheduler ||
       machineTypeSelected === null ||
@@ -797,10 +800,7 @@ const CreateVertexScheduler = ({
   }, [subNetworkList]);
 
   useEffect(() => {
-    const primaryNetwork =
-      primaryNetworkList.find(
-        option => option.name === DEFAULT_PRIMARY_NETWORK
-      ) || null;
+    const primaryNetwork = primaryNetworkList[0];
     setPrimaryNetworkSelected(primaryNetwork);
     if (primaryNetwork) {
       subNetworkAPI(DEFAULT_PRIMARY_NETWORK);
@@ -867,9 +867,12 @@ const CreateVertexScheduler = ({
               projectId={projectId}
               region={region}
               onRegionChange={region => handleRegionChange(region)}
+              editMode={editMode}
             />
           </div>
-          {!region && <ErrorMessage message="Region is required" />}
+          {!region && (
+            <ErrorMessage message="Region is required" showIcon={false} />
+          )}
 
           <div className="create-scheduler-form-element">
             <Autocomplete
@@ -888,7 +891,7 @@ const CreateVertexScheduler = ({
           </div>
 
           {!machineTypeSelected && (
-            <ErrorMessage message="Machine type is required" />
+            <ErrorMessage message="Machine type is required" showIcon={false} />
           )}
 
           {machineTypeList.length > 0 &&
@@ -1015,7 +1018,10 @@ const CreateVertexScheduler = ({
             />
           </div>
           {!cloudStorage && (
-            <ErrorMessage message="Cloud storage bucket is required" />
+            <ErrorMessage
+              message="Cloud storage bucket is required"
+              showIcon={false}
+            />
           )}
 
           <span className="tab-description tab-text-sub-cl">
@@ -1185,9 +1191,13 @@ const CreateVertexScheduler = ({
                     )}
                     clearIcon={false}
                     loading={primaryNetworkLoading}
+                    disabled={editMode}
                   />
                   {!primaryNetworkSelected && (
-                    <ErrorMessage message="Primary network is required" />
+                    <ErrorMessage
+                      message="Primary network is required"
+                      showIcon={false}
+                    />
                   )}
                 </div>
                 <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
@@ -1206,9 +1216,13 @@ const CreateVertexScheduler = ({
                     )}
                     clearIcon={false}
                     loading={subNetworkLoading}
+                    disabled={editMode}
                   />
                   {!subNetworkSelected && (
-                    <ErrorMessage message="Sub network is required" />
+                    <ErrorMessage
+                      message="Sub network is required"
+                      showIcon={false}
+                    />
                   )}
                 </div>
               </div>

@@ -19,12 +19,18 @@ import { iconError } from '../../utils/Icons';
 
 interface IErrorMessageInterface {
   message: string;
+  showIcon?: boolean;
 }
 
-const ErrorMessage: React.FC<IErrorMessageInterface> = ({ message }) => {
+const ErrorMessage: React.FC<IErrorMessageInterface> = ({
+  message,
+  showIcon = true
+}) => {
   return (
     <div className="error-key-parent">
-      <iconError.react tag="div" className="logo-alignment-style" />
+      {showIcon && (
+        <iconError.react tag="div" className="logo-alignment-style" />
+      )}
       <div className="error-key-missing">{message}</div>
     </div>
   );
