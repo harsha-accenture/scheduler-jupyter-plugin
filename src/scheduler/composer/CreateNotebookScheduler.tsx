@@ -151,6 +151,7 @@ const CreateNotebookScheduler = ({
     setCheckRequiredPackagesInstalledFlag
   ] = useState<boolean>(false);
   const [disableEnvLocal, setDisabaleEnvLocal] = useState<boolean>(false);
+  const [clusterFlag, setClusterFlag] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -222,6 +223,9 @@ const CreateNotebookScheduler = ({
   const handleSelectedModeChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if ((event.target as HTMLInputElement).value === 'cluster') {
+      setClusterFlag(true);
+    }
     setSelectedMode((event.target as HTMLInputElement).value);
   };
 
@@ -415,7 +419,10 @@ const CreateNotebookScheduler = ({
             context.sessionContext.kernelPreference.name
           ].resources.endpointParentResource.includes('/sessions')
         ) {
-          setSelectedMode('serverless');
+          if (!clusterFlag) {
+            setSelectedMode('serverless');
+          }
+
           const selectedData: any = serverlessDataList.filter(
             (serverless: any) => {
               return context.sessionContext.kernelDisplayName.includes(
