@@ -67,8 +67,23 @@ const NotebookSchedulerComponent = ({
     useState<boolean>(false);
   const [packageEditFlag, setPackageEditFlag] = useState<boolean>(false);
 
+  const formatTimestamp = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+  };
+
   useEffect(() => {
     if (context !== '') {
+      const currentTime = new Date().getTime();
+      const formattedCurrentTime = formatTimestamp(currentTime);
+      setJobNameSelected(`job_${formattedCurrentTime}`);
       setInputFileSelected(context.path);
       getKernelDetails();
     }
@@ -253,6 +268,7 @@ const NotebookSchedulerComponent = ({
         <CreateVertexScheduler
           themeManager={themeManager}
           app={app}
+          context={context}
           settingRegistry={settingRegistry}
           createCompleted={createCompleted}
           setCreateCompleted={setCreateCompleted}
@@ -265,6 +281,7 @@ const NotebookSchedulerComponent = ({
           setExecutionPageFlag={setExecutionPageFlag}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
+          jobNameSpecialValidation={jobNameSpecialValidation}
         />
       )}
     </div>

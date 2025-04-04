@@ -42,6 +42,10 @@ import { RegionDropdown } from '../../controls/RegionDropdown';
 import { authApi } from '../../utils/Config';
 import {
   CORN_EXP_DOC_URL,
+  DEFAULT_CLOUD_STORAGE_BUCKET,
+  DEFAULT_KERNEL,
+  DEFAULT_MACHINE_TYPE,
+  DEFAULT_PRIMARY_NETWORK,
   DISK_TYPE_VALUE,
   internalScheduleMode,
   KERNEL_VALUE,
@@ -62,6 +66,7 @@ import VertexScheduleJobs from './VertexScheduleJobs';
 const CreateVertexScheduler = ({
   themeManager,
   app,
+  context,
   settingRegistry,
   createCompleted,
   setCreateCompleted,
@@ -73,10 +78,12 @@ const CreateVertexScheduler = ({
   setEditMode,
   setExecutionPageFlag,
   setIsApiError,
-  setApiError
+  setApiError,
+  jobNameSpecialValidation
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
+  context: any;
   settingRegistry: ISettingRegistry;
   createCompleted: boolean;
   setCreateCompleted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -89,6 +96,7 @@ const CreateVertexScheduler = ({
   setExecutionPageFlag: React.Dispatch<React.SetStateAction<boolean>>;
   setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
   setApiError: React.Dispatch<React.SetStateAction<string>>;
+  jobNameSpecialValidation: boolean;
 }) => {
   const [parameterDetail, setParameterDetail] = useState<string[]>([]);
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState<
@@ -113,7 +121,11 @@ const CreateVertexScheduler = ({
   const [hostProject, setHostProject] = useState<string>('');
   const [region, setRegion] = useState<string>('');
   const [projectId, setProjectId] = useState<string>('');
-  const [kernelSelected, setKernelSelected] = useState<string | null>(null);
+  const [kernelSelected, setKernelSelected] = useState<string | null>(
+    KERNEL_VALUE.find(
+      option => option === context?.sessionContext?.kernelPreference?.name
+    ) || DEFAULT_KERNEL
+  );
   const [machineTypeList, setMachineTypeList] = useState<IMachineType[]>([]);
   const [machineTypeSelected, setMachineTypeSelected] = useState<string | null>(
     null
@@ -610,6 +622,7 @@ const CreateVertexScheduler = ({
     return (
       !selectedMachineType ||
       jobNameSelected === '' ||
+      jobNameSpecialValidation ||
       region === null ||
       creatingVertexScheduler ||
       machineTypeSelected === null ||
@@ -782,6 +795,33 @@ const CreateVertexScheduler = ({
     }
   }, [region]);
 
+  useEffect(() => {
+    setSubNetworkSelected(subNetworkList[0]);
+  }, [subNetworkList]);
+
+  useEffect(() => {
+    const primaryNetwork = primaryNetworkList[0];
+    setPrimaryNetworkSelected(primaryNetwork);
+    if (primaryNetwork) {
+      subNetworkAPI(DEFAULT_PRIMARY_NETWORK);
+    }
+  }, [primaryNetworkList]);
+
+  useEffect(() => {
+    setCloudStorage(
+      cloudStorageList.find(
+        option => option === DEFAULT_CLOUD_STORAGE_BUCKET
+      ) || null
+    );
+  }, [cloudStorageList]);
+
+  useEffect(() => {
+    const machineTypeOptions = machineTypeList.map(item => item.machineType);
+    setMachineTypeSelected(
+      machineTypeOptions.find(option => option === DEFAULT_MACHINE_TYPE) || null
+    );
+  }, [machineTypeList]);
+
   return (
     <>
       {createCompleted ? (
@@ -827,9 +867,12 @@ const CreateVertexScheduler = ({
               projectId={projectId}
               region={region}
               onRegionChange={region => handleRegionChange(region)}
+              editMode={editMode}
             />
           </div>
-          {!region && <ErrorMessage message="Region is required" />}
+          {!region && (
+            <ErrorMessage message="Region is required" showIcon={false} />
+          )}
 
           <div className="create-scheduler-form-element">
             <Autocomplete
@@ -848,7 +891,7 @@ const CreateVertexScheduler = ({
           </div>
 
           {!machineTypeSelected && (
-            <ErrorMessage message="Machine type is required" />
+            <ErrorMessage message="Machine type is required" showIcon={false} />
           )}
 
           {machineTypeList.length > 0 &&
@@ -975,7 +1018,10 @@ const CreateVertexScheduler = ({
             />
           </div>
           {!cloudStorage && (
-            <ErrorMessage message="Cloud storage bucket is required" />
+            <ErrorMessage
+              message="Cloud storage bucket is required"
+              showIcon={false}
+            />
           )}
 
           <span className="tab-description tab-text-sub-cl">
@@ -1145,9 +1191,13 @@ const CreateVertexScheduler = ({
                     )}
                     clearIcon={false}
                     loading={primaryNetworkLoading}
+                    disabled={editMode}
                   />
                   {!primaryNetworkSelected && (
-                    <ErrorMessage message="Primary network is required" />
+                    <ErrorMessage
+                      message="Primary network is required"
+                      showIcon={false}
+                    />
                   )}
                 </div>
                 <div className="create-scheduler-form-element create-scheduler-form-element-input-fl">
@@ -1166,9 +1216,13 @@ const CreateVertexScheduler = ({
                     )}
                     clearIcon={false}
                     loading={subNetworkLoading}
+                    disabled={editMode}
                   />
                   {!subNetworkSelected && (
-                    <ErrorMessage message="Sub network is required" />
+                    <ErrorMessage
+                      message="Sub network is required"
+                      showIcon={false}
+                    />
                   )}
                 </div>
               </div>
