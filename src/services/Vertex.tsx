@@ -124,8 +124,13 @@ export class VertexServices {
         }
       );
       if (data.error) {
-        toast.error(data.error, toastifyCustomStyle);
-        setCreatingVertexScheduler(false);
+        if (data.error.includes(':')) {
+          toast.error(data.error.split(':')[0], toastifyCustomStyle);
+          setCreatingVertexScheduler(false);
+        } else {
+          toast.error(data.error, toastifyCustomStyle);
+          setCreatingVertexScheduler(false);
+        }
       } else {
         toast.success(
           `Job ${payload.display_name} successfully updated`,
