@@ -210,16 +210,11 @@ function LabelProperties({
                         Label={`Key ${index + 1}*`}
                       />
                     </div>
-
                     {labelDetailUpdated[index].split(':')[0] === '' &&
                     labelDetailUpdated[index] !== '' &&
                     duplicateKeyError !== index ? (
                       <div role="alert" className="error-key-parent">
-                        <iconError.react
-                          tag="div"
-                          className="logo-alignment-style"
-                        />
-                        <div className="error-key-missing">key is required</div>
+                        <div className="error-key-missing">Key is required</div>
                       </div>
                     ) : (
                       keyValidation === index &&
@@ -277,6 +272,13 @@ function LabelProperties({
                         Label={`Value ${index + 1}`}
                       />
                     </div>
+                    {labelDetailUpdated[index].split(':')[1] === '' &&
+                      labelDetailUpdated[index] !== '' && (
+                        <div className="error-key-missing">
+                          Value is required
+                        </div>
+                      )}
+
                     {valueValidation === index && (
                       <div className="error-key-parent">
                         <iconError.react
