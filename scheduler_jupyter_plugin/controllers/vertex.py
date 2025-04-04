@@ -180,7 +180,7 @@ class ScheduleUpdateController(APIHandler):
                 resp = await client.update_schedule(region_id, schedule_id, input_data)
                 self.finish(json.dumps(resp))
         except Exception as e:
-            self.log.exception(f"Error updating the schedule: {str(e)}")
+            self.log.exception(f"error: {str(e)}")
             self.finish({"error": str(e)})
 
 
