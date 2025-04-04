@@ -522,7 +522,7 @@ class Client:
                     )
         except Exception as e:
             self.log.exception(f"Error updating schedule: {str(e)}")
-            return {"Error updating schedule": str(e)}
+            return {"error": str(e)}
 
     async def list_notebook_execution_jobs(
         self, region_id, schedule_id, order_by, page_size=None, start_date=None
