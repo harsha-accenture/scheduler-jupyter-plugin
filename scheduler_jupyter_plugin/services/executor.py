@@ -34,6 +34,7 @@ from scheduler_jupyter_plugin.commons.constants import (
     GCS,
     PACKAGE_NAME,
     WRAPPER_PAPPERMILL_FILE,
+    UTF8,
 )
 from scheduler_jupyter_plugin.models.models import DescribeJob
 from scheduler_jupyter_plugin.services import airflow
@@ -135,6 +136,7 @@ class Client:
         self.log.info("Generating dag file")
         DAG_TEMPLATE_CLUSTER_V1 = "pysparkJobTemplate-v1.txt"
         DAG_TEMPLATE_SERVERLESS_V1 = "pysparkBatchTemplate-v1.txt"
+        DAG_TEMPLATE_LOCAL_V1 = "localPythonTemplate-v1.txt"
         environment = Environment(
             loader=PackageLoader("scheduler_jupyter_plugin", TEMPLATES_FOLDER_PATH)
         )
@@ -163,60 +165,91 @@ class Client:
             parameters = "\n".join(item.replace(":", ": ") for item in job.parameters)
         else:
             parameters = ""
-        if job.mode_selected == "cluster":
-            template = environment.get_template(DAG_TEMPLATE_CLUSTER_V1)
-            if not job.input_filename.startswith(GCS):
-                input_notebook = f"gs://{gcs_dag_bucket}/dataproc-notebooks/{job.name}/input_notebooks/{job.input_filename}"
+        if job.local_kernel is False:
+            if job.mode_selected == "cluster":
+                template = environment.get_template(DAG_TEMPLATE_CLUSTER_V1)
+                if not job.input_filename.startswith(GCS):
+                    input_notebook = f"gs://{gcs_dag_bucket}/dataproc-notebooks/{job.name}/input_notebooks/{job.input_filename}"
+                else:
+                    input_notebook = job.input_filename
+                content = template.render(
+                    job,
+                    inputFilePath=f"gs://{gcs_dag_bucket}/dataproc-notebooks/wrapper_papermill.py",
+                    gcpProjectId=gcp_project_id,
+                    gcpRegion=gcp_region_id,
+                    input_notebook=input_notebook,
+                    output_notebook=f"gs://{gcs_dag_bucket}/dataproc-output/{job.name}/output-notebooks/{job.name}_",
+                    owner=owner,
+                    schedule_interval=schedule_interval,
+                    start_date=start_date,
+                    parameters=parameters,
+                    time_zone=time_zone,
+                )
             else:
-                input_notebook = job.input_filename
-            content = template.render(
-                job,
-                inputFilePath=f"gs://{gcs_dag_bucket}/dataproc-notebooks/wrapper_papermill.py",
-                gcpProjectId=gcp_project_id,
-                gcpRegion=gcp_region_id,
-                input_notebook=input_notebook,
-                output_notebook=f"gs://{gcs_dag_bucket}/dataproc-output/{job.name}/output-notebooks/{job.name}_",
-                owner=owner,
-                schedule_interval=schedule_interval,
-                start_date=start_date,
-                parameters=parameters,
-                time_zone=time_zone,
-            )
+                template = environment.get_template(DAG_TEMPLATE_SERVERLESS_V1)
+                job_dict = job.dict()
+                phs_path = (
+                    job_dict.get("serverless_name", {})
+                    .get("environmentConfig", {})
+                    .get("peripheralsConfig", {})
+                    .get("sparkHistoryServerConfig", {})
+                    .get("dataprocCluster", "")
+                )
+                serverless_name = (
+                    job_dict.get("serverless_name", {})
+                    .get("jupyterSession", {})
+                    .get("displayName", "")
+                )
+                custom_container = (
+                    job_dict.get("serverless_name", {})
+                    .get("runtimeConfig", {})
+                    .get("containerImage", "")
+                )
+                metastore_service = (
+                    job_dict.get("serverless_name", {})
+                    .get("environmentConfig", {})
+                    .get("peripheralsConfig", {})
+                    .get("metastoreService", {})
+                )
+                version = (
+                    job_dict.get("serverless_name", {})
+                    .get("runtimeConfig", {})
+                    .get("version", "")
+                )
+                if not job.input_filename.startswith(GCS):
+                    input_notebook = f"gs://{gcs_dag_bucket}/dataproc-notebooks/{job.name}/input_notebooks/{job.input_filename}"
+                else:
+                    input_notebook = job.input_filename
+                content = template.render(
+                    job,
+                    inputFilePath=f"gs://{gcs_dag_bucket}/dataproc-notebooks/wrapper_papermill.py",
+                    gcpProjectId=gcp_project_id,
+                    gcpRegion=gcp_region_id,
+                    input_notebook=input_notebook,
+                    output_notebook=f"gs://{gcs_dag_bucket}/dataproc-output/{job.name}/output-notebooks/{job.name}_",
+                    owner=owner,
+                    schedule_interval=schedule_interval,
+                    start_date=start_date,
+                    parameters=parameters,
+                    phs_path=phs_path,
+                    serverless_name=serverless_name,
+                    time_zone=time_zone,
+                    custom_container=custom_container,
+                    metastore_service=metastore_service,
+                    version=version,
+                )
         else:
-            template = environment.get_template(DAG_TEMPLATE_SERVERLESS_V1)
-            job_dict = job.dict()
-            phs_path = (
-                job_dict.get("serverless_name", {})
-                .get("environmentConfig", {})
-                .get("peripheralsConfig", {})
-                .get("sparkHistoryServerConfig", {})
-                .get("dataprocCluster", "")
-            )
-            serverless_name = (
-                job_dict.get("serverless_name", {})
-                .get("jupyterSession", {})
-                .get("displayName", "")
-            )
-            custom_container = (
-                job_dict.get("serverless_name", {})
-                .get("runtimeConfig", {})
-                .get("containerImage", "")
-            )
-            metastore_service = (
-                job_dict.get("serverless_name", {})
-                .get("environmentConfig", {})
-                .get("peripheralsConfig", {})
-                .get("metastoreService", {})
-            )
-            version = (
-                job_dict.get("serverless_name", {})
-                .get("runtimeConfig", {})
-                .get("version", "")
-            )
+            template = environment.get_template(DAG_TEMPLATE_LOCAL_V1)
             if not job.input_filename.startswith(GCS):
                 input_notebook = f"gs://{gcs_dag_bucket}/dataproc-notebooks/{job.name}/input_notebooks/{job.input_filename}"
             else:
                 input_notebook = job.input_filename
+            if len(job.parameters) != 0:
+                parameters = ",".join(
+                    item.replace(":", ": ") for item in job.parameters
+                )
+            else:
+                parameters = ""
             content = template.render(
                 job,
                 inputFilePath=f"gs://{gcs_dag_bucket}/dataproc-notebooks/wrapper_papermill.py",
@@ -228,12 +261,7 @@ class Client:
                 schedule_interval=schedule_interval,
                 start_date=start_date,
                 parameters=parameters,
-                phs_path=phs_path,
-                serverless_name=serverless_name,
                 time_zone=time_zone,
-                custom_container=custom_container,
-                metastore_service=metastore_service,
-                version=version,
             )
         LOCAL_DAG_FILE_LOCATION = f"./scheduled-jobs/{job.name}"
         file_path = os.path.join(LOCAL_DAG_FILE_LOCATION, dag_file)
@@ -248,6 +276,68 @@ class Client:
         shutil.copy2(wrapper_papermill_path, LOCAL_DAG_FILE_LOCATION)
         return file_path
 
+    async def check_package_in_env(self, composer_environment_name):
+        try:
+            packages = ["apache-airflow-providers-papermill", "ipykernel"]
+            packages_to_install = []
+            cmd = f"gcloud beta composer environments list-packages {composer_environment_name} --location {self.region_id}"
+            process = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+            )
+            stdout, stderr = process.communicate()
+            if stderr:
+                self.log.info(f"Error fetching list of packages: {stderr}")
+            else:
+                decoded_output = stdout.decode(UTF8)
+                installed_packages = set(
+                    line.split()[0].lower()
+                    for line in decoded_output.splitlines()[2:]
+                )
+                for package in packages:
+                    if package.lower() not in installed_packages:
+                        packages_to_install.append(package)
+                    else:
+                        self.log.info(f"{package} is already installed.")
+            return packages_to_install
+        except Exception as error:
+            self.log.exception(f"Error checking packages: {error}")
+            raise IOError(f"Error checking packages: {error}")
+
+
+    async def install_to_composer_environment(
+        self, local_kernel, composer_environment_name, packages_to_install
+    ):
+        try:
+            installing_packages = "false"
+            if local_kernel:
+                for package in packages_to_install:
+                    self.log.info(f"{package} is not installed. Installing...")
+                    installing_packages = "true"
+                    install_cmd = f"gcloud composer environments update {composer_environment_name} --location {self.region_id} --update-pypi-package {package}"
+                    install_process = subprocess.Popen(
+                        install_cmd,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        shell=True,
+                    )
+                    install_stdout, install_stderr = (
+                        install_process.communicate()
+                    )
+                    if install_process.returncode == 0:
+                        self.log.info(f"{package} installed successfully.")
+                    else:
+                        # decoding bytes class to string and taking out the error part
+                        decoded_message = install_stderr.decode("utf-8")
+                        start_index = decoded_message.find("ERROR")
+                        error = decoded_message[start_index:]
+                        raise Exception(
+                            f"can not create schedule, error in installing the packages, error: {error}"
+                        )
+            return {"installing_packages": str(installing_packages)}
+        except Exception as e:
+            self.log.exception(f"error installing {package}: {install_stderr}")
+            return {"error": str(e)}
+
     async def execute(self, input_data, project_id=None, region_id=None):
         try:
             job = DescribeJob(**input_data)
@@ -260,6 +350,14 @@ class Client:
                 job.composer_environment_name, project_id, region_id
             )
             wrapper_pappermill_file_path = WRAPPER_PAPPERMILL_FILE
+            install_packages = {}
+
+            if job.packages_to_install != None:
+                install_packages = await self.install_to_composer_environment(
+                    job.local_kernel, job.composer_environment_name, job.packages_to_install
+                )
+            if install_packages and install_packages.get("error"):
+                raise Exception(install_packages)
 
             if await self.check_file_exists(
                 gcs_dag_bucket, wrapper_pappermill_file_path
@@ -286,7 +384,10 @@ class Client:
             await self.upload_to_gcs(
                 gcs_dag_bucket, file_path=file_path, destination_dir="dags"
             )
-            return {"status": 0}
+            if install_packages.get("installing_packages") == "true":
+                return {"status": 0, "response": "installed python packages"}
+            else:
+                return {"status": 0}
         except Exception as e:
             return {"error": str(e)}
 
@@ -320,3 +421,10 @@ class Client:
         except Exception as error:
             self.log.exception(f"Error downloading output notebook file: {str(error)}")
             return {"error": str(error)}
+
+    async def check_required_packages(self, composer_environment_name):
+        try:
+            res = await self.check_package_in_env(composer_environment_name)
+            return res
+        except Exception as e:
+            return {"error": str(e)}

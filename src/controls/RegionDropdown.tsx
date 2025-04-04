@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2023 Google LLC
+ * Copyright 2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,15 @@ type Props = {
   region: string;
   /** Callback function for when the project ID is changed by the dropdown */
   onRegionChange: (projectId: string) => void;
+  /** Edit page */
+  editMode?: boolean;
 };
 
 /**
  * Component to render a region selector dropdown.
  */
 export function RegionDropdown(props: Props) {
-  const { projectId, region, onRegionChange } = props;
+  const { projectId, region, onRegionChange, editMode } = props;
   const regions = useRegion(projectId);
 
   const regionStrList = useMemo(
@@ -49,6 +51,7 @@ export function RegionDropdown(props: Props) {
       onChange={(_, value) => onRegionChange(value ?? '')}
       PaperComponent={(props: PaperProps) => <Paper elevation={8} {...props} />}
       renderInput={params => <TextField {...params} label={'Region*'} />}
+      disabled={editMode}
     />
   );
 }

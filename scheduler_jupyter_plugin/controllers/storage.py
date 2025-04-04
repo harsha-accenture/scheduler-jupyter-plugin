@@ -29,10 +29,12 @@ class DownloadOutputController(APIHandler):
             job_run_id = self.get_argument("job_run_id")
             file_name = self.get_argument("file_name")
             client = storage.Client(await credentials.get_cached(), self.log)
-            download_status = await client.download_output(
+            download_result = await client.download_output(
                 bucket_name, file_name, job_run_id
             )
-            self.finish(json.dumps({"status": download_status}))
+            self.finish(json.dumps({"status": download_result["status"],
+                                    "downloaded_filename": download_result["downloaded_filename"]
+                                    }))
         except Exception as e:
             self.log.exception({"Error in downloading output file": str(e)})
             self.finish({"Error in downloading output file": str(e)})

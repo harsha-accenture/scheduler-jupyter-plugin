@@ -168,6 +168,7 @@ def setup_handlers(web_app):
         "downloadOutput": executor.DownloadOutputController,
         "clusterList": dataproc.ClusterListController,
         "runtimeList": dataproc.RuntimeController,
+        "checkRequiredPackages": executor.CheckRequiredPackagesController,
         "api/vertex/uiConfig": vertex.UIConfigController,
         "api/compute/region": compute.RegionController,
         "api/compute/network": compute.NetworkController,

@@ -209,7 +209,17 @@ export interface IVertexCellProps {
       lastScheduledRunResponse: {
         runResponse: string;
       };
+      jobState: string[];
+      name: string;
+      createTime: string;
+      nextRunTime: string;
     };
   };
   render: (value: string) => React.ReactNode;
 }
+
+export const showToast = (message: string, id?: string) => {
+  if (!id || !toast.isActive(id)) {
+    toast.error(message, { toastId: id, ...toastifyCustomStyle });
+  }
+};

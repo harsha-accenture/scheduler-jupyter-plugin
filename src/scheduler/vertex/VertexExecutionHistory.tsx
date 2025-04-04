@@ -21,11 +21,12 @@ import { PickersDayProps, PickersDay } from '@mui/x-date-pickers/PickersDay';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { Box, LinearProgress } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
-import { authApi, handleDebounce } from '../../utils/Config';
+import { authApi } from '../../utils/Config';
 import VertexJobRuns from './VertexJobRuns';
-import VertexJobTaskLogs from './VertexJobTaskLogs';
-import { iconLeftArrow } from '../../utils/Icons';
-import { IDagRunList, ISchedulerData } from './VertexInterfaces';
+import { iconLeftArrow, iconCreateCluster } from '../../utils/Icons';
+import { ISchedulerData, IVertexScheduleRunList } from './VertexInterfaces';
+import { LOG_EXPLORER_BASE_URL } from '../../utils/Const';
+import { toast } from 'react-toastify';
 
 const VertexExecutionHistory = ({
   region,
@@ -45,8 +46,12 @@ const VertexExecutionHistory = ({
   const today = dayjs();
 
   const [jobRunId, setJobRunId] = useState<string>('');
-  const [dagRunsList, setDagRunsList] = useState<IDagRunList[]>([]);
-  const [jobRunsData, setJobRunsData] = useState<IDagRunList | undefined>();
+  const [vertexScheduleRunsList, setVertexScheduleRunsList] = useState<
+    IVertexScheduleRunList[]
+  >([]);
+  const [jobRunsData, setJobRunsData] = useState<
+    IVertexScheduleRunList | undefined
+  >();
   const currentDate = new Date().toLocaleDateString();
   const [selectedMonth, setSelectedMonth] = useState<Dayjs | null>(null);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
@@ -57,26 +62,7 @@ const VertexExecutionHistory = ({
   const [redListDates, setRedListDates] = useState<string[]>([]);
   const [greenListDates, setGreenListDates] = useState<string[]>([]);
   const [darkGreenListDates, setDarkGreenListDates] = useState<string[]>([]);
-
-  const [height, setHeight] = useState(window.innerHeight - 145);
-
-  function handleUpdateHeight() {
-    const updateHeight = window.innerHeight - 145;
-    setHeight(updateHeight);
-  }
-
-  // Debounce the handleUpdateHeight function
-  const debouncedHandleUpdateHeight = handleDebounce(handleUpdateHeight, 500);
-
-  // Add event listener for window resize using useEffect
-  useEffect(() => {
-    window.addEventListener('resize', debouncedHandleUpdateHeight);
-
-    // Cleanup function to remove event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', debouncedHandleUpdateHeight);
-    };
-  }, []);
+  const [projectId, setProjectId] = useState<string>('');
 
   useEffect(() => {
     authApi()
@@ -126,7 +112,7 @@ const VertexExecutionHistory = ({
       setSelectedDate(today);
     }
     setJobRunId('');
-    setDagRunsList([]);
+    setVertexScheduleRunsList([]);
     setSelectedMonth(resolvedMonth);
   };
 
@@ -246,6 +232,35 @@ const VertexExecutionHistory = ({
     );
   };
 
+  /**
+   *  Redirect to pantheon cloud logs
+   */
+  const handleLogs = async () => {
+    const logExplorerUrl = new URL(LOG_EXPLORER_BASE_URL);
+    logExplorerUrl.searchParams.set('query', jobRunId);
+    if (jobRunsData?.startDate) {
+      logExplorerUrl.searchParams.set('cursorTimestamp', jobRunsData.startDate);
+    }
+    logExplorerUrl.searchParams.set('project', projectId);
+    try {
+      window.open(logExplorerUrl.toString());
+    } catch (error) {
+      console.error('Failed to open Log Explorer window:', error);
+    }
+  };
+
+  useEffect(() => {
+    authApi()
+      .then(credentials => {
+        if (credentials && credentials?.region_id && credentials.project_id) {
+          setProjectId(credentials.project_id);
+        }
+      })
+      .catch(error => {
+        toast.error(error);
+      });
+  }, [projectId]);
+
   return (
     <>
       <>
@@ -264,63 +279,73 @@ const VertexExecutionHistory = ({
             Execution History: {scheduleName}
           </div>
         </div>
-        <div
-          className="execution-history-main-wrapper"
-          style={{ height: height }}
-        >
-          <div className="execution-history-left-wrapper">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              {isLoading ? (
-                <div className="spin-loader-main-calender">
-                  <Box sx={{ width: '100%' }}>
-                    <LinearProgress />
-                  </Box>
-                </div>
-              ) : (
-                <div
-                  className="spin-loader-main-calender"
-                  style={{ height: '4px' }}
-                ></div>
-              )}
-              <DateCalendar
-                minDate={dayjs(schedulerData?.createTime)}
-                maxDate={dayjs(currentDate)}
-                defaultValue={today}
-                onChange={newValue => handleDateSelection(newValue)}
-                onMonthChange={handleMonthChange}
-                slots={{
-                  day: CustomDay
-                }}
-              />
-            </LocalizationProvider>
-            <VertexJobRuns
-              region={region}
-              schedulerData={schedulerData}
-              scheduleName={scheduleName}
-              dagId={scheduleName}
-              setJobRunsData={setJobRunsData}
-              setJobRunId={setJobRunId}
-              selectedMonth={selectedMonth}
-              selectedDate={selectedDate}
-              setBlueListDates={setBlueListDates}
-              setGreyListDates={setGreyListDates}
-              setOrangeListDates={setOrangeListDates}
-              setRedListDates={setRedListDates}
-              setGreenListDates={setGreenListDates}
-              setDarkGreenListDates={setDarkGreenListDates}
-              setIsLoading={setIsLoading}
-              isLoading={isLoading}
-              dagRunsList={dagRunsList}
-              setDagRunsList={setDagRunsList}
-            />
-          </div>
-          <div className="execution-history-right-wrapper">
-            {jobRunId !== '' && (
-              <VertexJobTaskLogs
-                jobRunId={jobRunId}
-                jobRunsData={jobRunsData}
-              />
+        <div className="execution-history-main-full-wrapper execution-top-border">
+          <div className="execution-history-full-wrapper execution-wrapper-border-none">
+            {isLoading ? (
+              <div className="spin-loader-main-execution-history">
+                <Box sx={{ width: '100%', height: '1px' }}>
+                  <LinearProgress />
+                </Box>
+              </div>
+            ) : (
+              <div
+                className="spin-loader-main-execution-history"
+                style={{ height: '4px' }}
+              ></div>
             )}
+          </div>
+          <div className="execution-history-main-wrapper">
+            <div
+              className={
+                isLoading
+                  ? 'execution-history-left-wrapper execution-wrapper-border-none'
+                  : 'execution-history-left-wrapper text-enable-warning execution-wrapper-border-none'
+              }
+            >
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateCalendar
+                  minDate={dayjs(schedulerData?.createTime)}
+                  maxDate={dayjs(currentDate)}
+                  defaultValue={today}
+                  onChange={newValue => handleDateSelection(newValue)}
+                  onMonthChange={handleMonthChange}
+                  slots={{
+                    day: CustomDay
+                  }}
+                  className="date-box-shadow"
+                />
+              </LocalizationProvider>
+            </div>
+            <div className="execution-history-right-wrapper execution-wrapper-border-none">
+              <div role="button" className="log-btn" onClick={handleLogs}>
+                <div className="create-icon log-icon cursor-icon">
+                  <iconCreateCluster.react
+                    tag="div"
+                    className="logo-alignment-style"
+                  />
+                </div>
+                <div className="create-text cursor-icon">VIEW CLOUD LOGS</div>
+              </div>
+              <VertexJobRuns
+                region={region}
+                schedulerData={schedulerData}
+                scheduleName={scheduleName}
+                setJobRunsData={setJobRunsData}
+                setJobRunId={setJobRunId}
+                selectedMonth={selectedMonth}
+                selectedDate={selectedDate}
+                setBlueListDates={setBlueListDates}
+                setGreyListDates={setGreyListDates}
+                setOrangeListDates={setOrangeListDates}
+                setRedListDates={setRedListDates}
+                setGreenListDates={setGreenListDates}
+                setDarkGreenListDates={setDarkGreenListDates}
+                setIsLoading={setIsLoading}
+                isLoading={isLoading}
+                vertexScheduleRunsList={vertexScheduleRunsList}
+                setVertexScheduleRunsList={setVertexScheduleRunsList}
+              />
+            </div>
           </div>
         </div>
       </>

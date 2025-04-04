@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 import { requestAPI } from '../handler/Handler';
-import { IDagRunList } from '../scheduler/vertex/VertexInterfaces';
+import { IVertexScheduleRunList } from '../scheduler/vertex/VertexInterfaces';
 
 export class LogEntriesServices {
   static vertexJobTaskLogsListService = async (
     dagRunId: string | undefined,
-    jobRunsData: IDagRunList | undefined,
+    jobRunsData: IVertexScheduleRunList | undefined,
     setDagTaskInstancesList: (value: any) => void,
     setIsLoading: (value: boolean) => void
   ) => {
@@ -31,17 +31,14 @@ export class LogEntriesServices {
     try {
       /* eslint-disable */
       const data: any = await requestAPI(
-        `api/logEntries/listEntries?filter_query=timestamp >= \"${start_date}" AND timestamp <= \"${end_date}" AND SEARCH(\"${dagRunId}\")`
+        `api/logEntries/listEntries?filter_query=timestamp >= \"${start_date}" AND timestamp <= \"${end_date}" AND SEARCH(\"${dagRunId}\") AND severity >= WARNING`
       );
       if (data.length > 0) {
         let transformDagRunTaskInstanceListData = [];
         transformDagRunTaskInstanceListData = data.map((dagRunTask: any) => {
           return {
             severity: dagRunTask.severity,
-            textPayload:
-              dagRunTask.textPayload && dagRunTask.textPayload
-                ? dagRunTask.textPayload
-                : '',
+            textPayload: dagRunTask.summary,
             date: new Date(dagRunTask.timestamp).toDateString(),
             time: new Date(dagRunTask.timestamp).toTimeString().split(' ')[0],
             fullData: dagRunTask

@@ -81,6 +81,9 @@ class Client:
                                 )
                             )
                         return environments
+                elif response.status == 403:
+                    resp = await response.json()
+                    return resp
                 else:
                     self.log.exception("Error listing environments")
                     raise Exception(

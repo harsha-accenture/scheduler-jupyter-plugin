@@ -8,7 +8,7 @@
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing,
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -18,19 +18,18 @@ import React, { useEffect, useState } from 'react';
 import { useTable, useGlobalFilter } from 'react-table';
 import { CircularProgress } from '@mui/material';
 import { Dayjs } from 'dayjs';
-
 import TableData from '../../utils/TableData';
-import { ICellProps, handleDebounce } from '../../utils/Config';
+import { ICellProps } from '../../utils/Config';
 import { iconDownload } from '../../utils/Icons';
-import { IDagRunList, ISchedulerData } from './VertexInterfaces';
+import { IVertexScheduleRunList, ISchedulerData } from './VertexInterfaces';
 import { VertexServices } from '../../services/Vertex';
 import { StorageServices } from '../../services/Storage';
+import { iconDash } from '../../utils/Icons';
 
 const VertexJobRuns = ({
   region,
   schedulerData,
   scheduleName,
-  dagId,
   setJobRunsData,
   setJobRunId,
   selectedMonth,
@@ -43,14 +42,15 @@ const VertexJobRuns = ({
   setDarkGreenListDates,
   setIsLoading,
   isLoading,
-  dagRunsList,
-  setDagRunsList
+  vertexScheduleRunsList,
+  setVertexScheduleRunsList
 }: {
   region: string;
   schedulerData: ISchedulerData | undefined;
   scheduleName: string;
-  dagId: string;
-  setJobRunsData: React.Dispatch<React.SetStateAction<IDagRunList | undefined>>;
+  setJobRunsData: React.Dispatch<
+    React.SetStateAction<IVertexScheduleRunList | undefined>
+  >;
   setJobRunId: (value: string) => void;
   selectedMonth: Dayjs | null;
   selectedDate: Dayjs | null;
@@ -62,47 +62,27 @@ const VertexJobRuns = ({
   setDarkGreenListDates: (value: string[]) => void;
   setIsLoading: (value: boolean) => void;
   isLoading: boolean;
-  dagRunsList: IDagRunList[];
-  setDagRunsList: (value: IDagRunList[]) => void;
+  vertexScheduleRunsList: IVertexScheduleRunList[];
+  setVertexScheduleRunsList: (value: IVertexScheduleRunList[]) => void;
 }): JSX.Element => {
   const [jobDownloadLoading, setJobDownloadLoading] = useState(false);
-  const [downloadOutputDagRunId, setDownloadOutputDagRunId] = useState<
-    string | undefined
-  >('');
-  const [listDagRunHeight, setListDagRunHeight] = useState(
-    window.innerHeight - 485
-  );
-
-  function handleUpdateHeight() {
-    const updateHeight = window.innerHeight - 485;
-    setListDagRunHeight(updateHeight);
-  }
-
-  // Debounce the handleUpdateHeight function
-  const debouncedHandleUpdateHeight = handleDebounce(handleUpdateHeight, 500);
-
-  // Add event listener for window resize using useEffect
-  useEffect(() => {
-    window.addEventListener('resize', debouncedHandleUpdateHeight);
-
-    // Cleanup function to remove event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', debouncedHandleUpdateHeight);
-    };
-  }, []);
+  const [
+    downloadOutputVertexScheduleRunId,
+    setDownloadOutputVertexScheduleRunId
+  ] = useState<string | undefined>('');
 
   /**
-   * Filters dagRunsList based on the selected date.
+   * Filters vertex schedule runs list based on the selected date.
    */
   const filteredData = React.useMemo(() => {
     if (selectedDate) {
       const selectedDateString = selectedDate.toDate().toDateString(); // Only date, ignoring time
-      return dagRunsList.filter(dagRun => {
-        return new Date(dagRun.date).toDateString() === selectedDateString;
+      return vertexScheduleRunsList.filter(scheduleRun => {
+        return new Date(scheduleRun.date).toDateString() === selectedDateString;
       });
     }
     return [];
-  }, [dagRunsList, selectedDate]);
+  }, [vertexScheduleRunsList, selectedDate]);
 
   // Sync filtered data with the parent component's state
   useEffect(() => {
@@ -127,6 +107,14 @@ const VertexJobRuns = ({
         accessor: 'time'
       },
       {
+        Header: 'Code',
+        accessor: 'code'
+      },
+      {
+        Header: 'Status Message',
+        accessor: 'statusMessage'
+      },
+      {
         Header: 'Actions',
         accessor: 'actions'
       }
@@ -143,7 +131,7 @@ const VertexJobRuns = ({
     page
   } = useTable(
     {
-      //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagRunList>'
+      //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IVertexScheduleRunList>'
       columns,
       data: filteredData,
       autoResetPage: false,
@@ -155,42 +143,43 @@ const VertexJobRuns = ({
   const tableDataCondition = (cell: ICellProps) => {
     if (cell.column.Header === 'Actions') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data sub-title-heading"
+        >
           {renderActions(cell.row.original)}
         </td>
       );
     } else if (cell.column.Header === 'State') {
       if (cell.value === 'succeeded') {
         return (
-          <div className="dag-run-state-parent">
-            <td
-              {...cell.getCellProps()}
-              className="dag-runs-table-data-state-success"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
-            >
-              {cell.render('Cell')}
-            </td>
-          </div>
+          <td
+            {...cell.getCellProps()}
+            className="dag-runs-table-data-state-success"
+            onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
+          >
+            {cell.render('Cell')}
+          </td>
         );
       } else if (cell.value === 'failed') {
         return (
-          <div className="dag-run-state-parent">
-            <td
-              {...cell.getCellProps()}
-              className="dag-runs-table-data-state-failure"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
-            >
-              {cell.render('Cell')}
-            </td>
-          </div>
+          <td
+            {...cell.getCellProps()}
+            className="dag-runs-table-data-state-failure"
+            onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
+          >
+            {cell.render('Cell')}
+          </td>
         );
       } else if (cell.value === 'running') {
         return (
-          <div className="dag-run-state-parent">
+          <div>
             <td
               {...cell.getCellProps()}
               className="dag-runs-table-data-state-running"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
+              onClick={() =>
+                handleVertexScheduleRunStateClick(cell.row.original)
+              }
             >
               {cell.render('Cell')}
             </td>
@@ -198,16 +187,33 @@ const VertexJobRuns = ({
         );
       } else if (cell.value === 'queued') {
         return (
-          <div className="dag-run-state-parent">
+          <div>
             <td
               {...cell.getCellProps()}
               className="dag-runs-table-data-state-queued"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
+              onClick={() =>
+                handleVertexScheduleRunStateClick(cell.row.original)
+              }
             >
               {cell.render('Cell')}
             </td>
           </div>
         );
+      }
+    } else if (
+      cell.column.Header === 'Code' ||
+      cell.column.Header === 'Status Message'
+    ) {
+      if (cell.value === '-') {
+        return (
+          <td {...cell.getCellProps()} className="notebook-template-table-data">
+            <iconDash.react tag="div" />
+          </td>
+        );
+      } else {
+        <td {...cell.getCellProps()} className="notebook-template-table-data">
+          {cell.render('Cell')}
+        </td>;
       }
     }
     return (
@@ -218,15 +224,15 @@ const VertexJobRuns = ({
   };
 
   /**
-   * @param {Object} data - The data object containing information about the DAG run.
-   * @param {string} data.id - The optional ID of the DAG run.
-   * @param {string} data.status - The optional status of the DAG run.
-   * @param {string} data.jobRunId - The optional jobRunId of the DAG run.
+   * @param {Object} data - The data object containing information about the Vertex Schedule run.
+   * @param {string} data.id - The optional ID of the Vertex Schedule run.
+   * @param {string} data.status - The optional status of the Vertex Schedule run.
+   * @param {string} data.jobRunId - The optional jobRunId of the Vertex Schedule run.
    *
    * @description Updates the jobRunId state if a jobRunId is provided in the data object.
-   * Triggered when a DAG run state is clicked.
+   * Triggered when a Vertex Schedule run state is clicked.
    */
-  const handleDagRunStateClick = (data: {
+  const handleVertexScheduleRunStateClick = (data: {
     id?: string;
     status?: string;
     jobRunId?: string;
@@ -253,7 +259,7 @@ const VertexJobRuns = ({
     gcsUrl?: string;
     fileName?: string;
   }) => {
-    setDownloadOutputDagRunId(data.jobRunId);
+    setDownloadOutputVertexScheduleRunId(data.jobRunId);
     await StorageServices.downloadJobAPIService(
       data.gcsUrl,
       data.fileName,
@@ -270,8 +276,9 @@ const VertexJobRuns = ({
     state?: string;
   }) => {
     return (
-      <div className="actions-icon">
-        {jobDownloadLoading && data.jobRunId === downloadOutputDagRunId ? (
+      <div className="action-btn-execution">
+        {jobDownloadLoading &&
+        data.jobRunId === downloadOutputVertexScheduleRunId ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -284,8 +291,8 @@ const VertexJobRuns = ({
             role="button"
             className={
               data.state === 'succeeded'
-                ? 'icon-buttons-style'
-                : 'icon-buttons-style-disable'
+                ? 'icon-buttons-style sub-title-heading'
+                : 'icon-buttons-style-disable sub-title-heading'
             }
             title="Download Output"
             data-dag-run-id={data}
@@ -295,10 +302,7 @@ const VertexJobRuns = ({
                 : undefined
             }
           >
-            <iconDownload.react
-              tag="div"
-              className="icon-white logo-alignment-style"
-            />
+            <iconDownload.react tag="div" />
           </div>
         )}
       </div>
@@ -311,7 +315,7 @@ const VertexJobRuns = ({
       schedulerData,
       selectedMonth,
       setIsLoading,
-      setDagRunsList,
+      setVertexScheduleRunsList,
       setBlueListDates,
       setGreyListDates,
       setOrangeListDates,
@@ -332,10 +336,7 @@ const VertexJobRuns = ({
       <>
         {!isLoading && filteredData && filteredData.length > 0 ? (
           <div>
-            <div
-              className="dag-runs-list-table-parent"
-              style={{ maxHeight: listDagRunHeight }}
-            >
+            <div className="dag-runs-list-table-parent">
               <TableData
                 getTableProps={getTableProps}
                 headerGroups={headerGroups}
@@ -344,7 +345,7 @@ const VertexJobRuns = ({
                 page={page}
                 prepareRow={prepareRow}
                 tableDataCondition={tableDataCondition}
-                fromPage="Dag Runs"
+                fromPage="vertexTaskLog"
               />
             </div>
           </div>

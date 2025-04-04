@@ -80,7 +80,7 @@ class Client:
                     return resp, bucket
                 else:
                     raise Exception(
-                        f"Error lsiting scheduled jobs: {response.reason} {await response.text()}"
+                        f"Error listing scheduled jobs: {response.reason} {await response.text()}"
                     )
         except Exception as e:
             self.log.exception(f"Error getting dag list: {str(e)}")
@@ -264,6 +264,8 @@ class Client:
                         )  # Extract project_id from the line
                     elif "submit_pyspark_job" in line:
                         mode_selected = "cluster"
+                    elif "execute_notebook_task" in line:
+                        mode_selected = "local"
                     elif "'retries'" in line:
                         retries = line.split(":")[-1].strip().strip("'\"},")
                         retry_count = int(
@@ -274,22 +276,17 @@ class Client:
                             line.split("int('")[1].split("')")[0]
                         )  # Extract retry_delay from the line
                     elif "email_on_failure" in line:
-                        second_part = line.split(":")[1].strip()
-                        email_on_failure = second_part.split("'")[
-                            1
-                        ]  # Extract email_failure from the line
+                        email_on_failure = line.split(":")[1].strip().replace(",", "")
                     elif "email_on_retry" in line:
-                        second_part = line.split(":")[1].strip()
-                        email_on_retry = second_part.split("'")[1]
+                        email_on_retry = line.split(":")[1].strip().replace(",", "")
                     elif "email_on_success" in line:
-                        second_part = line.split(":")[1].strip()
-                        email_on_success = second_part.split("'")[1]
+                        email_on_success = line.split(":")[1].strip()
                     elif "schedule_interval" in line:
                         schedule_interval = (
                             line.split("=")[-1]
                             .strip()
                             .strip("'\"")
-                            .split(",")[0]
+                            .rsplit(",", 1)[0]
                             .rstrip("'\"")
                         )  # Extract schedule_interval from the line
                     elif "stop_cluster_check" in line:

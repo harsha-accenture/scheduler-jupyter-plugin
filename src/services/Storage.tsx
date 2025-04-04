@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import { requestAPI } from '../handler/Handler';
 import { SchedulerLoggingService, LOG_LEVEL } from './LoggingService';
 import { toastifyCustomStyle } from '../utils/Config';
+import path from 'path';
 
 export class StorageServices {
   static cloudStorageAPIService = async (
@@ -60,9 +61,17 @@ export class StorageServices {
           method: 'POST'
         }
       );
-      setBucketError(formattedResponse.error);
+      if (formattedResponse === null) {
+        toast.success('Bucket created successfully', toastifyCustomStyle);
+        setBucketError('');
+      } else if (formattedResponse?.error) {
+        let errorMessage = '400: Bucket not created.';
+        if (formattedResponse.error.includes('false')) {
+          errorMessage = `${errorMessage} ${formattedResponse.error.split('false:')[1]}`;
+        }
+        setBucketError(errorMessage);
+      }
       setIsCreatingNewBucket(false);
-      toast.success('Bucket created successfully', toastifyCustomStyle);
     } catch (error) {
       setIsCreatingNewBucket(false);
       SchedulerLoggingService.log(
@@ -89,8 +98,11 @@ export class StorageServices {
         }
       );
       if (formattedResponse.status === 0) {
+        const base_filename = path.basename(
+          formattedResponse.downloaded_filename
+        );
         toast.success(
-          `${scheduleName} job history downloaded successfully`,
+          `${base_filename} has been successfully downloaded from the ${scheduleName} job history`,
           toastifyCustomStyle
         );
       } else {

@@ -42,7 +42,25 @@ class Client:
             )
             for item in log_entries:
                 log_dict = item.to_api_repr()
-                logs.append(log_dict)
+                formatted_res = {
+                    "timestamp": log_dict.get("timestamp"),
+                    "severity": log_dict.get("severity"),
+                    "summary": "",
+                }
+                # extracting error message
+                if log_dict.get("textPayload"):
+                    formatted_res["summary"] = log_dict["textPayload"]
+                if log_dict.get("jsonPayload"):
+                    formatted_res["summary"] = (
+                        f"{formatted_res['summary']} {log_dict['jsonPayload']['message']}"
+                    )
+                if log_dict.get("protoPayload"):
+                    formatted_res["summary"] = log_dict["protoPayload"]["status"][
+                        "message"
+                    ]
+                if log_dict.get("httpRequest"):
+                    formatted_res["summary"] = log_dict["httpRequest"]["statusMessage"]
+                logs.append(formatted_res)
             return logs
 
         except Exception as e:

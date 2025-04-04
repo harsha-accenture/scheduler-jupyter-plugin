@@ -79,7 +79,6 @@ function listNotebookScheduler({
   setComposerSelected,
   setScheduleMode,
   setScheduleValue,
-
   setInputFileSelected,
   setParameterDetail,
   setParameterDetailUpdated,
@@ -101,7 +100,13 @@ function listNotebookScheduler({
   setEditMode,
   bucketName,
   setBucketName,
-  setIsLoadingKernelDetail
+  setIsLoadingKernelDetail,
+  setIsApiError,
+  setApiError,
+  setIsLocalKernel,
+  setPackageEditFlag,
+  setSchedulerBtnDisable,
+  composerSelected
 }: {
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
@@ -135,10 +140,18 @@ function listNotebookScheduler({
   setIsLoadingKernelDetail?: (value: boolean) => void;
   bucketName: string;
   setBucketName: (value: string) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
+  setIsLocalKernel: (value: boolean) => void;
+  setPackageEditFlag: (value: boolean) => void;
+  setSchedulerBtnDisable: (value: boolean) => void;
+  composerSelected?: string;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [composerList, setComposerList] = useState<string[]>([]);
-  const [composerSelectedList, setComposerSelectedList] = useState('');
+  const [composerSelectedList, setComposerSelectedList] = useState(
+    composerSelected ? composerSelected : ''
+  );
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const backselectedEnvironment = backButtonComposerName;
@@ -246,12 +259,13 @@ function listNotebookScheduler({
         jobid,
         composerSelectedList,
         setEditDagLoading,
+        setIsLocalKernel,
+        setPackageEditFlag,
         setCreateCompleted,
         setJobNameSelected,
         setComposerSelected,
         setScheduleMode,
         setScheduleValue,
-
         setInputFileSelected,
         setParameterDetail,
         setParameterDetailUpdated,
@@ -310,6 +324,8 @@ function listNotebookScheduler({
       setComposerList,
       projectId,
       region,
+      setIsApiError,
+      setApiError,
       setIsLoading
     );
   };
@@ -359,7 +375,7 @@ function listNotebookScheduler({
   const renderActions = (data: any) => {
     const is_status_paused = data.status === 'Paused';
     return (
-      <div className="actions-icon">
+      <div className="actions-icon-btn">
         <div
           role="button"
           className="icon-buttons-style"
@@ -518,10 +534,16 @@ function listNotebookScheduler({
       await listComposersAPI();
     };
     loadComposerListAndSelectFirst();
+
+    setSchedulerBtnDisable(false);
   }, []);
 
   useEffect(() => {
-    if (composerList.length > 0 && backselectedEnvironment === '') {
+    if (
+      composerList.length > 0 &&
+      backselectedEnvironment === '' &&
+      composerSelected === ''
+    ) {
       setComposerSelectedList(composerList[0]);
     }
     if (composerList.length > 0 && backselectedEnvironment !== '') {
@@ -593,6 +615,7 @@ function listNotebookScheduler({
           </div>
         )}
       </div>
+
       {dagList.length > 0 ? (
         <div className="notebook-templates-list-table-parent">
           <TableData

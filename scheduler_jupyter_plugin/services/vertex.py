@@ -110,21 +110,24 @@ class Client:
             disk_type = job.disk_type.split(" ", 1)[0]
 
             # getting list of strings from UI, the api accepts dictionary, so converting it
-            labels = {
+            parameters = {
                 param.split(":")[0]: param.split(":")[1] for param in job.parameters
             }
 
-            api_endpoint = f"https://{self.region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{self.region_id}/schedules"
+            api_endpoint = f"https://{job.region}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{job.region}/schedules"
             headers = self.create_headers()
             payload = {
                 "displayName": job.display_name,
                 "cron": cron,
                 "maxConcurrentRunCount": "1",
                 "createNotebookExecutionJobRequest": {
-                    "parent": f"projects/{self.project_id}/locations/{self.region_id}",
+                    "parent": f"projects/{self.project_id}/locations/{job.region}",
                     "notebookExecutionJob": {
                         "displayName": job.display_name,
-                        "labels": labels,
+                        "parameters": parameters,
+                        "labels": {
+                            "aiplatform.googleapis.com/colab_enterprise_entry_service": "workbench",
+                        },
                         "customEnvironmentSpec": {
                             "machineSpec": {
                                 "machineType": machine_type,
@@ -145,6 +148,7 @@ class Client:
                         "gcsOutputUri": job.cloud_storage_bucket,
                         "serviceAccount": job.service_account,
                         "kernelName": job.kernel_name,
+                        "workbenchRuntime": {},
                     },
                 },
             }
@@ -195,7 +199,6 @@ class Client:
         except Exception as e:
             return {"error": str(e)}
 
-          
     async def list_uiconfig(self, region_id):
         try:
             uiconfig = []
@@ -210,22 +213,31 @@ class Client:
                     if not resp:
                         return uiconfig
                     else:
-                        for machineconfig in resp.get("notebookRuntimeConfig").get(
-                            "machineConfigs"
+                        if (
+                            "notebookRuntimeConfig" in resp
+                            and "machineConfigs" in resp["notebookRuntimeConfig"]
                         ):
-                            ramBytes_in_gb = round(
-                                int(machineconfig.get("ramBytes")) / 1000000000, 2
-                            )
-                            formatted_config = {
-                                "machineType": f"{machineconfig.get('machineType')} ({machineconfig.get('cpuCount')} CPUs, {ramBytes_in_gb} GB RAM)",
-                                "acceleratorConfigs": machineconfig.get(
-                                    "acceleratorConfigs"
-                                ),
-                            }
-                            uiconfig.append(formatted_config)
+                            for machineconfig in resp["notebookRuntimeConfig"][
+                                "machineConfigs"
+                            ]:
+                                ramBytes_in_gb = round(
+                                    int(machineconfig.get("ramBytes")) / 1000000000, 2
+                                )
+                                formatted_config = {
+                                    "machineType": f"{machineconfig.get('machineType')} ({machineconfig.get('cpuCount')} CPUs, {ramBytes_in_gb} GB RAM)",
+                                    "acceleratorConfigs": machineconfig.get(
+                                        "acceleratorConfigs"
+                                    ),
+                                }
+                                uiconfig.append(formatted_config)
                         return uiconfig
+                elif response.status == 403:
+                    resp = await response.json()
+                    return resp
                 else:
-                    self.log.exception("Error listing ui config")
+                    self.log.exception(
+                        f"Error getting vertex ui config: {response.reason} {await response.text()}"
+                    )
                     raise Exception(
                         f"Error getting vertex ui config: {response.reason} {await response.text()}"
                     )
@@ -269,6 +281,7 @@ class Client:
                                 "schedule": schedule_value,
                                 "status": schedule.get("state"),
                                 "createTime": schedule.get("createTime"),
+                                "nextRunTime": schedule.get("nextRunTime"),
                                 "gcsNotebookSourceUri": schedule.get(
                                     "createNotebookExecutionJobRequest"
                                 )
@@ -282,6 +295,9 @@ class Client:
                         resp["schedules"] = schedule_list
                         result.update(resp)
                         return result
+                elif response.status == 403:
+                    resp = await response.json()
+                    return resp
                 else:
                     self.log.exception(
                         f"Error listing schedules: {response.reason} {await response.text()}"
@@ -425,6 +441,10 @@ class Client:
                 "displayName": data.display_name,
                 "gcsNotebookSource": {"uri": data.gcs_notebook_source},
                 "customEnvironmentSpec": custom_environment_spec,
+                "labels": {
+                    "aiplatform.googleapis.com/colab_enterprise_entry_service": "workbench",
+                },
+                "workbenchRuntime": {},
             }
             schedule_value = (
                 "* * * * *" if data.schedule_value == "" else data.schedule_value
@@ -435,7 +455,7 @@ class Client:
                 else f"TZ={data.time_zone} {schedule_value}"
             )
             # getting list of strings from UI, the api accepts dictionary, so converting it
-            labels = {
+            parameters = {
                 param.split(":")[0]: param.split(":")[1] for param in data.parameters
             }
 
@@ -446,7 +466,7 @@ class Client:
             if data.cloud_storage_bucket:
                 notebook_execution_job["gcsOutputUri"] = data.cloud_storage_bucket
             if data.parameters:
-                notebook_execution_job["labels"] = labels
+                notebook_execution_job["parameters"] = parameters
             if data.machine_type:
                 custom_environment_spec["machineSpec"] = {
                     "machineType": data.machine_type.split(" ", 1)[0],
@@ -502,12 +522,17 @@ class Client:
                     )
         except Exception as e:
             self.log.exception(f"Error updating schedule: {str(e)}")
-            return {"Error updating schedule": str(e)}
-          
-    async def list_notebook_execution_jobs(self, region_id, schedule_id, start_date):
+            return {"error": str(e)}
+
+    async def list_notebook_execution_jobs(
+        self, region_id, schedule_id, order_by, page_size=None, start_date=None
+    ):
         try:
             execution_jobs = []
-            api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy=createTime desc"
+            if page_size:
+                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&pageSize={page_size}&orderBy={order_by}"
+            else:
+                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/notebookExecutionJobs?filter=schedule={schedule_id}&orderBy={order_by}"
 
             headers = self.create_headers()
             async with self.client_session.get(
@@ -523,9 +548,12 @@ class Client:
                             # getting only the jobs whose create time is equal to start date
                             # splitting it in order to get only the date part from the values which is in zulu format (2011-08-12T20:17:46.384Z)
                             if (
-                                start_date.rsplit("-", 1)[0]
+                                start_date
+                                and start_date.rsplit("-", 1)[0]
                                 == job.get("createTime").rsplit("-", 1)[0]
                             ):
+                                execution_jobs.append(job)
+                            else:
                                 execution_jobs.append(job)
                         return execution_jobs
                 else:

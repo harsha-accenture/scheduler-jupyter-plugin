@@ -34,6 +34,8 @@ import {
   Typography
 } from '@mui/material';
 import CreateVertexScheduler from './vertex/CreateVertexScheduler';
+import EnableNotifyMessage from './common/EnableNotifyMessage';
+import { iconError } from '../utils/Icons';
 
 const NotebookSchedulerComponent = ({
   themeManager,
@@ -58,10 +60,32 @@ const NotebookSchedulerComponent = ({
     context !== '' ? useState(false) : useState(true);
   const [notebookSelector, setNotebookSelector] = useState<string>('vertex');
   const [executionPageFlag, setExecutionPageFlag] = useState<boolean>(true);
+  const [isApiError, setIsApiError] = useState(false);
+  const [apiError, setApiError] = useState('');
+  const [isLocalKernel, setIsLocalKernel] = useState<boolean>(true);
+  const [schedulerBtnDisable, setSchedulerBtnDisable] =
+    useState<boolean>(false);
+  const [packageEditFlag, setPackageEditFlag] = useState<boolean>(false);
+
+  const formatTimestamp = (timestamp: number) => {
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}${month}${day}_${hours}${minutes}${seconds}`;
+  };
 
   useEffect(() => {
     if (context !== '') {
+      const currentTime = new Date().getTime();
+      const formattedCurrentTime = formatTimestamp(currentTime);
+      setJobNameSelected(`job_${formattedCurrentTime}`);
       setInputFileSelected(context.path);
+      getKernelDetails();
     }
   }, []);
 
@@ -84,14 +108,29 @@ const NotebookSchedulerComponent = ({
       app.shell.activeWidget?.close();
     } else {
       setCreateCompleted(true);
+      setPackageEditFlag(false);
     }
   };
 
   const handleSchedulerModeChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    setIsApiError(false);
     const newValue = (event.target as HTMLInputElement).value;
     setNotebookSelector(newValue);
+  };
+
+  const getKernelDetails = async () => {
+    //Check whether kernel Local or Remote
+    if (context?.sessionContext?.kernelDisplayName?.includes('(Remote)')) {
+      setIsLocalKernel(false);
+      setNotebookSelector('composer');
+      setSchedulerBtnDisable(true);
+    } else {
+      setIsLocalKernel(true);
+      setNotebookSelector('vertex');
+      setSchedulerBtnDisable(false);
+    }
   };
 
   return (
@@ -153,29 +192,48 @@ const NotebookSchedulerComponent = ({
         )
       )}
       {executionPageFlag && (
-        <div className="create-scheduler-form-element sub-para">
-          <FormControl>
-            <RadioGroup
-              className="schedule-radio-btn"
-              aria-labelledby="demo-controlled-radio-buttons-group"
-              name="controlled-radio-buttons-group"
-              value={notebookSelector}
-              onChange={handleSchedulerModeChange}
-            >
-              <FormControlLabel
-                value="vertex"
-                className="create-scheduler-label-style"
-                control={<Radio size="small" />}
-                label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
-              />
-              <FormControlLabel
-                value="composer"
-                className="create-scheduler-label-style"
-                control={<Radio size="small" />}
-                label={<Typography sx={{ fontSize: 13 }}>Composer</Typography>}
-              />
-            </RadioGroup>
-          </FormControl>
+        <div>
+          <div className="create-scheduler-form-element sub-para">
+            <FormControl>
+              <RadioGroup
+                className="schedule-radio-btn"
+                aria-labelledby="demo-controlled-radio-buttons-group"
+                name="controlled-radio-buttons-group"
+                value={notebookSelector}
+                onChange={handleSchedulerModeChange}
+              >
+                <FormControlLabel
+                  value="vertex"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  disabled={
+                    schedulerBtnDisable ||
+                    (editMode && notebookSelector === 'composer')
+                  }
+                  label={<Typography sx={{ fontSize: 13 }}>Vertex</Typography>}
+                />
+                <FormControlLabel
+                  value="composer"
+                  className="create-scheduler-label-style"
+                  control={<Radio size="small" />}
+                  disabled={editMode && notebookSelector === 'vertex'}
+                  label={
+                    <Typography sx={{ fontSize: 13 }}>Composer</Typography>
+                  }
+                />
+              </RadioGroup>
+            </FormControl>
+          </div>
+          <div>
+            {isApiError && (
+              <div className="error-key-parent enable-error-text-label">
+                <iconError.react tag="div" className="logo-alignment-style" />
+                <div className="error-key-missing">
+                  <EnableNotifyMessage message={apiError} />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -197,11 +255,20 @@ const NotebookSchedulerComponent = ({
           jobNameSpecialValidation={jobNameSpecialValidation}
           jobNameUniqueValidation={jobNameUniqueValidation}
           setJobNameUniqueValidation={setJobNameUniqueValidation}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
+          setExecutionPageFlag={setExecutionPageFlag}
+          isLocalKernel={isLocalKernel}
+          setIsLocalKernel={setIsLocalKernel}
+          packageEditFlag={packageEditFlag}
+          setPackageEditFlag={setPackageEditFlag}
+          setSchedulerBtnDisable={setSchedulerBtnDisable}
         />
       ) : (
         <CreateVertexScheduler
           themeManager={themeManager}
           app={app}
+          context={context}
           settingRegistry={settingRegistry}
           createCompleted={createCompleted}
           setCreateCompleted={setCreateCompleted}
@@ -212,6 +279,9 @@ const NotebookSchedulerComponent = ({
           editMode={editMode}
           setEditMode={setEditMode}
           setExecutionPageFlag={setExecutionPageFlag}
+          setIsApiError={setIsApiError}
+          setApiError={setApiError}
+          jobNameSpecialValidation={jobNameSpecialValidation}
         />
       )}
     </div>

@@ -17,7 +17,7 @@
 
 import { requestAPI } from '../handler/Handler';
 import { SchedulerLoggingService, LOG_LEVEL } from './LoggingService';
-import { toastifyCustomStyle } from '../utils/Config';
+import { showToast, toastifyCustomStyle } from '../utils/Config';
 import { JupyterLab } from '@jupyterlab/application';
 import { scheduleMode } from '../utils/Const';
 import {
@@ -45,8 +45,8 @@ export class SchedulerService {
 
       const formattedResponse: any = await requestAPI(serviceURL);
       let transformClusterListData = [];
-      if (formattedResponse && formattedResponse.clusters) {
-        transformClusterListData = formattedResponse.clusters.map(
+      if (formattedResponse?.clusters) {
+        transformClusterListData = formattedResponse?.clusters?.map(
           (data: IClusterAPIResponse) => {
             return {
               clusterName: data.clusterName
@@ -77,9 +77,9 @@ export class SchedulerService {
         setClusterList(keyLabelStructure);
         setIsLoadingKernelDetail(false);
       }
-      if (formattedResponse?.error?.code) {
+      if (formattedResponse?.error) {
         if (!toast.isActive('clusterError')) {
-          toast.error(formattedResponse?.error?.message, {
+          toast.error(formattedResponse?.error, {
             ...toastifyCustomStyle,
             toastId: 'clusterError'
           });
@@ -111,9 +111,13 @@ export class SchedulerService {
 
       const formattedResponse: any = await requestAPI(serviceURL);
       let transformSessionTemplateListData = [];
-      if (formattedResponse && formattedResponse.sessionTemplates) {
-        transformSessionTemplateListData =
-          formattedResponse.sessionTemplates.map((data: any) => {
+      if (
+        formattedResponse &&
+        Object.hasOwn(formattedResponse, 'sessionTemplates')
+      ) {
+        transformSessionTemplateListData = formattedResponse.sessionTemplates
+          .filter((item: any) => Object.hasOwn(item, 'jupyterSession'))
+          .map((data: any) => {
             return {
               serverlessName: data.jupyterSession.displayName,
               serverlessData: data
@@ -136,7 +140,6 @@ export class SchedulerService {
         );
       } else {
         const transformSessionTemplateListData = allSessionTemplatesData;
-
         const keyLabelStructure = transformSessionTemplateListData.map(
           (obj: { serverlessName: string }) => obj.serverlessName
         );
@@ -147,9 +150,9 @@ export class SchedulerService {
           setIsLoadingKernelDetail(false);
         }
       }
-      if (formattedResponse?.error?.code) {
+      if (formattedResponse?.error) {
         if (!toast.isActive('sessionTemplateError')) {
-          toast.error(formattedResponse?.error?.message, {
+          toast.error(formattedResponse?.error, {
             ...toastifyCustomStyle,
             toastId: 'sessionTemplateError'
           });
@@ -172,6 +175,8 @@ export class SchedulerService {
     setComposerList: (value: string[]) => void,
     projectId: string,
     region: string,
+    setIsApiError: (value: boolean) => void,
+    setApiError: (value: string) => void,
     setIsLoading?: (value: boolean) => void
   ) => {
     try {
@@ -187,7 +192,25 @@ export class SchedulerService {
         if (setIsLoading) {
           setIsLoading(false);
         }
+      } else if (formattedResponse.length === undefined) {
+        try {
+          if (formattedResponse.error.code === 403) {
+            setIsApiError(true);
+            setApiError(formattedResponse.error.message);
+            if (setIsLoading) {
+              setIsLoading(false);
+            }
+          }
+        } catch (error) {
+          console.error('Error parsing error message:', error);
+          showToast(
+            'Error fetching environments list. Please try again later.',
+            'error-featching-env-list'
+          );
+        }
       } else {
+        setIsApiError(false);
+        setApiError('');
         const composerEnvironmentList: string[] = [];
         formattedResponse.forEach((data: IComposerAPIResponse) => {
           composerEnvironmentList.push(data.name);
@@ -213,7 +236,10 @@ export class SchedulerService {
     setCreatingScheduler: (value: boolean) => void,
     editMode: boolean,
     projectId: string,
-    region: string
+    region: string,
+    selectedMode: string,
+    packageInstalledList: string[],
+    setPackageEditFlag: (value: boolean) => void
   ) => {
     setCreatingScheduler(true);
     try {
@@ -224,7 +250,7 @@ export class SchedulerService {
           method: 'POST'
         }
       );
-      if (data.error) {
+      if (data?.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);
       } else {
@@ -233,11 +259,24 @@ export class SchedulerService {
             'Job scheduler successfully updated',
             toastifyCustomStyle
           );
+          if (packageInstalledList.length > 0) {
+            toast.success(
+              'Installation of packages will take sometime',
+              toastifyCustomStyle
+            );
+          }
+          setPackageEditFlag(false);
         } else {
           toast.success(
             'Job scheduler successfully created',
             toastifyCustomStyle
           );
+          if (packageInstalledList.length > 0) {
+            toast.success(
+              'Installation of packages will take sometime',
+              toastifyCustomStyle
+            );
+          }
         }
         setCreatingScheduler(false);
         setCreateCompleted(true);
@@ -278,12 +317,13 @@ export class SchedulerService {
     dagId: string,
     composerSelectedList: string,
     setEditDagLoading: (value: string) => void,
+    setIsLocalKernel: (value: boolean) => void,
+    setPackageEditFlag: (value: boolean) => void,
     setCreateCompleted?: (value: boolean) => void,
     setJobNameSelected?: (value: string) => void,
     setComposerSelected?: (value: string) => void,
     setScheduleMode?: (value: scheduleMode) => void,
     setScheduleValue?: (value: string) => void,
-
     setInputFileSelected?: (value: string) => void,
     setParameterDetail?: (value: string[]) => void,
     setParameterDetailUpdated?: (value: string[]) => void,
@@ -341,8 +381,22 @@ export class SchedulerService {
         setJobNameSelected(dagId);
         setComposerSelected(composerSelectedList);
         setInputFileSelected(formattedResponse.input_filename);
-        setParameterDetail(formattedResponse.parameters);
-        setParameterDetailUpdated(formattedResponse.parameters);
+
+        if (formattedResponse.mode_selected === 'local') {
+          setIsLocalKernel(true);
+          setPackageEditFlag(true);
+          if (formattedResponse.parameters.length > 0) {
+            const parameterList = formattedResponse.parameters[0]
+              .split(',')
+              .map((item: any) => item.trim());
+            setParameterDetail(parameterList);
+            setParameterDetailUpdated(parameterList);
+          }
+        } else {
+          setParameterDetail(formattedResponse.parameters);
+          setParameterDetailUpdated(formattedResponse.parameters);
+        }
+
         setSelectedMode(formattedResponse.mode_selected);
         setClusterSelected(formattedResponse.cluster_name);
         setServerlessSelected(formattedResponse.serverless_name);
@@ -361,7 +415,9 @@ export class SchedulerService {
                 );
               }
             );
-            setServerlessDataSelected(selectedData[0].serverlessData);
+            if (selectedData.length > 0) {
+              setServerlessDataSelected(selectedData[0].serverlessData);
+            }
           }
         }
         setRetryCount(formattedResponse.retry_count);
@@ -578,8 +634,8 @@ export class SchedulerService {
       const serviceURL = `dagList?composer=${composerSelected}`;
       const formattedResponse: any = await requestAPI(serviceURL);
       let transformDagListData = [];
-      if (formattedResponse && formattedResponse[0].dags) {
-        transformDagListData = formattedResponse[0].dags.map(
+      if (formattedResponse.length > 0) {
+        transformDagListData = formattedResponse[0]?.dags?.map(
           (dag: ISchedulerDagData) => {
             return {
               jobid: dag.dag_id,
@@ -590,6 +646,21 @@ export class SchedulerService {
             };
           }
         );
+      } else {
+        const jsonstr = formattedResponse?.error.slice(
+          formattedResponse?.error.indexOf('{'),
+          formattedResponse?.error.lastIndexOf('}') + 1
+        );
+        if (jsonstr) {
+          const errorObject = JSON.parse(jsonstr);
+          toast.error(
+            `Failed to fetch schedule list : ${errorObject.error.message}`,
+            {
+              ...toastifyCustomStyle,
+              toastId: 'dagListError'
+            }
+          );
+        }
       }
       setDagList(transformDagListData);
       setIsLoading(false);
@@ -601,9 +672,9 @@ export class SchedulerService {
         LOG_LEVEL.ERROR
       );
       if (!toast.isActive('dagListError')) {
-        toast.error(`Failed to fetch clusters : ${error}`, {
+        toast.error(`Failed to fetch schedule list : ${error}`, {
           ...toastifyCustomStyle,
-          toastId: 'clusterError'
+          toastId: 'dagListError'
         });
       }
     }
@@ -636,7 +707,7 @@ export class SchedulerService {
         LOG_LEVEL.ERROR
       );
       if (!toast.isActive('dagListError')) {
-        toast.error(`Failed to fetch clusters : ${error}`, {
+        toast.error(`Failed to fetch schedule list : ${error}`, {
           ...toastifyCustomStyle,
           toastId: 'clusterError'
         });
@@ -726,7 +797,7 @@ export class SchedulerService {
         serviceURL,
         { method: 'POST' }
       );
-      if (formattedResponse && formattedResponse.status === 0) {
+      if (formattedResponse?.status === 0) {
         toast.success(
           `scheduler ${dag_id} updated successfully`,
           toastifyCustomStyle
@@ -737,10 +808,18 @@ export class SchedulerService {
           setBucketName,
           composerSelected
         );
+      } else {
+        toast.error(
+          `Error in pausing the schedule : ${formattedResponse?.error}`,
+          toastifyCustomStyle
+        );
       }
     } catch (error) {
       SchedulerLoggingService.log('Error in Update api', LOG_LEVEL.ERROR);
-      toast.error(`Failed to fetch Update api : ${error}`, toastifyCustomStyle);
+      toast.error(
+        `Error in pausing the schedule : ${error}`,
+        toastifyCustomStyle
+      );
     }
   };
   static listDagTaskInstancesListService = async (
@@ -757,12 +836,12 @@ export class SchedulerService {
       const data: any = await requestAPI(
         `dagRunTask?composer=${composerName}&dag_id=${dagId}&dag_run_id=${dagRunId}`
       );
-      data.task_instances.sort(
+      data.task_instances?.sort(
         (a: any, b: any) =>
           new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
       );
       let transformDagRunTaskInstanceListData = [];
-      transformDagRunTaskInstanceListData = data.task_instances.map(
+      transformDagRunTaskInstanceListData = data.task_instances?.map(
         (dagRunTask: any) => {
           return {
             tryNumber: dagRunTask.try_number,
@@ -800,7 +879,7 @@ export class SchedulerService {
       const data: any = await requestAPI(
         `dagRunTaskLogs?composer=${composerName}&dag_id=${dagId}&dag_run_id=${dagRunId}&task_id=${taskId}&task_try_number=${tryNumber}`
       );
-      setLogList(data.content);
+      setLogList(data?.content);
       setIsLoadingLogs(false);
     } catch (reason) {
       if (!toast.isActive('credentialsError')) {
@@ -820,8 +899,8 @@ export class SchedulerService {
       const data: any = await requestAPI(
         `importErrorsList?composer=${composerSelectedList}`
       );
-      setImportErrorData(data.import_errors);
-      setImportErrorEntries(data.total_entries);
+      setImportErrorData(data?.import_errors);
+      setImportErrorEntries(data?.total_entries);
     } catch (reason) {
       if (!toast.isActive('credentialsError')) {
         toast.error(`Error on GET credentials..\n${reason}`, {
@@ -841,22 +920,96 @@ export class SchedulerService {
         `triggerDag?dag_id=${dagId}&composer=${composerSelectedList}`,
         { method: 'POST' }
       );
-      if (data) {
+      if (data?.error) {
+        let errorObject: any = {};
+        if (data?.error.includes('Bad Request')) {
+          const jsonstr = data?.error.slice(
+            data?.error.indexOf('{'),
+            data?.error.lastIndexOf('}') + 1
+          );
+          errorObject = JSON.parse(jsonstr);
+        }
+
+        if (errorObject?.status === 400) {
+          const installedPackageList: any = await requestAPI(
+            `checkRequiredPackages?composer_environment_name=${composerSelectedList}`
+          );
+          if (installedPackageList.length > 0) {
+            toast.error(
+              `Failed to trigger ${dagId} : required packages are not installed`,
+              toastifyCustomStyle
+            );
+          } else {
+            toast.error(
+              `Failed to trigger ${dagId} : ${data?.error}`,
+              toastifyCustomStyle
+            );
+          }
+        } else {
+          toast.error(
+            `Failed to trigger ${dagId} : ${data?.error}`,
+            toastifyCustomStyle)
+        }
+      } else {
         toast.success(`${dagId} triggered successfully `, toastifyCustomStyle);
       }
     } catch (reason) {
       toast.error(
-        `Failed to Trigger ${dagId} : ${reason}`,
+        `Failed to trigger ${dagId} : ${reason}`,
         toastifyCustomStyle
       );
     }
   };
+
   static listComposersAPICheckService = async () => {
     try {
       const formattedResponse: any = await requestAPI('composerList');
       return formattedResponse;
     } catch (error) {
       return error;
+    }
+  };
+
+  static checkRequiredPackagesInstalled = async (
+    selectedComposer: string,
+    setPackageInstallationMessage: (value: string) => void,
+    setPackageInstalledList: (value: string[]) => void,
+    setPackageListFlag: (value: boolean) => void,
+    setapiErrorMessage: (value: string) => void,
+    setCheckRequiredPackagesInstalledFlag: (value: boolean) => void,
+    setDisabaleEnvLocal: (value: boolean) => void
+  ) => {
+    try {
+      setPackageInstallationMessage(
+        'Checking if required packages are installed...'
+      );
+      const installedPackageList: any = await requestAPI(
+        `checkRequiredPackages?composer_environment_name=${selectedComposer}`
+      );
+
+      if (installedPackageList.length > 0) {
+        setPackageInstallationMessage(
+          installedPackageList.join(', ') +
+            ' packages will get installed on creation of schedule'
+        );
+        setPackageInstalledList(installedPackageList);
+        setPackageListFlag(false);
+      } else if (Object.hasOwn(installedPackageList, 'error')) {
+        setPackageInstallationMessage('');
+        setapiErrorMessage(installedPackageList.error);
+      } else {
+        setPackageInstallationMessage('');
+        setPackageInstalledList([]);
+        setPackageListFlag(true);
+      }
+
+      setCheckRequiredPackagesInstalledFlag(true);
+      setDisabaleEnvLocal(false);
+    } catch (reason) {
+      toast.error(
+        `Failed to installation package list : ${reason}`,
+        toastifyCustomStyle
+      );
     }
   };
 }

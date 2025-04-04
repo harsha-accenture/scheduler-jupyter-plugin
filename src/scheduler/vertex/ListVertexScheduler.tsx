@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationView } from '../../utils/PaginationView';
@@ -26,6 +26,7 @@ import DeletePopup from '../../utils/DeletePopup';
 import { scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
+import { iconDash } from '../../utils/Icons';
 import { authApi } from '../../utils/Config';
 import {
   iconActive,
@@ -38,10 +39,11 @@ import {
   iconPause,
   iconPlay,
   iconSuccess,
-  iconTrigger
+  iconTrigger,
+  iconPending
 } from '../../utils/Icons';
 import { VertexServices } from '../../services/Vertex';
-import { IDagList } from './VertexInterfaces';
+import { IVertexScheduleList } from './VertexInterfaces';
 import dayjs from 'dayjs';
 import ErrorMessage from '../common/ErrorMessage';
 
@@ -75,7 +77,9 @@ function ListVertexScheduler({
   setEditMode,
   setJobNameSelected,
   setGcsPath,
-  handleDagIdSelection
+  handleDagIdSelection,
+  setIsApiError,
+  setApiError
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -113,10 +117,14 @@ function ListVertexScheduler({
   setJobNameSelected: (value: string) => void;
   setGcsPath: (value: string) => void;
   handleDagIdSelection: (scheduleId: any, scheduleName: string) => void;
+  setIsApiError: (value: boolean) => void;
+  setApiError: (value: string) => void;
 }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [dagList, setDagList] = useState<IDagList[]>([]);
-  const data = dagList;
+  const [vertexScheduleList, setScheduleList] = useState<IVertexScheduleList[]>(
+    []
+  );
+  const data = vertexScheduleList;
   const [deletePopupOpen, setDeletePopupOpen] = useState<boolean>(false);
   const [editDagLoading, setEditDagLoading] = useState('');
   const [triggerLoading, setTriggerLoading] = useState('');
@@ -130,15 +138,27 @@ function ListVertexScheduler({
   const [scheduleDisplayName, setScheduleDisplayName] = useState<string>('');
   const isPreview = false;
 
-  const columns = React.useMemo(
+  const columns = useMemo(
     () => [
       {
-        Header: 'Job Name',
+        Header: 'Schedule Name',
         accessor: 'displayName'
       },
       {
-        Header: 'Schedule',
+        Header: 'Frequency',
         accessor: 'schedule'
+      },
+      {
+        Header: 'Next Run Date',
+        accessor: 'nextRunTime'
+      },
+      {
+        Header: 'Created',
+        accessor: 'createTime'
+      },
+      {
+        Header: 'Latest Execution Jobs',
+        accessor: 'jobState'
       },
       {
         Header: 'Status',
@@ -155,9 +175,15 @@ function ListVertexScheduler({
   /**
    * Get list of schedules
    */
-  const listDagInfoAPI = async () => {
+  const listVertexScheduleInfoAPI = async () => {
     setIsLoading(true);
-    await VertexServices.listVertexSchedules(setDagList, region, setIsLoading);
+    await VertexServices.listVertexSchedules(
+      setScheduleList,
+      region,
+      setIsLoading,
+      setIsApiError,
+      setApiError
+    );
   };
 
   /**
@@ -175,19 +201,23 @@ function ListVertexScheduler({
       await VertexServices.handleUpdateSchedulerPauseAPIService(
         scheduleId,
         region,
-        setDagList,
+        setScheduleList,
         setIsLoading,
         displayName,
-        setResumeLoading
+        setResumeLoading,
+        setIsApiError,
+        setApiError
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
         scheduleId,
         region,
-        setDagList,
+        setScheduleList,
         setIsLoading,
         displayName,
-        setResumeLoading
+        setResumeLoading,
+        setIsApiError,
+        setApiError
       );
     }
   };
@@ -239,8 +269,10 @@ function ListVertexScheduler({
       region,
       uniqueScheduleId,
       scheduleDisplayName,
-      setDagList,
-      setIsLoading
+      setScheduleList,
+      setIsLoading,
+      setIsApiError,
+      setApiError
     );
     setDeletePopupOpen(false);
     setDeletingSchedule(false);
@@ -466,18 +498,97 @@ function ListVertexScheduler({
   const tableDataCondition = (cell: IVertexCellProps) => {
     if (cell.column.Header === 'Actions') {
       return (
-        <td {...cell.getCellProps()} className="clusters-table-data">
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
           {renderActions(cell.row.original)}
         </td>
       );
-    } else if (cell.column.Header === 'Job Name') {
+    } else if (cell.column.Header === 'Schedule Name') {
       return (
         <td
           {...cell.getCellProps()}
-          className="clusters-table-data"
+          className="clusters-table-data table-cell-overflow"
           onClick={() => handleDagIdSelection(cell.row.original, cell.value)}
         >
           {cell.value}
+        </td>
+      );
+    } else if (cell.column.Header === 'Created') {
+      return (
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
+          {dayjs(cell.row.original.createTime).format('lll')}
+        </td>
+      );
+    } else if (cell.column.Header === 'Next Run Date') {
+      return (
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
+          {cell.row.original.status === 'COMPLETED' ? (
+            <iconDash.react tag="div" />
+          ) : (
+            dayjs(cell.row.original.nextRunTime).format('lll')
+          )}
+        </td>
+      );
+    } else if (cell.column.Header === 'Latest Execution Jobs') {
+      return (
+        <td
+          {...cell.getCellProps()}
+          className="clusters-table-data table-cell-overflow"
+        >
+          {cell.row.original.jobState ? (
+            cell.row.original.jobState.length > 0 ? (
+              <div className="execution-history-main-wrapper">
+                {cell.row.original.jobState.map(job => {
+                  return (
+                    <>
+                      {job === 'JOB_STATE_SUCCEEDED' ? (
+                        <iconSuccess.react
+                          tag="div"
+                          title={job}
+                          className="icon-white logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      ) : job === 'JOB_STATE_FAILED' ||
+                        job === 'JOB_STATE_EXPIRED' ||
+                        job === 'JOB_STATE_PARTIALLY_SUCCEEDED' ? (
+                        <iconFailed.react
+                          tag="div"
+                          title={job}
+                          className="logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      ) : (
+                        <iconPending.react
+                          tag="div"
+                          title={job}
+                          className="logo-alignment-style success_icon icon-size icon-completed"
+                        />
+                      )}
+                    </>
+                  );
+                })}
+              </div>
+            ) : (
+              <iconPending.react
+                tag="div"
+                title="No Job State Found"
+                className="logo-alignment-style success_icon icon-size icon-completed"
+              />
+            )
+          ) : (
+            <CircularProgress
+              className="spin-loader-custom-style"
+              size={18}
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          )}
         </td>
       );
     } else {
@@ -511,7 +622,7 @@ function ListVertexScheduler({
           {...cell.getCellProps()}
           className={
             cell.column.Header === 'Schedule'
-              ? 'clusters-table-data table-cell-width'
+              ? 'clusters-table-data table-cell-overflow'
               : 'clusters-table-data'
           }
         >
@@ -598,11 +709,7 @@ function ListVertexScheduler({
     }
   };
 
-  /**
-   * Opens edit notebook
-   */
-  const openEditDagNotebookFile = async () => {
-    console.log('inputNotebookFilePath', inputNotebookFilePath);
+  const openEditVertexNotebookFile = async () => {
     const filePath = inputNotebookFilePath.replace('gs://', 'gs:');
     const openNotebookFile = await app.commands.execute('docmanager:open', {
       path: filePath
@@ -615,7 +722,7 @@ function ListVertexScheduler({
 
   useEffect(() => {
     if (inputNotebookFilePath !== '') {
-      openEditDagNotebookFile();
+      openEditVertexNotebookFile();
     }
   }, [inputNotebookFilePath]);
 
@@ -626,7 +733,7 @@ function ListVertexScheduler({
   useEffect(() => {
     if (region !== '') {
       setIsLoading(true);
-      listDagInfoAPI();
+      listVertexScheduleInfoAPI();
     }
   }, [region]);
 
@@ -646,30 +753,33 @@ function ListVertexScheduler({
   return (
     <div>
       <div className="select-text-overlay-scheduler">
-        <div className="region-overlay create-scheduler-form-element content-pd-space ">
-          <RegionDropdown
-            projectId={projectId}
-            region={region}
-            onRegionChange={region => setRegion(region)}
-          />
-          {!isLoading && !region && (
-            <ErrorMessage message="Region is required" />
-          )}
+        <div className="enable-text-label">
+          <div className="create-scheduler-form-element content-pd-space ">
+            <RegionDropdown
+              projectId={projectId}
+              region={region}
+              onRegionChange={region => setRegion(region)}
+            />
+            {!isLoading && !region && (
+              <ErrorMessage message="Region is required" />
+            )}
+          </div>
         </div>
+
         <div className="btn-refresh">
           <Button
             disabled={isLoading}
             className="btn-refresh-text"
             variant="outlined"
             aria-label="cancel Batch"
-            onClick={listDagInfoAPI}
+            onClick={listVertexScheduleInfoAPI}
           >
             <div>REFRESH</div>
           </Button>
         </div>
       </div>
 
-      {dagList.length > 0 ? (
+      {vertexScheduleList.length > 0 ? (
         <>
           <div className="notebook-templates-list-table-parent">
             <TableData
@@ -683,12 +793,12 @@ function ListVertexScheduler({
               tableDataCondition={tableDataCondition}
               fromPage="Vertex schedulers"
             />
-            {dagList.length > 100 && (
+            {vertexScheduleList.length > 100 && (
               <PaginationView
                 pageSize={pageSize}
                 setPageSize={setPageSize}
                 pageIndex={pageIndex}
-                allData={dagList}
+                allData={vertexScheduleList}
                 previousPage={previousPage}
                 nextPage={nextPage}
                 canPreviousPage={canPreviousPage}
