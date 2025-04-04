@@ -8,7 +8,7 @@
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
+ * Unless required by applicable law or agreed to in writing,
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
@@ -30,7 +30,6 @@ const VertexJobRuns = ({
   region,
   schedulerData,
   scheduleName,
-  dagId,
   setJobRunsData,
   setJobRunId,
   selectedMonth,
@@ -43,13 +42,12 @@ const VertexJobRuns = ({
   setDarkGreenListDates,
   setIsLoading,
   isLoading,
-  dagRunsList,
-  setDagRunsList
+  vertexScheduleRunsList,
+  setVertexScheduleRunsList
 }: {
   region: string;
   schedulerData: ISchedulerData | undefined;
   scheduleName: string;
-  dagId: string;
   setJobRunsData: React.Dispatch<
     React.SetStateAction<IVertexScheduleRunList | undefined>
   >;
@@ -64,26 +62,27 @@ const VertexJobRuns = ({
   setDarkGreenListDates: (value: string[]) => void;
   setIsLoading: (value: boolean) => void;
   isLoading: boolean;
-  dagRunsList: IVertexScheduleRunList[];
-  setDagRunsList: (value: IVertexScheduleRunList[]) => void;
+  vertexScheduleRunsList: IVertexScheduleRunList[];
+  setVertexScheduleRunsList: (value: IVertexScheduleRunList[]) => void;
 }): JSX.Element => {
   const [jobDownloadLoading, setJobDownloadLoading] = useState(false);
-  const [downloadOutputDagRunId, setDownloadOutputDagRunId] = useState<
-    string | undefined
-  >('');
+  const [
+    downloadOutputVertexScheduleRunId,
+    setDownloadOutputVertexScheduleRunId
+  ] = useState<string | undefined>('');
 
   /**
-   * Filters dagRunsList based on the selected date.
+   * Filters vertex schedule runs list based on the selected date.
    */
   const filteredData = React.useMemo(() => {
     if (selectedDate) {
       const selectedDateString = selectedDate.toDate().toDateString(); // Only date, ignoring time
-      return dagRunsList.filter(dagRun => {
-        return new Date(dagRun.date).toDateString() === selectedDateString;
+      return vertexScheduleRunsList.filter(scheduleRun => {
+        return new Date(scheduleRun.date).toDateString() === selectedDateString;
       });
     }
     return [];
-  }, [dagRunsList, selectedDate]);
+  }, [vertexScheduleRunsList, selectedDate]);
 
   // Sync filtered data with the parent component's state
   useEffect(() => {
@@ -132,7 +131,7 @@ const VertexJobRuns = ({
     page
   } = useTable(
     {
-      //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagRunList>'
+      //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IVertexScheduleRunList>'
       columns,
       data: filteredData,
       autoResetPage: false,
@@ -157,7 +156,7 @@ const VertexJobRuns = ({
           <td
             {...cell.getCellProps()}
             className="dag-runs-table-data-state-success"
-            onClick={() => handleDagRunStateClick(cell.row.original)}
+            onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
             {cell.render('Cell')}
           </td>
@@ -167,7 +166,7 @@ const VertexJobRuns = ({
           <td
             {...cell.getCellProps()}
             className="dag-runs-table-data-state-failure"
-            onClick={() => handleDagRunStateClick(cell.row.original)}
+            onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
             {cell.render('Cell')}
           </td>
@@ -178,7 +177,9 @@ const VertexJobRuns = ({
             <td
               {...cell.getCellProps()}
               className="dag-runs-table-data-state-running"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
+              onClick={() =>
+                handleVertexScheduleRunStateClick(cell.row.original)
+              }
             >
               {cell.render('Cell')}
             </td>
@@ -190,7 +191,9 @@ const VertexJobRuns = ({
             <td
               {...cell.getCellProps()}
               className="dag-runs-table-data-state-queued"
-              onClick={() => handleDagRunStateClick(cell.row.original)}
+              onClick={() =>
+                handleVertexScheduleRunStateClick(cell.row.original)
+              }
             >
               {cell.render('Cell')}
             </td>
@@ -221,15 +224,15 @@ const VertexJobRuns = ({
   };
 
   /**
-   * @param {Object} data - The data object containing information about the DAG run.
-   * @param {string} data.id - The optional ID of the DAG run.
-   * @param {string} data.status - The optional status of the DAG run.
-   * @param {string} data.jobRunId - The optional jobRunId of the DAG run.
+   * @param {Object} data - The data object containing information about the Vertex Schedule run.
+   * @param {string} data.id - The optional ID of the Vertex Schedule run.
+   * @param {string} data.status - The optional status of the Vertex Schedule run.
+   * @param {string} data.jobRunId - The optional jobRunId of the Vertex Schedule run.
    *
    * @description Updates the jobRunId state if a jobRunId is provided in the data object.
-   * Triggered when a DAG run state is clicked.
+   * Triggered when a Vertex Schedule run state is clicked.
    */
-  const handleDagRunStateClick = (data: {
+  const handleVertexScheduleRunStateClick = (data: {
     id?: string;
     status?: string;
     jobRunId?: string;
@@ -256,7 +259,7 @@ const VertexJobRuns = ({
     gcsUrl?: string;
     fileName?: string;
   }) => {
-    setDownloadOutputDagRunId(data.jobRunId);
+    setDownloadOutputVertexScheduleRunId(data.jobRunId);
     await StorageServices.downloadJobAPIService(
       data.gcsUrl,
       data.fileName,
@@ -274,7 +277,8 @@ const VertexJobRuns = ({
   }) => {
     return (
       <div className="action-btn-execution">
-        {jobDownloadLoading && data.jobRunId === downloadOutputDagRunId ? (
+        {jobDownloadLoading &&
+        data.jobRunId === downloadOutputVertexScheduleRunId ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -311,7 +315,7 @@ const VertexJobRuns = ({
       schedulerData,
       selectedMonth,
       setIsLoading,
-      setDagRunsList,
+      setVertexScheduleRunsList,
       setBlueListDates,
       setGreyListDates,
       setOrangeListDates,
