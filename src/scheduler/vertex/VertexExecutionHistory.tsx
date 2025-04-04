@@ -46,7 +46,9 @@ const VertexExecutionHistory = ({
   const today = dayjs();
 
   const [jobRunId, setJobRunId] = useState<string>('');
-  const [dagRunsList, setDagRunsList] = useState<IVertexScheduleRunList[]>([]);
+  const [vertexScheduleRunsList, setVertexScheduleRunsList] = useState<
+    IVertexScheduleRunList[]
+  >([]);
   const [jobRunsData, setJobRunsData] = useState<
     IVertexScheduleRunList | undefined
   >();
@@ -110,7 +112,7 @@ const VertexExecutionHistory = ({
       setSelectedDate(today);
     }
     setJobRunId('');
-    setDagRunsList([]);
+    setVertexScheduleRunsList([]);
     setSelectedMonth(resolvedMonth);
   };
 
@@ -328,7 +330,6 @@ const VertexExecutionHistory = ({
                 region={region}
                 schedulerData={schedulerData}
                 scheduleName={scheduleName}
-                dagId={scheduleName}
                 setJobRunsData={setJobRunsData}
                 setJobRunId={setJobRunId}
                 selectedMonth={selectedMonth}
@@ -341,8 +342,8 @@ const VertexExecutionHistory = ({
                 setDarkGreenListDates={setDarkGreenListDates}
                 setIsLoading={setIsLoading}
                 isLoading={isLoading}
-                dagRunsList={dagRunsList}
-                setDagRunsList={setDagRunsList}
+                vertexScheduleRunsList={vertexScheduleRunsList}
+                setVertexScheduleRunsList={setVertexScheduleRunsList}
               />
             </div>
           </div>
