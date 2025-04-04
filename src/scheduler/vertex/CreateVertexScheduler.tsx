@@ -629,7 +629,12 @@ const CreateVertexScheduler = ({
       kernelSelected === null ||
       cloudStorage === null ||
       serviceAccountSelected === null ||
-      parameterDetailUpdated.some(item => item.length === 1) ||
+      parameterDetailUpdated.some(
+        item =>
+          item.length === 1 ||
+          (item.split(':')[0].length > 0 && item.split(':')[1].length === 0) ||
+          (item.split(':')[0].length === 0 && item.split(':')[1].length > 0)
+      ) ||
       (networkSelected === 'networkInThisProject' &&
         (primaryNetworkSelected === null || subNetworkSelected === null)) ||
       (networkSelected === 'networkShared' && sharedNetworkSelected === null) ||
