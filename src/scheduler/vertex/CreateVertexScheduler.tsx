@@ -626,6 +626,7 @@ const CreateVertexScheduler = ({
       region === null ||
       creatingVertexScheduler ||
       machineTypeSelected === null ||
+      (acceleratorType && !acceleratedCount) ||
       kernelSelected === null ||
       cloudStorage === null ||
       serviceAccountSelected === null ||
@@ -952,7 +953,10 @@ const CreateVertexScheduler = ({
                                   )}
                                 />
                                 {!acceleratedCount && (
-                                  <ErrorMessage message="Accelerator count is required" />
+                                  <ErrorMessage
+                                    message="Accelerator count is required"
+                                    showIcon={false}
+                                  />
                                 )}
                               </div>
                             ) : null}
