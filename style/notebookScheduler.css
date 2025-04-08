@@ -592,3 +592,49 @@
 .execution-task-log-outline {
   outline: 1px solid var(--jp-layout-color3);
 }
+
+.pagination-parent-view {
+  display: flex;
+  align-items: center;
+  gap: 1rem; /* Adjust spacing between elements */
+  padding: 0.5rem; /* Add some padding around the component */
+}
+
+.pagination-numbers {
+  font-size: 0.9rem;
+  color: #555; /* Adjust text color */
+}
+
+.pagination-button {
+  display: flex;
+  gap: 0.5rem; /* Adjust spacing between buttons */
+}
+
+.pagination-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: #f0f0f0; /* Light background for buttons */
+  color: #888; /* Default icon color */
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pagination-arrow:hover {
+  background-color: #ddd; /* Slightly darker on hover */
+  color: #333;
+}
+
+.pagination-arrow.disabled {
+  background-color: #eee;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-arrow.disabled:hover {
+  background-color: #eee;
+  color: #ccc;
+}
