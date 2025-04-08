@@ -90,3 +90,13 @@ export interface ILastScheduledRunResponse {
   scheduledRunTime: string;
   runResponse: string;
 }
+export interface IPaginationViewProps {
+  canPreviousPage: boolean;
+  canNextPage: boolean;
+  currentStartIndex: number;
+  currentLastIndex: number;
+  handleNextPage: () => void;
+  handlePreviousPage: () => void;
+  isLoading: boolean;
+  totalCount: number;
+}

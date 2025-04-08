@@ -528,9 +528,9 @@ function ListVertexScheduler({
     // canPreviousPage,
     // canNextPage,
     // nextPage,
-    // previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize }
+    // // previousPage,
+    // setPageSize,
+    // state: { pageIndex, pageSize }
   } = useTable(
     //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagList>'
     {columns,
@@ -971,7 +971,7 @@ function ListVertexScheduler({
         </div>
       </div>
 
-      {vertexScheduleList.length > 0 ? (
+      {vertexScheduleList.length > 0 || nextPageToken ? (
         <>
           <div className="notebook-templates-list-table-parent">
             <TableData
@@ -987,13 +987,8 @@ function ListVertexScheduler({
             />
             {vertexScheduleList.length > 0 && (
               <PaginationComponent
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-                pageIndex={pageIndex}
-                allData={vertexScheduleList}
                 canPreviousPage={canPreviousPage}
                 canNextPage={canNextPage}
-                scheduleSelected="vertex"
                 currentStartIndex={currentStartIndex}
                 currentLastIndex={currentLastIndex}
                 handleNextPage={handleNextPage}
