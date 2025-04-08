@@ -85,8 +85,11 @@ const NotebookSchedulerComponent = ({
       const formattedCurrentTime = formatTimestamp(currentTime);
       setJobNameSelected(`job_${formattedCurrentTime}`);
       setInputFileSelected(context.path);
-      getKernelDetails();
     }
+  }, [notebookSelector]);
+
+  useEffect(() => {
+    getKernelDetails();
   }, []);
 
   const handleJobNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {

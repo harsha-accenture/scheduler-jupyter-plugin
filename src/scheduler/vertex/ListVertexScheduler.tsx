@@ -53,6 +53,7 @@ function ListVertexScheduler({
   app,
   setJobId,
   settingRegistry,
+  createCompleted,
   setCreateCompleted,
   setInputFileSelected,
   setMachineTypeSelected,
@@ -86,6 +87,7 @@ function ListVertexScheduler({
   app: JupyterFrontEnd;
   setJobId: (value: string) => void;
   settingRegistry: ISettingRegistry;
+  createCompleted?: boolean;
   setCreateCompleted: (value: boolean) => void;
   setInputFileSelected: (value: string) => void;
   setMachineTypeSelected: (value: string | null) => void;
@@ -924,7 +926,9 @@ function ListVertexScheduler({
     authApi()
       .then(credentials => {
         if (credentials && credentials?.region_id && credentials.project_id) {
-          setRegion(credentials.region_id);
+          if (!createCompleted) {
+            setRegion(credentials.region_id);
+          }
           setProjectId(credentials.project_id);
         }
       })

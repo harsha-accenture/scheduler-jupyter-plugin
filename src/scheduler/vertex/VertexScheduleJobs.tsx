@@ -30,6 +30,7 @@ const VertexScheduleJobs = ({
   app,
   settingRegistry,
   setJobId,
+  createCompleted,
   setCreateCompleted,
   setInputFileSelected,
   region,
@@ -64,6 +65,7 @@ const VertexScheduleJobs = ({
   themeManager: IThemeManager;
   settingRegistry: ISettingRegistry;
   setJobId: (value: string) => void;
+  createCompleted?: boolean;
   setCreateCompleted: (value: boolean) => void;
   setInputFileSelected: (value: string) => void;
   region: string;
@@ -142,6 +144,7 @@ const VertexScheduleJobs = ({
           app={app}
           setJobId={setJobId}
           settingRegistry={settingRegistry}
+          createCompleted={createCompleted}
           setCreateCompleted={setCreateCompleted}
           setInputFileSelected={setInputFileSelected}
           setMachineTypeSelected={setMachineTypeSelected}
