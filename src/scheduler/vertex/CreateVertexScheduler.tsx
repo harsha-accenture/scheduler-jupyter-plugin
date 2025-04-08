@@ -626,6 +626,7 @@ const CreateVertexScheduler = ({
       region === null ||
       creatingVertexScheduler ||
       machineTypeSelected === null ||
+      (acceleratorType && !acceleratedCount) ||
       kernelSelected === null ||
       cloudStorage === null ||
       serviceAccountSelected === null ||
@@ -797,6 +798,7 @@ const CreateVertexScheduler = ({
       setMachineTypeList([]);
     } else {
       machineTypeAPI();
+      subNetworkAPI(primaryNetworkSelected?.name);
     }
   }, [region]);
 
@@ -818,7 +820,7 @@ const CreateVertexScheduler = ({
         option => option === DEFAULT_CLOUD_STORAGE_BUCKET
       ) || null
     );
-  }, [cloudStorageList]);
+  }, []);
 
   useEffect(() => {
     const machineTypeOptions = machineTypeList.map(item => item.machineType);
@@ -835,6 +837,7 @@ const CreateVertexScheduler = ({
           themeManager={themeManager}
           settingRegistry={settingRegistry}
           setJobId={setJobId}
+          createCompleted={createCompleted}
           setCreateCompleted={setCreateCompleted}
           setInputFileSelected={setInputFileSelected}
           region={region}
@@ -950,7 +953,10 @@ const CreateVertexScheduler = ({
                                   )}
                                 />
                                 {!acceleratedCount && (
-                                  <ErrorMessage message="Accelerator count is required" />
+                                  <ErrorMessage
+                                    message="Accelerator count is required"
+                                    showIcon={false}
+                                  />
                                 )}
                               </div>
                             ) : null}

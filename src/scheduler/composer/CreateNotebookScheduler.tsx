@@ -397,8 +397,9 @@ const CreateNotebookScheduler = ({
       parameterDetailUpdated.some(
         item =>
           item.length === 1 ||
-          (item.split(':')[0].length > 0 && item.split(':')[1].length === 0) ||
-          (item.split(':')[0].length === 0 && item.split(':')[1].length > 0)
+          (item.split(':')[0]?.length > 0 &&
+            item.split(':')[1]?.length === 0) ||
+          (item.split(':')[0]?.length === 0 && item.split(':')[1]?.length > 0)
       ) ||
       composerSelected === '' ||
       (selectedMode === 'cluster' &&
