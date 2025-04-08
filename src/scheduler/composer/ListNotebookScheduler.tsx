@@ -19,7 +19,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationView } from '../../utils/PaginationView';
-import { ICellProps } from '../../utils/Config';
+import { ICellProps, authApi } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import deleteIcon from '../../../style/icons/scheduler_delete.svg';
@@ -36,6 +36,10 @@ import ImportErrorPopup from '../../utils/ImportErrorPopup';
 import triggerIcon from '../../../style/icons/scheduler_trigger.svg';
 import { PLUGIN_ID, scheduleMode } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
+import { RegionDropdown } from '../../controls/RegionDropdown';
+import ErrorMessage from '../common/ErrorMessage';
+import { DynamicDropdown } from '../../controls/DynamicDropdown';
+import { projectListAPI } from '../../services/ProjectService';
 
 const iconDelete = new LabIcon({
   name: 'launcher:delete-icon',
@@ -165,8 +169,9 @@ function listNotebookScheduler({
   const [importErrorData, setImportErrorData] = useState<string[]>([]);
   const [importErrorEntries, setImportErrorEntries] = useState<number>(0);
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
-  const projectId = '';
-  const region = '';
+  const [projectId, setProjectId] = useState('');
+  const [region, setRegion] = useState<string>('');
+
   const columns = React.useMemo(
     () => [
       {
@@ -522,6 +527,14 @@ function listNotebookScheduler({
     }
   };
 
+  /**
+   * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
+   * @param {string} value selected region
+   */
+  const handleRegionChange = (value: React.SetStateAction<string>) => {
+    setRegion(value);
+  };
+
   useEffect(() => {
     if (inputNotebookFilePath !== '') {
       openEditDagNotebookFile();
@@ -577,21 +590,90 @@ function listNotebookScheduler({
     };
   }, [composerSelectedList]);
 
+  useEffect(() => {
+    authApi().then(credentials => {
+      if (credentials && credentials.project_id && credentials.region_id) {
+        setProjectId(credentials.project_id);
+        setRegion(credentials.region_id);
+      }
+    });
+    if (!projectId) {
+      setRegion('');
+      setComposerList([]);
+      setComposerSelectedList('');
+    }
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!region) {
+      setComposerList([]);
+      setComposerSelectedList('');
+    } else {
+      listComposersAPI();
+    }
+  }, [region])
+
   return (
     <div>
       <div className="select-text-overlay-scheduler">
-        <div className="create-scheduler-form-element">
-          <Autocomplete
-            options={composerList}
-            value={composerSelectedList}
-            onChange={(_event, val) => {
-              handleComposerSelected(val);
-            }}
-            renderInput={params => (
-              <TextField {...params} label="Environment*" />
+        <div className="select-panel-list">
+          <div>
+            <div className={importErrorEntries > 0 ? "create-scheduler-form-element select-panel-list-view-lay success_icon" : "create-scheduler-form-element select-panel-list-view"}>
+              <DynamicDropdown
+                value={projectId}
+                onChange={(_, projectId: string | null) =>
+                  setProjectId(projectId ?? '')
+                }
+                fetchFunc={projectListAPI}
+                label="Project ID*"
+                // Always show the clear indicator and hide the dropdown arrow
+                // make it very clear that this is an autocomplete.
+                sx={{
+                  '& .MuiAutocomplete-clearIndicator': {
+                    visibility: 'visible'
+                  }
+                }}
+                popupIcon={null}
+              />
+            </div>
+            {!projectId && (
+              <ErrorMessage message="Project ID is required" showIcon={false} />
             )}
-          />
+          </div>
+
+          <div>
+            <div className={importErrorEntries > 0 ? "create-scheduler-form-element select-panel-list-view-lay success_icon" : "create-scheduler-form-element select-panel-list-view"}>
+              <RegionDropdown
+                projectId={projectId}
+                region={region}
+                onRegionChange={region => handleRegionChange(region)}
+              />
+            </div>
+            {!region && (
+              <ErrorMessage message="Region is required" showIcon={false} />
+            )}
+          </div>
+
+          <div className={importErrorEntries > 0 ? "create-scheduler-form-element select-panel-list-view-lay progress-main" : "create-scheduler-form-element select-panel-list-view"}>
+            <Autocomplete
+              options={composerList}
+              value={composerSelectedList}
+              onChange={(_event, val) => {
+                handleComposerSelected(val);
+              }}
+              renderInput={params => (
+                <TextField {...params} label="Environment*" />
+              )}
+            />
+            {!composerSelectedList && (
+              <ErrorMessage
+                message="Environment is required"
+                showIcon={false}
+              />
+            )}
+          </div>
         </div>
+
         {importErrorEntries > 0 && (
           <div className="import-error-parent">
             <div

@@ -158,6 +158,7 @@ const CreateNotebookScheduler = ({
   ] = useState<boolean>(false);
   const [disableEnvLocal, setDisabaleEnvLocal] = useState<boolean>(false);
   const [clusterFlag, setClusterFlag] = useState<boolean>(false);
+  const [envApiFlag, setEnvApiFlag] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -180,7 +181,8 @@ const CreateNotebookScheduler = ({
       projectId,
       region,
       setIsApiError,
-      setApiError
+      setApiError,
+      setEnvApiFlag
     );
   };
 
@@ -483,6 +485,14 @@ const CreateNotebookScheduler = ({
     if (projectId && region) {
       listComposersAPI();
     }
+
+    if (!region) {
+      setComposerList([]);
+      setComposerSelected('');
+      setapiErrorMessage('');
+      setPackageInstallationMessage('');
+      setPackageListFlag(false);
+    }
   }, [projectId, region]);
 
   useEffect(() => {
@@ -523,7 +533,16 @@ const CreateNotebookScheduler = ({
         setRegion(credentials.region_id);
       }
     });
-  }, []);
+    if (!projectId) {
+      setRegion('');
+      setComposerSelected('');
+      setComposerList([]);
+      setapiErrorMessage('');
+      setPackageInstallationMessage('');
+      setPackageListFlag(false);
+    }
+  }, [projectId]);
+
   useEffect(() => {
     const checkRequiredPackageApiService = async () => {
       setPackageListFlag(false);
@@ -604,17 +623,21 @@ const CreateNotebookScheduler = ({
                   }
                 }}
                 popupIcon={null}
+                className={disableEnvLocal ? 'disable-item' : ''}
               />
             </div>
             {!projectId && <ErrorMessage message="Project ID is required" />}
-            <div className="region-overlay create-scheduler-form-element scheduler-region-top">
+
+            <div className="create-scheduler-form-element scheduler-region-top">
               <RegionDropdown
                 projectId={projectId}
                 region={region}
                 onRegionChange={region => handleRegionChange(region)}
+                editMode={disableEnvLocal}
               />
             </div>
             {!region && <ErrorMessage message="Region is required" />}
+
             <div className="create-scheduler-form-element block-level-seperation ">
               <Autocomplete
                 className="create-scheduler-style"
@@ -624,7 +647,7 @@ const CreateNotebookScheduler = ({
                 renderInput={params => (
                   <TextField {...params} label="Environment*" />
                 )}
-                disabled={editMode || disableEnvLocal}
+                disabled={editMode || disableEnvLocal || envApiFlag}
               />
             </div>
             {!composerSelected && (
