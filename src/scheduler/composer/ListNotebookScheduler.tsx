@@ -611,14 +611,20 @@ function listNotebookScheduler({
     } else {
       listComposersAPI();
     }
-  }, [region])
+  }, [region]);
 
   return (
     <div>
       <div className="select-text-overlay-scheduler">
         <div className="select-panel-list">
           <div>
-            <div className={importErrorEntries > 0 ? "create-scheduler-form-element select-panel-list-view-lay success_icon" : "create-scheduler-form-element select-panel-list-view"}>
+            <div
+              className={
+                importErrorEntries > 0
+                  ? 'create-scheduler-form-element select-panel-list-view-lay success_icon'
+                  : 'create-scheduler-form-element select-panel-list-view'
+              }
+            >
               <DynamicDropdown
                 value={projectId}
                 onChange={(_, projectId: string | null) =>
@@ -642,7 +648,13 @@ function listNotebookScheduler({
           </div>
 
           <div>
-            <div className={importErrorEntries > 0 ? "create-scheduler-form-element select-panel-list-view-lay success_icon" : "create-scheduler-form-element select-panel-list-view"}>
+            <div
+              className={
+                importErrorEntries > 0
+                  ? 'create-scheduler-form-element select-panel-list-view-lay success_icon'
+                  : 'create-scheduler-form-element select-panel-list-view'
+              }
+            >
               <RegionDropdown
                 projectId={projectId}
                 region={region}
@@ -654,7 +666,13 @@ function listNotebookScheduler({
             )}
           </div>
 
-          <div className={importErrorEntries > 0 ? "create-scheduler-form-element select-panel-list-view-lay progress-main" : "create-scheduler-form-element select-panel-list-view"}>
+          <div
+            className={
+              importErrorEntries > 0
+                ? 'create-scheduler-form-element select-panel-list-view-lay progress-main'
+                : 'create-scheduler-form-element select-panel-list-view'
+            }
+          >
             <Autocomplete
               options={composerList}
               value={composerSelectedList}
