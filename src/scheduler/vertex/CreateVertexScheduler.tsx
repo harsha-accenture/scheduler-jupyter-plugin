@@ -798,6 +798,7 @@ const CreateVertexScheduler = ({
       setMachineTypeList([]);
     } else {
       machineTypeAPI();
+      subNetworkAPI(primaryNetworkSelected?.name);
     }
   }, [region]);
 
@@ -836,6 +837,7 @@ const CreateVertexScheduler = ({
           themeManager={themeManager}
           settingRegistry={settingRegistry}
           setJobId={setJobId}
+          createCompleted={createCompleted}
           setCreateCompleted={setCreateCompleted}
           setInputFileSelected={setInputFileSelected}
           region={region}
