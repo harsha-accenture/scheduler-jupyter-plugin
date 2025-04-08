@@ -274,6 +274,7 @@ const VertexJobRuns = ({
     status?: string;
     jobRunId?: string;
     state?: string;
+    outputFileExists?: string;
   }) => {
     return (
       <div className="action-btn-execution">
@@ -290,14 +291,14 @@ const VertexJobRuns = ({
           <div
             role="button"
             className={
-              data.state === 'succeeded'
+              data.state === 'succeeded' || data.outputFileExists === 'true'
                 ? 'icon-buttons-style sub-title-heading'
                 : 'icon-buttons-style-disable sub-title-heading'
             }
             title="Download Output"
             data-dag-run-id={data}
             onClick={
-              data.state === 'succeeded'
+              data.state === 'succeeded' || data.outputFileExists === 'true'
                 ? e => handleDownloadOutput(data)
                 : undefined
             }

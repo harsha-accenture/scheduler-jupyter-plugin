@@ -41,8 +41,9 @@ class Client:
             blob_name = f"{job_run_id}/{file_name}"
             bucket = storage_client.bucket(bucket_name)
             blob = bucket.blob(blob_name)
+            print(f"******* blob {blob.exists()}")
             original_file_name = os.path.basename(blob_name)
-           
+
             timestamp = time.strftime("%H%M%S")
             base_name, extension = os.path.splitext(original_file_name)
             unique_file_name = f"{base_name}_{job_run_id}_{timestamp}{extension}"
@@ -72,3 +73,19 @@ class Client:
         except Exception as e:
             self.log.exception(f"Error fetching cloud storage buckets: {str(e)}")
             return {"Error fetching cloud storage buckets": str(e)}
+
+    async def output_file_exists(self, bucket_name, file_name, job_run_id):
+        try:
+            credentials = oauth2.Credentials(self._access_token)
+            storage_client = storage.Client(credentials=credentials)
+            blob_name = f"{job_run_id}/{file_name}"
+            bucket = storage_client.bucket(bucket_name)
+            blob = bucket.blob(blob_name)
+            if blob.exists():
+                return 'true'
+            else:
+                return 'false'
+            # return blob.exists()
+        except Exception as error:
+            self.log.exception(f"Error checking output notebook file: {str(error)}")
+            return {"error": str(error)}

@@ -638,6 +638,23 @@ export class VertexServices {
               codeValue = jobRun.status.code;
               statusMessage = jobRun.status.message;
             }
+
+            let outputFileExistsRes = {};
+            if (jobRun.jobState === 'JOB_STATE_FAILED') {
+              const bucketName = jobRun.gcsOutputUri?.split('//')[1];
+              const jobRunId = jobRun.name.split('/').pop();
+              const fileName = jobRun.gcsNotebookSource.uri.split('/').pop();
+              // outputFileExistsRes = requestAPI(
+              //   `api/storage/outputFileExists?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`
+              // );
+              outputFileExistsRes = outputFileExists(
+                bucketName,
+                jobRunId,
+                fileName
+              );
+            }
+            console.log('api res', outputFileExistsRes);
+
             return {
               jobRunId: jobRun.name.split('/').pop(),
               startDate: jobRun.createTime,
@@ -654,11 +671,18 @@ export class VertexServices {
               statusMessage:
                 jobRun.jobState === 'JOB_STATE_FAILED'
                   ? (statusMessage ?? '')
-                  : '-'
+                  : '-',
+              outputFileExists: outputFileExistsRes ? outputFileExistsRes : ''
             };
           }
         );
       }
+      await Promise.all(transformDagRunListDataCurrent);
+      console.log(
+        'transformDagRunListDataCurrent',
+        transformDagRunListDataCurrent
+      );
+
       // Group data by date and state
       const groupedDataByDateStatus = transformDagRunListDataCurrent.reduce(
         (result: any, item: any) => {
@@ -770,5 +794,21 @@ async function fetchLastFiveRunStatus(
       'Error fetching last five job executions',
       LOG_LEVEL.ERROR
     );
+  }
+}
+
+//Funtion to check weather output file exists or not
+async function outputFileExists(
+  bucketName: string,
+  jobRunId: string,
+  fileName: string
+) {
+  try {
+    const formattedResponse = await requestAPI(
+      `api/storage/outputFileExists?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`
+    );
+    return formattedResponse;
+  } catch (lastRunError: any) {
+    SchedulerLoggingService.log('Error checking output file', LOG_LEVEL.ERROR);
   }
 }
