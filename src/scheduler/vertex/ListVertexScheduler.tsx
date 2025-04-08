@@ -215,9 +215,7 @@ function ListVertexScheduler({
    * For applying pagination
    */
   useEffect(() => {
-
     setPaginationVariables(); // Recalculate pagination when vertexScheduleList or pageLength changes
-    
   }, [vertexScheduleList, scheduleListPageLength]);
 
   /**
@@ -264,7 +262,7 @@ function ListVertexScheduler({
 
     if (pageTokenList.length>1){ // checking Previous page availability
       setCanPreviousPage(true); // From the 2nd page
-    }else{ 
+    }else{
       setCanPreviousPage(false); // on load of page for the first time or when back at first page
     }
 
@@ -294,61 +292,67 @@ function ListVertexScheduler({
   /**
    * Handles next page navigation
    */
-  const handleNextPage = async () => {
-    let nextTokenToFetch = null;
-    if (pageTokenList.length > 0) {
-      nextTokenToFetch = pageTokenList[pageTokenList.length - 1]; // get the last token on list
-      setNextPageToken(nextTokenToFetch);
-      if (nextTokenToFetch) {
-        await listVertexScheduleInfoAPI(nextTokenToFetch); // call api for the next page token.
-        setCanPreviousPage(true);
-      }
-    } else {
-      await listVertexScheduleInfoAPI(nextTokenToFetch); // pass null to fetch first page.
-    }
+  const handleNextPage = () => {
+    // let nextTokenToFetch = null;
+    // if (pageTokenList.length > 0) {
+    //   nextTokenToFetch = pageTokenList[pageTokenList.length - 1]; // get the last token on list
+    //   setNextPageToken(nextTokenToFetch);
+    //   if (nextTokenToFetch) {
+    //     await listVertexScheduleInfoAPI(nextTokenToFetch); // call api for the next page token.
+    //     setCanPreviousPage(true);
+    //   }
+    // } else {
+    //   await listVertexScheduleInfoAPI(nextTokenToFetch); // pass null to fetch first page.
+    // }
+    const nextTokenToFetch = pageTokenList.length > 0 ? pageTokenList[pageTokenList.length - 1] : null;
+    setNextPageToken(nextTokenToFetch);
+
+    listVertexScheduleInfoAPI(nextTokenToFetch);
+    setCanPreviousPage(true);
   };
 
   /**
    * Handles previous page navigation
    */
   const handlePreviousPage = async () => {
- 
+
     if (pageTokenList.length > 0) {
       setFetchPreviousPage(true);
       setIsLoading(true); // Indicate loading during page transition
 
-      let newPageTokenList = pageTokenList;
-      if(nextPageToken){
-        newPageTokenList = pageTokenList.slice(0, -1); // removing next page's token if available
+      let updatedTokens = [...pageTokenList];
+      if (nextPageToken) {
+        updatedTokens = pageTokenList.slice(0, -1); // removing next page's token if available
       }
-      if(newPageTokenList.length>0){
-        newPageTokenList = newPageTokenList.slice(0, -1);// removing current page's token
-        const nextTokenTofetch = newPageTokenList[newPageTokenList.length - 1]; //Reading last element (previous page's token) for fetching
-        await listVertexScheduleInfoAPI(nextTokenTofetch); // Step 3 API call
+      if (updatedTokens.length > 0) {
+        updatedTokens = updatedTokens.slice(0, -1);// removing current page's token
+        const nextTokenTofetch = updatedTokens[updatedTokens.length - 1]; //Reading last element (previous page's token) for fetching
+        listVertexScheduleInfoAPI(nextTokenTofetch); // Step 3 API call
       }
-      else{
-        await listVertexScheduleInfoAPI(null); // In case there are no more tokens after popping, fetch first page.
+      else {
+        listVertexScheduleInfoAPI(null); // In case there are no more tokens after popping, fetch first page.
         setCanPreviousPage(false);
       }
       setCanNextPage(true); // Re-enable next if we went back
-    
     } else {
       // when there is no more tokens and should fetch first page.
-      await listVertexScheduleInfoAPI(null);
+      listVertexScheduleInfoAPI(null);
       setCanPreviousPage(false);
     }
-   
   };
 
   // API call for refresh
   const handleCurrentPageRefresh = async () => {
+    // setFetchCurrentPage(true);
+    // if(pageTokenList.length>1){
+    // const currentPageToken = pageTokenList[pageTokenList.length - 2];// Current page token is the second last one on the list
+    // await listVertexScheduleInfoAPI(currentPageToken);
+    // }else{
+    //   await listVertexScheduleInfoAPI(null);
+    // }
     setFetchCurrentPage(true);
-    if(pageTokenList.length>1){
-    const currentPageToken = pageTokenList[pageTokenList.length - 2];// Current page token is the second last one on the list
-    await listVertexScheduleInfoAPI(currentPageToken);
-    }else{
-      await listVertexScheduleInfoAPI(null);
-    }
+    const currentPageToken = pageTokenList.length > 1 ? pageTokenList[pageTokenList.length - 2] : null;
+    listVertexScheduleInfoAPI(currentPageToken);
   };
   /**
    * Handle resume and pause
