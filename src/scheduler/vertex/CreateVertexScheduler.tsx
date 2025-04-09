@@ -839,12 +839,6 @@ const CreateVertexScheduler = ({
   }, [machineTypeList]);
 
   return (
-    console.log(
-      'primary',
-      primaryNetworkSelected,
-      'subnetwrok',
-      subNetworkSelected
-    ),
     (
       <>
         {createCompleted ? (
