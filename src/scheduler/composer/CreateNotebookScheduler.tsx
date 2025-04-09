@@ -46,6 +46,10 @@ import { scheduleValueExpression } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import ErrorMessage from '../common/ErrorMessage';
 import { IDagList } from '../common/SchedulerInteface';
+import { DynamicDropdown } from '../../controls/DynamicDropdown';
+import { projectListAPI } from '../../services/ProjectService';
+import { RegionDropdown } from '../../controls/RegionDropdown';
+import { authApi } from '../../utils/Config';
 import { iconSuccess, iconWarning } from '../../utils/Icons';
 import { ProgressPopUp } from '../../utils/ProgressPopUp';
 import { toast } from 'react-toastify';
@@ -139,6 +143,8 @@ const CreateNotebookScheduler = ({
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const [dagListCall, setDagListCall] = useState(false);
   const [isLoadingKernelDetail, setIsLoadingKernelDetail] = useState(false);
+  const [projectId, setProjectId] = useState('');
+  const [region, setRegion] = useState<string>('');
   const [packageInstallationMessage, setPackageInstallationMessage] =
     useState<string>('');
   const [packageInstalledList, setPackageInstalledList] = useState<string[]>(
@@ -152,6 +158,7 @@ const CreateNotebookScheduler = ({
   ] = useState<boolean>(false);
   const [disableEnvLocal, setDisabaleEnvLocal] = useState<boolean>(false);
   const [clusterFlag, setClusterFlag] = useState<boolean>(false);
+  const [envApiFlag, setEnvApiFlag] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -171,8 +178,11 @@ const CreateNotebookScheduler = ({
   const listComposersAPI = async () => {
     await SchedulerService.listComposersAPIService(
       setComposerList,
+      projectId,
+      region,
       setIsApiError,
-      setApiError
+      setApiError,
+      setEnvApiFlag
     );
   };
 
@@ -366,6 +376,8 @@ const CreateNotebookScheduler = ({
       setCreateCompleted,
       setCreatingScheduler,
       editMode,
+      projectId,
+      region,
       selectedMode,
       packageInstalledList,
       setPackageEditFlag
@@ -459,8 +471,6 @@ const CreateNotebookScheduler = ({
   };
 
   useEffect(() => {
-    listComposersAPI();
-
     if (context !== '') {
       setInputFileSelected(context.path);
     }
@@ -470,6 +480,20 @@ const CreateNotebookScheduler = ({
       setParameterDetailUpdated([]);
     }
   }, []);
+
+  useEffect(() => {
+    if (projectId && region) {
+      listComposersAPI();
+    }
+
+    if (!region) {
+      setComposerList([]);
+      setComposerSelected('');
+      setapiErrorMessage('');
+      setPackageInstallationMessage('');
+      setPackageListFlag(false);
+    }
+  }, [projectId, region]);
 
   useEffect(() => {
     if (composerSelected !== '' && dagList.length > 0) {
@@ -493,6 +517,31 @@ const CreateNotebookScheduler = ({
       listSessionTemplatesAPI();
     }
   }, [selectedMode]);
+
+  /**
+   * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
+   * @param {string} value selected region
+   */
+  const handleRegionChange = (value: React.SetStateAction<string>) => {
+    setRegion(value);
+  };
+
+  useEffect(() => {
+    authApi().then(credentials => {
+      if (credentials && credentials.project_id && credentials.region_id) {
+        setProjectId(credentials.project_id);
+        setRegion(credentials.region_id);
+      }
+    });
+    if (!projectId) {
+      setRegion('');
+      setComposerSelected('');
+      setComposerList([]);
+      setapiErrorMessage('');
+      setPackageInstallationMessage('');
+      setPackageListFlag(false);
+    }
+  }, [projectId]);
 
   useEffect(() => {
     const checkRequiredPackageApiService = async () => {
@@ -558,6 +607,37 @@ const CreateNotebookScheduler = ({
       ) : (
         <div>
           <div className="submit-job-container">
+            <div className="create-scheduler-form-element">
+              <DynamicDropdown
+                value={projectId}
+                onChange={(_, projectId: string | null) =>
+                  setProjectId(projectId ?? '')
+                }
+                fetchFunc={projectListAPI}
+                label="Project ID*"
+                // Always show the clear indicator and hide the dropdown arrow
+                // make it very clear that this is an autocomplete.
+                sx={{
+                  '& .MuiAutocomplete-clearIndicator': {
+                    visibility: 'visible'
+                  }
+                }}
+                popupIcon={null}
+                className={disableEnvLocal ? 'disable-item' : ''}
+              />
+            </div>
+            {!projectId && <ErrorMessage message="Project ID is required" />}
+
+            <div className="create-scheduler-form-element scheduler-region-top">
+              <RegionDropdown
+                projectId={projectId}
+                region={region}
+                onRegionChange={region => handleRegionChange(region)}
+                editMode={disableEnvLocal}
+              />
+            </div>
+            {!region && <ErrorMessage message="Region is required" />}
+
             <div className="create-scheduler-form-element block-level-seperation ">
               <Autocomplete
                 className="create-scheduler-style"
@@ -567,7 +647,7 @@ const CreateNotebookScheduler = ({
                 renderInput={params => (
                   <TextField {...params} label="Environment*" />
                 )}
-                disabled={editMode || disableEnvLocal}
+                disabled={editMode || disableEnvLocal || envApiFlag}
               />
             </div>
             {!composerSelected && (

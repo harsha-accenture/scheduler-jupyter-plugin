@@ -637,7 +637,9 @@ const CreateVertexScheduler = ({
           (item.split(':')[0].length === 0 && item.split(':')[1].length > 0)
       ) ||
       (networkSelected === 'networkInThisProject' &&
-        (primaryNetworkSelected === null || subNetworkSelected === null)) ||
+        (primaryNetworkSelected === null ||
+          subNetworkSelected === null ||
+          subNetworkSelected === undefined)) ||
       (networkSelected === 'networkShared' && sharedNetworkSelected === null) ||
       (scheduleMode === 'runSchedule' &&
         internalScheduleMode === 'cronFormat' &&

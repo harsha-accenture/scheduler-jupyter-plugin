@@ -44,8 +44,14 @@ class MockClientSession:
 async def test_list_composer(monkeypatch, jp_fetch):
     mocks.patch_mocks(monkeypatch)
     monkeypatch.setattr(aiohttp, "ClientSession", MockClientSession)
+    mock_project_id = "mock-project-id"
+    mock_region_id = "mock-region-id"
 
-    response = await jp_fetch("scheduler-plugin", "composerList")
+    response = await jp_fetch(
+        "scheduler-plugin",
+        "composerList",
+        params={"project_id": mock_project_id, "region_id": mock_region_id},
+    )
     assert response.code == 200
     payload = json.loads(response.body)
     assert len(payload) == 2
