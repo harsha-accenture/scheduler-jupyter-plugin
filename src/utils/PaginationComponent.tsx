@@ -43,7 +43,7 @@ export const PaginationComponent = ({
       ) : (
         <div className="pagination-numbers">
           {currentStartIndex} - {currentLastIndex} of{' '}
-          {totalCount != 0 ? `${totalCount}` : `many`}
+          {totalCount !== 0 ? totalCount : 'many'}
         </div>
       )}
 
