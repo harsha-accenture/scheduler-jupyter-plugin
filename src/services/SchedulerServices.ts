@@ -173,14 +173,21 @@ export class SchedulerService {
   };
   static listComposersAPIService = async (
     setComposerList: (value: string[]) => void,
+    projectId: string,
+    region: string,
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
+    setEnvApiFlag: (value: boolean) => void,
     setIsLoading?: (value: boolean) => void
   ) => {
+    setEnvApiFlag(true);
     try {
-      const formattedResponse: any = await requestAPI('composerList');
+      const formattedResponse: any = await requestAPI(
+        `composerList?project_id=${projectId}&region_id=${region}`
+      );
       if (formattedResponse.length === 0) {
         // Handle the case where the list is empty
+        setComposerList([]);
         toast.error(
           'No composer environment in this project and region',
           toastifyCustomStyle
@@ -188,8 +195,10 @@ export class SchedulerService {
         if (setIsLoading) {
           setIsLoading(false);
         }
+        setEnvApiFlag(false);
       } else if (formattedResponse.length === undefined) {
         try {
+          setComposerList([]);
           if (formattedResponse.error.code === 403) {
             setIsApiError(true);
             setApiError(formattedResponse.error.message);
@@ -204,6 +213,7 @@ export class SchedulerService {
             'error-featching-env-list'
           );
         }
+        setEnvApiFlag(false);
       } else {
         setIsApiError(false);
         setApiError('');
@@ -213,6 +223,7 @@ export class SchedulerService {
         });
         composerEnvironmentList.sort();
         setComposerList(composerEnvironmentList);
+        setEnvApiFlag(false);
       }
     } catch (error) {
       SchedulerLoggingService.log(
@@ -223,6 +234,7 @@ export class SchedulerService {
         `Failed to fetch composer environment list : ${error}`,
         toastifyCustomStyle
       );
+      setEnvApiFlag(false);
     }
   };
   static createJobSchedulerService = async (
@@ -231,16 +243,21 @@ export class SchedulerService {
     setCreateCompleted: (value: boolean) => void,
     setCreatingScheduler: (value: boolean) => void,
     editMode: boolean,
+    projectId: string,
+    region: string,
     selectedMode: string,
     packageInstalledList: string[],
     setPackageEditFlag: (value: boolean) => void
   ) => {
     setCreatingScheduler(true);
     try {
-      const data: any = await requestAPI('createJobScheduler', {
-        body: JSON.stringify(payload),
-        method: 'POST'
-      });
+      const data: any = await requestAPI(
+        `createJobScheduler?project_id=${projectId}&region_id=${region}`,
+        {
+          body: JSON.stringify(payload),
+          method: 'POST'
+        }
+      );
       if (data?.error) {
         toast.error(data.error, toastifyCustomStyle);
         setCreatingScheduler(false);

@@ -489,6 +489,10 @@
   cursor: pointer;
 }
 
+.scheduler-region-top {
+  padding-top: 10px;
+}
+
 .enable-error-text-label a {
   color: blue;
   text-decoration: underline;
@@ -593,21 +597,72 @@
   outline: 1px solid var(--jp-layout-color3);
 }
 
+.select-panel-list {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.select-panel-list-view {
+  max-width: 340px;
+}
+
+.disable-item {
+  padding-right: 5px;
+  color: rgb(245 245 245);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.select-panel-list-view-lay {
+  width: 294px;
+}
+
+.select-panel-list {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.select-panel-list-view {
+  max-width: 340px;
+}
+
+.disable-item {
+  padding-right: 5px;
+  color: rgb(245 245 245);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.select-panel-list-view-lay {
+  width: 294px;
+}
+
 .pagination-parent-view {
   display: flex;
   align-items: center;
-  gap: 1rem; /* Adjust spacing between elements */
-  padding: 0.5rem; /* Add some padding around the component */
+  justify-content: flex-end;
+  gap: 1rem;
+  /* Adjust spacing between elements */
+  padding: 0.5rem;
+  /* Add some padding around the component */
+}
+
+.pagination-parent-view .logo-alignment-style {
+  cursor: pointer;
 }
 
 .pagination-numbers {
   font-size: 0.9rem;
-  color: #555; /* Adjust text color */
+  color: #555;
+  /* Adjust text color */
 }
 
 .pagination-button {
   display: flex;
-  gap: 0.5rem; /* Adjust spacing between buttons */
+  gap: 0.5rem;
+  /* Adjust spacing between buttons */
 }
 
 .pagination-arrow {
@@ -617,14 +672,17 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background-color: #f0f0f0; /* Light background for buttons */
-  color: #888; /* Default icon color */
+  background-color: #f0f0f0;
+  /* Light background for buttons */
+  color: #888;
+  /* Default icon color */
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .pagination-arrow:hover {
-  background-color: #ddd; /* Slightly darker on hover */
+  background-color: #ddd;
+  /* Slightly darker on hover */
   color: #333;
 }
 

@@ -81,5 +81,6 @@ export const PaginationComponent = ({
         )}
       </div>
     </div>
+
   );
 };
