@@ -806,7 +806,7 @@ const CreateVertexScheduler = ({
   }, [region]);
 
   useEffect(() => {
-    if(!editMode){
+    if (!editMode) {
       setSubNetworkSelected(subNetworkList[0]);
     }
   }, [subNetworkList]);
