@@ -617,3 +617,11 @@
 .select-panel-list-view-lay {
   width: 294px;
 }
+
+.execution-state {
+  margin: 5px 15px 5px 0;
+}
+
+.table-right-space {
+  padding-right: 15px;
+}

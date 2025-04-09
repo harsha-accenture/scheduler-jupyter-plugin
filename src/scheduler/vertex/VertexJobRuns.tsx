@@ -155,20 +155,24 @@ const VertexJobRuns = ({
         return (
           <td
             {...cell.getCellProps()}
-            className='notebook-template-table-data'
+            className="notebook-template-table-data"
             onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
-            <div className="dag-runs-table-data-state-success">{cell.render('Cell')}</div>  
+            <div className="dag-runs-table-data-state-success execution-state">
+              {cell.render('Cell')}
+            </div>
           </td>
         );
       } else if (cell.value === 'failed') {
         return (
           <td
             {...cell.getCellProps()}
-            className='notebook-template-table-data'
+            className="notebook-template-table-data"
             onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
-            <div className="dag-runs-table-data-state-failure">{cell.render('Cell')}</div>
+            <div className="dag-runs-table-data-state-failure execution-state">
+              {cell.render('Cell')}
+            </div>
           </td>
         );
       } else if (cell.value === 'running') {
@@ -176,12 +180,14 @@ const VertexJobRuns = ({
           <div>
             <td
               {...cell.getCellProps()}
-              className='notebook-template-table-data'
+              className="notebook-template-table-data"
               onClick={() =>
                 handleVertexScheduleRunStateClick(cell.row.original)
               }
             >
-              <div className="dag-runs-table-data-state-running">{cell.render('Cell')}</div>
+              <div className="dag-runs-table-data-state-running execution-state">
+                {cell.render('Cell')}
+              </div>
             </td>
           </div>
         );
@@ -190,12 +196,14 @@ const VertexJobRuns = ({
           <div>
             <td
               {...cell.getCellProps()}
-              className='notebook-template-table-data'
+              className="notebook-template-table-data"
               onClick={() =>
                 handleVertexScheduleRunStateClick(cell.row.original)
               }
             >
-              <div className="dag-runs-table-data-state-queued">{cell.render('Cell')}</div>
+              <div className="dag-runs-table-data-state-queued execution-state table-right-space">
+                {cell.render('Cell')}
+              </div>
             </td>
           </div>
         );
