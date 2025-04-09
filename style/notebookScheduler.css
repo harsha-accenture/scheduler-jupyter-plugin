@@ -489,6 +489,10 @@
   cursor: pointer;
 }
 
+.scheduler-region-top {
+  padding-top: 10px;
+}
+
 .enable-error-text-label a {
   color: blue;
   text-decoration: underline;
@@ -591,4 +595,25 @@
 
 .execution-task-log-outline {
   outline: 1px solid var(--jp-layout-color3);
+}
+
+.select-panel-list {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.select-panel-list-view {
+  max-width: 340px;
+}
+
+.disable-item {
+  padding-right: 5px;
+  color: rgb(245 245 245);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.select-panel-list-view-lay {
+  width: 294px;
 }
