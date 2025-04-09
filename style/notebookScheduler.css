@@ -399,15 +399,6 @@
   padding-left: 27px;
 }
 
-.pagination-button {
-  padding: 15px 10px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  float: right;
-  width: 10%;
-}
-
 .content-pd-space {
   padding: 0 0 22px 22px;
   width: 370px !important;
@@ -616,4 +607,63 @@
 
 .select-panel-list-view-lay {
   width: 294px;
+}
+
+.pagination-parent-view {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  /* Adjust spacing between elements */
+  gap: 1rem;
+
+  /* Add some padding around the component */
+  padding: 0.5rem;
+}
+
+.pagination-parent-view .logo-alignment-style {
+  cursor: pointer;
+}
+
+.pagination-numbers {
+  font-size: 0.9rem;
+
+  /* Adjust text color */
+  color: #555;
+}
+
+.pagination-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+
+  /* Light background for buttons */
+  background-color: #f0f0f0;
+
+  /* Default icon color */
+  color: #888;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.pagination-arrow:hover {
+  /* Slightly darker on hover */
+  background-color: #ddd;
+  color: #333;
+}
+
+.pagination-arrow.disabled {
+  background-color: #eee;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-arrow.disabled:hover {
+  background-color: #eee;
+  color: #ccc;
 }
