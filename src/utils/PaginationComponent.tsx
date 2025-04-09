@@ -55,7 +55,10 @@ export const PaginationComponent = ({
         aria-disabled={!canPreviousPage || isLoading}
       >
         {canPreviousPage && !isLoading ? (
-          <iconPrevious.react tag="div" className="logo-alignment-style cursor-icon" />
+          <iconPrevious.react
+            tag="div"
+            className="logo-alignment-style cursor-icon"
+          />
         ) : (
           <iconPrevious.react
             tag="div"
@@ -72,7 +75,10 @@ export const PaginationComponent = ({
         aria-disabled={!canNextPage || isLoading}
       >
         {canNextPage && !isLoading ? (
-          <iconNext.react tag="div" className="logo-alignment-style cursor-icon" />
+          <iconNext.react
+            tag="div"
+            className="logo-alignment-style cursor-icon"
+          />
         ) : (
           <iconNext.react
             tag="div"
@@ -81,6 +87,5 @@ export const PaginationComponent = ({
         )}
       </div>
     </div>
-
   );
 };

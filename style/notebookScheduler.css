@@ -399,15 +399,6 @@
   padding-left: 27px;
 }
 
-.pagination-button {
-  padding: 15px 10px 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  float: right;
-  width: 10%;
-}
-
 .content-pd-space {
   padding: 0 0 22px 22px;
   width: 370px !important;
@@ -618,35 +609,16 @@
   width: 294px;
 }
 
-.select-panel-list {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.select-panel-list-view {
-  max-width: 340px;
-}
-
-.disable-item {
-  padding-right: 5px;
-  color: rgb(245 245 245);
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.select-panel-list-view-lay {
-  width: 294px;
-}
-
 .pagination-parent-view {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 1rem;
+
   /* Adjust spacing between elements */
-  padding: 0.5rem;
+  gap: 1rem;
+
   /* Add some padding around the component */
+  padding: 0.5rem;
 }
 
 .pagination-parent-view .logo-alignment-style {
@@ -655,14 +627,9 @@
 
 .pagination-numbers {
   font-size: 0.9rem;
-  color: #555;
-  /* Adjust text color */
-}
 
-.pagination-button {
-  display: flex;
-  gap: 0.5rem;
-  /* Adjust spacing between buttons */
+  /* Adjust text color */
+  color: #555;
 }
 
 .pagination-arrow {
@@ -672,17 +639,21 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background-color: #f0f0f0;
+
   /* Light background for buttons */
-  color: #888;
+  background-color: #f0f0f0;
+
   /* Default icon color */
+  color: #888;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .pagination-arrow:hover {
-  background-color: #ddd;
   /* Slightly darker on hover */
+  background-color: #ddd;
   color: #333;
 }
 

@@ -946,9 +946,6 @@ function ListVertexScheduler({
             aria-label="cancel Batch"
             onClick={() => {
               handleCurrentPageRefresh();
-              //listVertexScheduleInfoAPI(null);
-              // setPageTokenList([]);
-              // setCanPreviousPage(false);
             }}
           >
             <div>REFRESH</div>
