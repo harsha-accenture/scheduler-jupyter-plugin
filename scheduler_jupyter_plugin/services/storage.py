@@ -63,7 +63,7 @@ class Client:
         try:
             cloud_storage_buckets = []
             credentials = oauth2.Credentials(self._access_token)
-            storage_client = storage.Client(credentials=credentials)
+            storage_client = storage.Client(credentials=credentials, project=self.project_id)
             buckets = storage_client.list_buckets()
             for bucket in buckets:
                 cloud_storage_buckets.append(bucket.name)
