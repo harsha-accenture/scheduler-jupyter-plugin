@@ -158,36 +158,5 @@ export const PaginationComponent = ({
     
     </div>
 
-    // <div className="pagination-parent-view pagination ">
-    //     <div className="page-display-part pagination-numbers">
-    //       {currentStartIndex} - {currentLastIndex} of many
-    //     </div>
-    // <div className='pagination-button '>
-    //   <div
-    //     role="button"
-    //     // className={
-    //     //   !canPreviousPage ? 'page-move-button disabled' : 'page-move-button'
-    //     // }
-    //     className={
-    //         !canPreviousPage ? 'pagination-arrow disabled' : 'pagination-arrow'
-    //       }
-    //     onClick={() => handlePreviousPage()}
-    //   >
-    //     <iconPrevious.react
-    //       tag="div"
-    //       className="icon-white logo-alignment-style"
-    //     />
-    //   </div>
-    //   </div>
-    //   <div
-    //     role="button"
-    //     onClick={() => handleNextPage()}
-    //     className={
-    //       !canNextPage ? 'pagination-arrow disabled' : 'pagination-arrow'
-    //     }
-    //   >
-    //     <iconNext.react tag="div" className="icon-white logo-alignment-style" />
-    //   </div>
-    // </div>
   );
 };

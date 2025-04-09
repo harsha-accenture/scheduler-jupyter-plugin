@@ -516,16 +516,11 @@ function ListVertexScheduler({
     rows,
     prepareRow,
     page,
-    // canPreviousPage,
-    // canNextPage,
-    // nextPage,
-    // previousPage,
     setPageSize,
     state: { pageIndex, pageSize }
   } = useTable(
     //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagList>'
-    {
-      columns,
+    {columns,
       data,
       autoResetPage: false,
       initialState: { pageSize: scheduleListPageLength },
