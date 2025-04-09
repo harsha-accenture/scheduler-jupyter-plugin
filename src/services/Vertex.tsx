@@ -610,7 +610,7 @@ export class VertexServices {
     schedulerData: ISchedulerData | undefined,
     selectedMonth: Dayjs | null,
     setIsLoading: (value: boolean) => void,
-    setDagRunsList: (value: IVertexScheduleRunList[]) => void,
+    setVertexScheduleRunsList: (value: IVertexScheduleRunList[]) => void,
     setBlueListDates: (value: string[]) => void,
     setGreyListDates: (value: string[]) => void,
     setOrangeListDates: (value: string[]) => void,
@@ -725,7 +725,7 @@ export class VertexServices {
       setRedListDates(redList);
       setGreenListDates(greenList);
       setDarkGreenListDates(darkGreenList);
-      setDagRunsList(transformDagRunListDataCurrent);
+      setVertexScheduleRunsList(transformDagRunListDataCurrent);
     } catch (error) {
       toast.error(
         'Error in fetching the execution history',
