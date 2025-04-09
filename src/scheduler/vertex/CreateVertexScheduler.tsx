@@ -716,7 +716,8 @@ const CreateVertexScheduler = ({
         payload,
         setCreateCompleted,
         setCreatingVertexScheduler,
-        gcsPath
+        gcsPath,
+        setEditMode
       );
     } else {
       await VertexServices.createVertexSchedulerService(
@@ -724,8 +725,8 @@ const CreateVertexScheduler = ({
         setCreateCompleted,
         setCreatingVertexScheduler
       );
+      setEditMode(false);
     }
-    setEditMode(false);
   };
 
   /**
@@ -805,7 +806,9 @@ const CreateVertexScheduler = ({
   }, [region]);
 
   useEffect(() => {
-    setSubNetworkSelected(subNetworkList[0]);
+    if(!editMode){
+      setSubNetworkSelected(subNetworkList[0]);
+    }
   }, [subNetworkList]);
 
   useEffect(() => {

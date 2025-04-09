@@ -83,8 +83,13 @@ export class VertexServices {
         method: 'POST'
       });
       if (data.error) {
-        toast.error(data.error, toastifyCustomStyle);
-        setCreatingVertexScheduler(false);
+        if (data.error.includes(':')) {
+          toast.error(data.error.split(':')[0], toastifyCustomStyle);
+          setCreatingVertexScheduler(false);
+        } else {
+          toast.error(data.error, toastifyCustomStyle);
+          setCreatingVertexScheduler(false);
+        }
       } else {
         toast.success(
           `Job ${payload.display_name} successfully created`,
@@ -108,7 +113,8 @@ export class VertexServices {
     payload: ICreatePayload,
     setCreateCompleted: (value: boolean) => void,
     setCreatingVertexScheduler: (value: boolean) => void,
-    gcsPath: string
+    gcsPath: string,
+    setEditMode: (value: boolean) => void
   ) => {
     setCreatingVertexScheduler(true);
     if (gcsPath) {
@@ -138,6 +144,7 @@ export class VertexServices {
         );
         setCreatingVertexScheduler(false);
         setCreateCompleted(true);
+        setEditMode(false);
       }
     } catch (reason) {
       setCreatingVertexScheduler(false);
