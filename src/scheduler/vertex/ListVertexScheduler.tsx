@@ -251,11 +251,14 @@ function ListVertexScheduler({
       setFetchCurrentPage(false); // to make sure ttoken list is not refreshed again.
     }
 
-    const hasPreviousPage = pageTokenList.length > 1 && updatedPageTokenList.length > 0; // true only if not in first page
-    setCanPreviousPage(hasPreviousPage);// false only on first page
-    
-    if (nextPageToken) { // add new token after getting paginated token list and has set Previous flag.
-      if (!updatedPageTokenList.includes(nextPageToken)) {// to make sure the token is added only once.
+    const hasPreviousPage =
+      pageTokenList.length > 1 && updatedPageTokenList.length > 0; // true only if not in first page
+    setCanPreviousPage(hasPreviousPage); // false only on first page
+
+    if (nextPageToken) {
+      // add new token after getting paginated token list and has set Previous flag.
+      if (!updatedPageTokenList.includes(nextPageToken)) {
+        // to make sure the token is added only once.
         setPageTokenList([...updatedPageTokenList, nextPageToken]); // set paginated token list and the new token list.
       }
       setCanNextPage(true); // enable next page icon
@@ -521,7 +524,8 @@ function ListVertexScheduler({
     state: { pageIndex, pageSize }
   } = useTable(
     //@ts-expect-error react-table 'columns' which is declared here on type 'TableOptions<IDagList>'
-    {columns,
+    {
+      columns,
       data,
       autoResetPage: false,
       initialState: { pageSize: scheduleListPageLength },
