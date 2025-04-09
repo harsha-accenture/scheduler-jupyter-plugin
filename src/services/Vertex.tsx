@@ -176,7 +176,9 @@ export class VertexServices {
     try {
       const serviceURL = 'api/vertex/listSchedules';
       let urlparam = `?region_id=${region}&page_size=${pageLength}`;
-      if (newPageToken) urlparam += `&page_token=${newPageToken}`;
+      if (newPageToken) {
+        urlparam += `&page_token=${newPageToken}`;
+      }
 
       // API call
       const formattedResponse = await requestAPI(serviceURL + urlparam);
@@ -189,14 +191,14 @@ export class VertexServices {
       }
 
       // Define the expected type for formattedResponse
-      interface FormattedResponse {
+      interface IFormattedResponse {
         schedules?: IVertexScheduleList[];
         nextPageToken?: string;
         error?: { code: number; message: string };
       }
 
       const { schedules, nextPageToken, error } =
-        formattedResponse as FormattedResponse;
+        formattedResponse as IFormattedResponse;
 
       // Handle API error
       if (error?.code === 403) {
