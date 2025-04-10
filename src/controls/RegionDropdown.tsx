@@ -52,30 +52,30 @@ export function RegionDropdown(props: Props) {
       options={regionStrList}
       onChange={(_, value) => onRegionChange(value ?? '')}
       PaperComponent={(props: PaperProps) => <Paper elevation={8} {...props} />}
-      renderInput={params => <TextField 
-        {...params} 
-        label={'Region*'}
-        InputProps={{
-          ...params.InputProps,
-          endAdornment: (
-            <>
-              {loaderRegion && !region ? (
-                <CircularProgress
-                  aria-label="Loading Spinner"
-                  data-testid="loader"
-                  size={18}
-                />
-              ) : null}
-              {params.InputProps.endAdornment}
-            </>
-          )
-        }}
+      renderInput={params => (
+        <TextField
+          {...params}
+          label={'Region*'}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {loaderRegion && !region ? (
+                  <CircularProgress
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                    size={18}
+                  />
+                ) : null}
+                {params.InputProps.endAdornment}
+              </>
+            )
+          }}
         />
-        
-      }
+      )}
       loading={!(regionStrList.length > 0)}
       disabled={editMode}
-      disableClearable={loaderRegion && !region} 
+      disableClearable={loaderRegion && !region}
     />
   );
 }
