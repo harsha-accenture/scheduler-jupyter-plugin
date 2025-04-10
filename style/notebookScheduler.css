@@ -667,3 +667,7 @@
   background-color: #eee;
   color: #ccc;
 }
+
+.w-height {
+  height: 100vh;
+}

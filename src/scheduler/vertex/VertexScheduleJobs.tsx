@@ -59,7 +59,8 @@ const VertexScheduleJobs = ({
   setGcsPath,
   setExecutionPageFlag,
   setIsApiError,
-  setApiError
+  setApiError,
+  setExecutionWindowHeight
 }: {
   app: JupyterLab;
   themeManager: IThemeManager;
@@ -101,6 +102,7 @@ const VertexScheduleJobs = ({
   setExecutionPageFlag: (value: boolean) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  setExecutionWindowHeight: (value: boolean) => void;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] =
     useState<boolean>(false);
@@ -136,6 +138,7 @@ const VertexScheduleJobs = ({
           scheduleName={scheduleName}
           handleBackButton={handleBackButton}
           setExecutionPageFlag={setExecutionPageFlag}
+          setExecutionWindowHeight={setExecutionWindowHeight}
         />
       ) : (
         <ListVertexScheduler
@@ -217,6 +220,7 @@ export class NotebookJobs extends SchedulerWidget {
   setGcsPath: (value: string) => void;
   setIsApiError: (value: boolean) => void;
   setApiError: (value: string) => void;
+  setExecutionWindowHeight: (value: boolean) => void;
 
   constructor(
     app: JupyterLab,
@@ -259,6 +263,7 @@ export class NotebookJobs extends SchedulerWidget {
     setGcsPath: (value: string) => void,
     setIsApiError: (value: boolean) => void,
     setApiError: (value: string) => void,
+    setExecutionWindowHeight: (value: boolean) => void,
     setJobNameSelected?: (value: string) => void
   ) {
     super(themeManager);
@@ -295,6 +300,7 @@ export class NotebookJobs extends SchedulerWidget {
     this.setIsApiError = setIsApiError;
     this.setApiError = setApiError;
     this.setGcsPath = setGcsPath;
+    this.setExecutionWindowHeight = setExecutionWindowHeight;
   }
   renderInternal(): React.JSX.Element {
     return (
@@ -331,6 +337,7 @@ export class NotebookJobs extends SchedulerWidget {
         setExecutionPageFlag={this.setExecutionPageFlag}
         setIsApiError={this.setIsApiError}
         setApiError={this.setApiError}
+        setExecutionWindowHeight={this.setExecutionWindowHeight}
       />
     );
   }

@@ -66,6 +66,8 @@ const NotebookSchedulerComponent = ({
   const [schedulerBtnDisable, setSchedulerBtnDisable] =
     useState<boolean>(false);
   const [packageEditFlag, setPackageEditFlag] = useState<boolean>(false);
+  const [executionWindowHeight, setExecutionWindowHeight] =
+    useState<boolean>(false);
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -137,7 +139,11 @@ const NotebookSchedulerComponent = ({
   };
 
   return (
-    <div className="component-level">
+    <div
+      className={
+        executionWindowHeight ? 'component-level w-height' : 'component-level'
+      }
+    >
       {!createCompleted ? (
         <>
           <div className="cluster-details-header">
@@ -285,6 +291,7 @@ const NotebookSchedulerComponent = ({
           setIsApiError={setIsApiError}
           setApiError={setApiError}
           jobNameSpecialValidation={jobNameSpecialValidation}
+          setExecutionWindowHeight={setExecutionWindowHeight}
         />
       )}
     </div>

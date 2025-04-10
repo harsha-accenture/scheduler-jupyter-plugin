@@ -79,7 +79,8 @@ const CreateVertexScheduler = ({
   setExecutionPageFlag,
   setIsApiError,
   setApiError,
-  jobNameSpecialValidation
+  jobNameSpecialValidation,
+  setExecutionWindowHeight
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -97,6 +98,7 @@ const CreateVertexScheduler = ({
   setIsApiError: React.Dispatch<React.SetStateAction<boolean>>;
   setApiError: React.Dispatch<React.SetStateAction<string>>;
   jobNameSpecialValidation: boolean;
+  setExecutionWindowHeight: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [parameterDetail, setParameterDetail] = useState<string[]>([]);
   const [parameterDetailUpdated, setParameterDetailUpdated] = useState<
@@ -876,6 +878,7 @@ const CreateVertexScheduler = ({
           setExecutionPageFlag={setExecutionPageFlag}
           setIsApiError={setIsApiError}
           setApiError={setApiError}
+          setExecutionWindowHeight={setExecutionWindowHeight}
         />
       ) : (
         <div className="submit-job-container text-enable-warning">
