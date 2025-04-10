@@ -159,6 +159,8 @@ const CreateNotebookScheduler = ({
   const [disableEnvLocal, setDisabaleEnvLocal] = useState<boolean>(false);
   const [clusterFlag, setClusterFlag] = useState<boolean>(false);
   const [envApiFlag, setEnvApiFlag] = useState<boolean>(false);
+  const [loaderRegion, setLoaderRegion] = useState<boolean>(false);
+  const [loaderProjectId, setLoaderProjectId] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -527,9 +529,13 @@ const CreateNotebookScheduler = ({
   };
 
   useEffect(() => {
+    setLoaderRegion(true);
+    setLoaderProjectId(true);
     authApi().then(credentials => {
       if (credentials && credentials.project_id && credentials.region_id) {
+        setLoaderProjectId(false);
         setProjectId(credentials.project_id);
+        setLoaderRegion(false);
         setRegion(credentials.region_id);
       }
     });
@@ -624,6 +630,7 @@ const CreateNotebookScheduler = ({
                 }}
                 popupIcon={null}
                 className={disableEnvLocal ? 'disable-item' : ''}
+                loaderProjectId={loaderProjectId}
               />
             </div>
             {!projectId && <ErrorMessage message="Project ID is required" />}
@@ -634,6 +641,7 @@ const CreateNotebookScheduler = ({
                 region={region}
                 onRegionChange={region => handleRegionChange(region)}
                 editMode={disableEnvLocal}
+                loaderRegion={loaderRegion}
               />
             </div>
             {!region && <ErrorMessage message="Region is required" />}
@@ -645,9 +653,28 @@ const CreateNotebookScheduler = ({
                 value={composerSelected}
                 onChange={(_event, val) => handleComposerSelected(val)}
                 renderInput={params => (
-                  <TextField {...params} label="Environment*" />
+                  <TextField
+                    {...params}
+                    label="Environment*"
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {!(composerList.length > 0) && region && envApiFlag && (
+                            <CircularProgress
+                              aria-label="Loading Spinner"
+                              data-testid="loader"
+                              size={18}
+                            />
+                          )}
+                          {params.InputProps.endAdornment}
+                        </>
+                      )
+                    }}
+                  />
                 )}
                 disabled={editMode || disableEnvLocal || envApiFlag}
+                disableClearable={!projectId || !region}
               />
             </div>
             {!composerSelected && (
