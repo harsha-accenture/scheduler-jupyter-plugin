@@ -245,13 +245,15 @@ class Client:
             self.log.exception(f"Error fetching ui config: {str(e)}")
             return {"Error fetching ui config": str(e)}
 
-    async def list_schedules(self, region_id, next_page_token=None):
+    async def list_schedules(self, region_id, page_size=100, next_page_token=None):
         try:
             result = {}
+            
             if next_page_token:
-                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules?orderBy=createTime desc&pageToken={next_page_token}"
+                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules?orderBy=createTime desc&pageToken={next_page_token}&pageSize={page_size}"
+                
             else:
-                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules?orderBy=createTime desc"
+                api_endpoint = f"https://{region_id}-aiplatform.googleapis.com/v1/projects/{self.project_id}/locations/{region_id}/schedules?orderBy=createTime desc&pageSize={page_size}"
 
             headers = self.create_headers()
             async with self.client_session.get(

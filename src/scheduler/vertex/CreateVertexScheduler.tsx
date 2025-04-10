@@ -435,11 +435,15 @@ const CreateVertexScheduler = ({
     target: { value: React.SetStateAction<string> };
   }) => {
     if (networkSelected === 'networkInThisProject') {
-      setSharedNetworkSelected(null);
+      if (!editMode) {
+        setSharedNetworkSelected(null);
+      }
     }
     if (networkSelected === 'networkShared') {
-      setPrimaryNetworkSelected(null);
-      setSubNetworkSelected(null);
+      if (!editMode) {
+        setPrimaryNetworkSelected(null);
+        setSubNetworkSelected(null);
+      }
     }
     setNetworkSelected(eventValue.target.value);
   };
