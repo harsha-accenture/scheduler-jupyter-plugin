@@ -19,7 +19,7 @@ import React, { useMemo } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useRegion } from '../services/RegionService';
-import { Paper, PaperProps } from '@mui/material';
+import { CircularProgress, Paper, PaperProps } from '@mui/material';
 
 type Props = {
   /** The currently selected project ID */
@@ -30,13 +30,15 @@ type Props = {
   onRegionChange: (projectId: string) => void;
   /** Edit page */
   editMode?: boolean;
+  /** Initial loading flag for region */
+  loaderRegion?: boolean;
 };
 
 /**
  * Component to render a region selector dropdown.
  */
 export function RegionDropdown(props: Props) {
-  const { projectId, region, onRegionChange, editMode } = props;
+  const { projectId, region, onRegionChange, editMode, loaderRegion } = props;
   const regions = useRegion(projectId);
 
   const regionStrList = useMemo(
@@ -50,8 +52,30 @@ export function RegionDropdown(props: Props) {
       options={regionStrList}
       onChange={(_, value) => onRegionChange(value ?? '')}
       PaperComponent={(props: PaperProps) => <Paper elevation={8} {...props} />}
-      renderInput={params => <TextField {...params} label={'Region*'} />}
+      renderInput={params => <TextField 
+        {...params} 
+        label={'Region*'}
+        InputProps={{
+          ...params.InputProps,
+          endAdornment: (
+            <>
+              {loaderRegion && !region ? (
+                <CircularProgress
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                  size={18}
+                />
+              ) : null}
+              {params.InputProps.endAdornment}
+            </>
+          )
+        }}
+        />
+        
+      }
+      loading={!(regionStrList.length > 0)}
       disabled={editMode}
+      disableClearable={loaderRegion && !region} 
     />
   );
 }
