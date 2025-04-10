@@ -78,12 +78,13 @@ class ScheduleListController(APIHandler):
         """Returns available schedules"""
         try:
             region_id = self.get_argument("region_id")
-            next_page_token = self.get_argument("next_page_token", default=None)
+            page_size = self.get_argument("page_size")
+            next_page_token = self.get_argument("page_token", default=None)
             async with aiohttp.ClientSession() as client_session:
                 client = vertex.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-                schedules = await client.list_schedules(region_id, next_page_token)
+                schedules = await client.list_schedules(region_id, page_size, next_page_token)
                 self.finish(json.dumps(schedules))
         except Exception as e:
             self.log.exception(f"Error fetching list of schedules: {str(e)}")

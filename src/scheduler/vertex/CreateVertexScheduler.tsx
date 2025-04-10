@@ -435,11 +435,15 @@ const CreateVertexScheduler = ({
     target: { value: React.SetStateAction<string> };
   }) => {
     if (networkSelected === 'networkInThisProject') {
-      setSharedNetworkSelected(null);
+      if (!editMode) {
+        setSharedNetworkSelected(null);
+      }
     }
     if (networkSelected === 'networkShared') {
-      setPrimaryNetworkSelected(null);
-      setSubNetworkSelected(null);
+      if (!editMode) {
+        setPrimaryNetworkSelected(null);
+        setSubNetworkSelected(null);
+      }
     }
     setNetworkSelected(eventValue.target.value);
   };
@@ -637,7 +641,9 @@ const CreateVertexScheduler = ({
           (item.split(':')[0].length === 0 && item.split(':')[1].length > 0)
       ) ||
       (networkSelected === 'networkInThisProject' &&
-        (primaryNetworkSelected === null || subNetworkSelected === null)) ||
+        (primaryNetworkSelected === null ||
+          subNetworkSelected === null ||
+          subNetworkSelected === undefined)) ||
       (networkSelected === 'networkShared' && sharedNetworkSelected === null) ||
       (scheduleMode === 'runSchedule' &&
         internalScheduleMode === 'cronFormat' &&
@@ -714,7 +720,8 @@ const CreateVertexScheduler = ({
         payload,
         setCreateCompleted,
         setCreatingVertexScheduler,
-        gcsPath
+        gcsPath,
+        setEditMode
       );
     } else {
       await VertexServices.createVertexSchedulerService(
@@ -722,8 +729,8 @@ const CreateVertexScheduler = ({
         setCreateCompleted,
         setCreatingVertexScheduler
       );
+      setEditMode(false);
     }
-    setEditMode(false);
   };
 
   /**
@@ -803,7 +810,9 @@ const CreateVertexScheduler = ({
   }, [region]);
 
   useEffect(() => {
-    setSubNetworkSelected(subNetworkList[0]);
+    if (!editMode) {
+      setSubNetworkSelected(subNetworkList[0]);
+    }
   }, [subNetworkList]);
 
   useEffect(() => {

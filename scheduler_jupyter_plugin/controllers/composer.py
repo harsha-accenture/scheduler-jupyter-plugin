@@ -27,11 +27,13 @@ class EnvironmentListController(APIHandler):
     async def get(self):
         """Returns names of available composer environments"""
         try:
+            project_id = self.get_argument("project_id")
+            region_id = self.get_argument("region_id")
             async with aiohttp.ClientSession() as client_session:
                 client = composer.Client(
                     await credentials.get_cached(), self.log, client_session
                 )
-                environments = await client.list_environments()
+                environments = await client.list_environments(project_id, region_id)
                 self.set_header("Content-Type", "application/json")
                 self.finish(json.dumps(environments, default=lambda x: x.dict()))
         except Exception as e:

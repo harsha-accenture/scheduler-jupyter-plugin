@@ -84,8 +84,13 @@ export class VertexServices {
         method: 'POST'
       });
       if (data.error) {
-        toast.error(data.error, toastifyCustomStyle);
-        setCreatingVertexScheduler(false);
+        if (data.error.includes(':')) {
+          toast.error(data.error.split(':')[0], toastifyCustomStyle);
+          setCreatingVertexScheduler(false);
+        } else {
+          toast.error(data.error, toastifyCustomStyle);
+          setCreatingVertexScheduler(false);
+        }
       } else {
         toast.success(
           `Job ${payload.display_name} successfully created`,
@@ -109,7 +114,8 @@ export class VertexServices {
     payload: ICreatePayload,
     setCreateCompleted: (value: boolean) => void,
     setCreatingVertexScheduler: (value: boolean) => void,
-    gcsPath: string
+    gcsPath: string,
+    setEditMode: (value: boolean) => void
   ) => {
     setCreatingVertexScheduler(true);
     if (gcsPath) {
@@ -139,6 +145,7 @@ export class VertexServices {
         );
         setCreatingVertexScheduler(false);
         setCreateCompleted(true);
+        setEditMode(false);
       }
     } catch (reason) {
       setCreatingVertexScheduler(false);
@@ -157,66 +164,92 @@ export class VertexServices {
     region: string,
     setIsLoading: (value: boolean) => void,
     setIsApiError: (value: boolean) => void,
-    setApiError: (value: string) => void
+    setApiError: (value: string) => void,
+    setNextPageToken: (value: string | null) => void, // function for setting the next page token
+    newPageToken: string | null | undefined, // token of page to be fetched
+    pageLength: number = 50, // number of items to be fetched
+    setHasNextPageToken: (value: boolean) => void // true if there are more items that were not fetched
   ) => {
     setIsLoading(true);
     setIsApiError(false);
     setApiError('');
+
     try {
-      //First render the list of scheduled jobs with all details (except job run statuses).
       const serviceURL = 'api/vertex/listSchedules';
-      const formattedResponse: any = await requestAPI(
-        serviceURL + `?region_id=${region}`
-      );
-      if (Object.keys(formattedResponse).length !== 0) {
-        if (
-          Object.hasOwn(formattedResponse, 'error') &&
-          formattedResponse.error?.code === 403
-        ) {
-          setIsApiError(true);
-          setApiError(formattedResponse.error.message);
-          setIsLoading(false);
-        } else {
-          if (
-            Object.hasOwn(formattedResponse, 'schedules') &&
-            formattedResponse.schedules.length > 0
-          ) {
-            // Initial schedule list is set without last run status.
-            setVertexScheduleList(formattedResponse.schedules);
-            setIsLoading(false);
+      let urlparam = `?region_id=${region}&page_size=${pageLength}`;
+      if (newPageToken) {
+        urlparam += `&page_token=${newPageToken}`;
+      }
 
-            // Adding a slight delay to ensure the initial render to give time for DOM refresh
-            await new Promise(resolve => requestAnimationFrame(resolve));
+      // API call
+      const formattedResponse = await requestAPI(serviceURL + urlparam);
 
-            //Fetching Last run status seperately
-            const fetchPromises = formattedResponse.schedules.map(
-              (schedule: IVertexScheduleList) =>
-                fetchLastFiveRunStatus(schedule, region, setVertexScheduleList)
-            );
-            // Execute all fetchLastRunStatus calls in parallel.
-            await Promise.all(fetchPromises);
-            setVertexScheduleList(formattedResponse.schedules);
-            setIsLoading(false);
-          } else {
-            // Set an empty array is no JobExecutions were found.
-            setVertexScheduleList([]);
-            setIsLoading(false);
-          }
-        }
-      } else {
-        //In case no schedule List was found.
+      if (!formattedResponse || Object.keys(formattedResponse).length === 0) {
         setVertexScheduleList([]);
+        setNextPageToken(null);
+        setHasNextPageToken(false);
+        return;
+      }
+
+      // Define the expected type for formattedResponse
+      interface IFormattedResponse {
+        schedules?: IVertexScheduleList[];
+        nextPageToken?: string;
+        error?: { code: number; message: string };
+      }
+
+      const { schedules, nextPageToken, error } =
+        formattedResponse as IFormattedResponse;
+
+      // Handle API error
+      if (error?.code === 403) {
+        setIsApiError(true);
+        setApiError(error.message);
+        return;
+      }
+
+      // Handle schedule data
+      if (schedules && schedules.length > 0) {
+        setVertexScheduleList(schedules);
+
+        // Handle pagination
+        if (nextPageToken) {
+          setNextPageToken(nextPageToken);
+          setHasNextPageToken(true);
+        } else {
+          setNextPageToken(null);
+          setHasNextPageToken(false);
+        }
+
+        // Adding a slight delay for DOM refresh
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        // Fetch Last run status asynchronously without waiting for completion
+        schedules.forEach((schedule: IVertexScheduleList) => {
+          // Triggering fetch asynchronously
+          fetchLastFiveRunStatus(schedule, region, setVertexScheduleList);
+        });
+
+        setIsLoading(false); // Stop loading after everything is complete
+      } else {
+        setVertexScheduleList([]);
+        setNextPageToken(null);
+        setHasNextPageToken(false);
         setIsLoading(false);
       }
-    } catch (error: any) {
+    } catch (error) {
+      // Handle errors during the API call
       setVertexScheduleList([]);
+      setNextPageToken(null);
+      setHasNextPageToken(false);
+      setIsApiError(true);
+      setApiError('An error occurred while fetching schedules.');
       SchedulerLoggingService.log(
         'Error listing vertex schedules',
         LOG_LEVEL.ERROR
       );
     } finally {
-      // To make sure loader stops.
-      setIsLoading(false);
+      setIsLoading(false); // Ensure loading is stopped
     }
   };
 
@@ -232,7 +265,11 @@ export class VertexServices {
     displayName: string,
     setResumeLoading: (value: string) => void,
     setIsApiError: (value: boolean) => void,
-    setApiError: (value: string) => void
+    setApiError: (value: string) => void,
+    setNextPageToken: (value: string | null) => void,
+    newPageToken: string | null | undefined,
+    pageLength: number = 50,
+    hasNextPage: (value: boolean) => void
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -250,7 +287,11 @@ export class VertexServices {
           region,
           setIsLoading,
           setIsApiError,
-          setApiError
+          setApiError,
+          setNextPageToken,
+          newPageToken,
+          pageLength,
+          hasNextPage
         );
         setResumeLoading('');
       } else {
@@ -277,7 +318,11 @@ export class VertexServices {
     displayName: string,
     setResumeLoading: (value: string) => void,
     setIsApiError: (value: boolean) => void,
-    setApiError: (value: string) => void
+    setApiError: (value: string) => void,
+    setNextPageToken: (value: string | null) => void,
+    newPageToken: string | null | undefined,
+    pageLength: number = 50,
+    hasNextPage: (value: boolean) => void
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -295,7 +340,11 @@ export class VertexServices {
           region,
           setIsLoading,
           setIsApiError,
-          setApiError
+          setApiError,
+          setNextPageToken,
+          newPageToken,
+          pageLength,
+          hasNextPage
         );
         setResumeLoading('');
       } else {
@@ -355,7 +404,11 @@ export class VertexServices {
     ) => void,
     setIsLoading: (value: boolean) => void,
     setIsApiError: (value: boolean) => void,
-    setApiError: (value: string) => void
+    setApiError: (value: string) => void,
+    setNextPageToken: (value: string | null) => void,
+    newPageToken: string | null | undefined,
+    pageLength: number = 50,
+    hasNextPage: (value: boolean) => void
   ) => {
     try {
       const serviceURL = 'api/vertex/deleteSchedule';
@@ -369,7 +422,11 @@ export class VertexServices {
           region,
           setIsLoading,
           setIsApiError,
-          setApiError
+          setApiError,
+          setNextPageToken,
+          newPageToken,
+          pageLength,
+          hasNextPage
         );
         toast.success(
           `Deleted job ${displayName}. It might take a few minutes to for it to be deleted from the list of jobs.`,
@@ -763,7 +820,7 @@ async function fetchLastFiveRunStatus(
       | IVertexScheduleList[]
       | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
   ) => void
-) {
+): Promise<any> {
   //Extract Schedule id from schedule name.
   const scheduleId = schedule.name.split('/').pop();
   const serviceURLLastRunResponse = 'api/vertex/listNotebookExecutionJobs';
