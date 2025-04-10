@@ -660,13 +660,15 @@ const CreateNotebookScheduler = ({
                       ...params.InputProps,
                       endAdornment: (
                         <>
-                          {!(composerList.length > 0) && region && envApiFlag && (
-                            <CircularProgress
-                              aria-label="Loading Spinner"
-                              data-testid="loader"
-                              size={18}
-                            />
-                          )}
+                          {!(composerList.length > 0) &&
+                            region &&
+                            envApiFlag && (
+                              <CircularProgress
+                                aria-label="Loading Spinner"
+                                data-testid="loader"
+                                size={18}
+                              />
+                            )}
                           {params.InputProps.endAdornment}
                         </>
                       )
