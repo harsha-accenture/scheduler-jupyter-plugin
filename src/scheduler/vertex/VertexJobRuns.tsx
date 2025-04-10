@@ -155,20 +155,24 @@ const VertexJobRuns = ({
         return (
           <td
             {...cell.getCellProps()}
-            className="dag-runs-table-data-state-success"
+            className="notebook-template-table-data"
             onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
-            {cell.render('Cell')}
+            <div className="dag-runs-table-data-state-success execution-state">
+              {cell.render('Cell')}
+            </div>
           </td>
         );
       } else if (cell.value === 'failed') {
         return (
           <td
             {...cell.getCellProps()}
-            className="dag-runs-table-data-state-failure"
+            className="notebook-template-table-data"
             onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
-            {cell.render('Cell')}
+            <div className="dag-runs-table-data-state-failure execution-state">
+              {cell.render('Cell')}
+            </div>
           </td>
         );
       } else if (cell.value === 'running') {
@@ -176,12 +180,14 @@ const VertexJobRuns = ({
           <div>
             <td
               {...cell.getCellProps()}
-              className="dag-runs-table-data-state-running"
+              className="notebook-template-table-data"
               onClick={() =>
                 handleVertexScheduleRunStateClick(cell.row.original)
               }
             >
-              {cell.render('Cell')}
+              <div className="dag-runs-table-data-state-running execution-state">
+                {cell.render('Cell')}
+              </div>
             </td>
           </div>
         );
@@ -190,12 +196,14 @@ const VertexJobRuns = ({
           <div>
             <td
               {...cell.getCellProps()}
-              className="dag-runs-table-data-state-queued"
+              className="notebook-template-table-data"
               onClick={() =>
                 handleVertexScheduleRunStateClick(cell.row.original)
               }
             >
-              {cell.render('Cell')}
+              <div className="dag-runs-table-data-state-queued execution-state table-right-space">
+                {cell.render('Cell')}
+              </div>
             </td>
           </div>
         );
