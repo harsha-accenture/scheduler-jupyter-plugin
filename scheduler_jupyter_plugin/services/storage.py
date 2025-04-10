@@ -41,7 +41,6 @@ class Client:
             blob_name = f"{job_run_id}/{file_name}"
             bucket = storage_client.bucket(bucket_name)
             blob = bucket.blob(blob_name)
-            print(f"******* blob {blob.exists()}")
             original_file_name = os.path.basename(blob_name)
 
             timestamp = time.strftime("%H%M%S")
@@ -82,10 +81,9 @@ class Client:
             bucket = storage_client.bucket(bucket_name)
             blob = bucket.blob(blob_name)
             if blob.exists():
-                return 'true'
+                return "true"
             else:
-                return 'false'
-            # return blob.exists()
+                return "false"
         except Exception as error:
             self.log.exception(f"Error checking output notebook file: {str(error)}")
             return {"error": str(error)}

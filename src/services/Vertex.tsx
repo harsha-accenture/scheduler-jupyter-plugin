@@ -30,6 +30,7 @@ import {
 } from '../scheduler/vertex/VertexInterfaces';
 import dayjs, { Dayjs } from 'dayjs';
 import { scheduleMode } from '../utils/Const';
+import { Dispatch, SetStateAction } from 'react';
 
 export class VertexServices {
   static machineTypeAPIService = async (
@@ -603,7 +604,7 @@ export class VertexServices {
     schedulerData: ISchedulerData | undefined,
     selectedMonth: Dayjs | null,
     setIsLoading: (value: boolean) => void,
-    setDagRunsList: (value: IVertexScheduleRunList[]) => void,
+    setVertexScheduleRunsList: (value: IVertexScheduleRunList[]) => void,
     setBlueListDates: (value: string[]) => void,
     setGreyListDates: (value: string[]) => void,
     setOrangeListDates: (value: string[]) => void,
@@ -639,22 +640,6 @@ export class VertexServices {
               statusMessage = jobRun.status.message;
             }
 
-            let outputFileExistsRes = {};
-            if (jobRun.jobState === 'JOB_STATE_FAILED') {
-              const bucketName = jobRun.gcsOutputUri?.split('//')[1];
-              const jobRunId = jobRun.name.split('/').pop();
-              const fileName = jobRun.gcsNotebookSource.uri.split('/').pop();
-              // outputFileExistsRes = requestAPI(
-              //   `api/storage/outputFileExists?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`
-              // );
-              outputFileExistsRes = outputFileExists(
-                bucketName,
-                jobRunId,
-                fileName
-              );
-            }
-            console.log('api res', outputFileExistsRes);
-
             return {
               jobRunId: jobRun.name.split('/').pop(),
               startDate: jobRun.createTime,
@@ -671,17 +656,11 @@ export class VertexServices {
               statusMessage:
                 jobRun.jobState === 'JOB_STATE_FAILED'
                   ? (statusMessage ?? '')
-                  : '-',
-              outputFileExists: outputFileExistsRes ? outputFileExistsRes : ''
+                  : '-'
             };
           }
         );
       }
-      await Promise.all(transformDagRunListDataCurrent);
-      console.log(
-        'transformDagRunListDataCurrent',
-        transformDagRunListDataCurrent
-      );
 
       // Group data by date and state
       const groupedDataByDateStatus = transformDagRunListDataCurrent.reduce(
@@ -742,7 +721,7 @@ export class VertexServices {
       setRedListDates(redList);
       setGreenListDates(greenList);
       setDarkGreenListDates(darkGreenList);
-      setDagRunsList(transformDagRunListDataCurrent);
+      setVertexScheduleRunsList(transformDagRunListDataCurrent);
     } catch (error) {
       toast.error(
         'Error in fetching the execution history',
@@ -750,6 +729,28 @@ export class VertexServices {
       );
     }
     setIsLoading(false);
+  };
+
+  //Funtion to check weather output file exists or not
+  static outputFileExists = async (
+    bucketName: string | undefined,
+    jobRunId: string | undefined,
+    fileName: string | undefined,
+    setIsLoading: Dispatch<SetStateAction<boolean>>,
+    setFileExists: Dispatch<SetStateAction<boolean>>
+  ) => {
+    try {
+      const formattedResponse = await requestAPI(
+        `api/storage/outputFileExists?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`
+      );
+      setFileExists(formattedResponse === 'true' ? true : false);
+      setIsLoading(false);
+    } catch (lastRunError: any) {
+      SchedulerLoggingService.log(
+        'Error checking output file',
+        LOG_LEVEL.ERROR
+      );
+    }
   };
 }
 
@@ -794,21 +795,5 @@ async function fetchLastFiveRunStatus(
       'Error fetching last five job executions',
       LOG_LEVEL.ERROR
     );
-  }
-}
-
-//Funtion to check weather output file exists or not
-async function outputFileExists(
-  bucketName: string,
-  jobRunId: string,
-  fileName: string
-) {
-  try {
-    const formattedResponse = await requestAPI(
-      `api/storage/outputFileExists?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`
-    );
-    return formattedResponse;
-  } catch (lastRunError: any) {
-    SchedulerLoggingService.log('Error checking output file', LOG_LEVEL.ERROR);
   }
 }
