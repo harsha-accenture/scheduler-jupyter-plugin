@@ -282,11 +282,34 @@ const VertexJobRuns = ({
     status?: string;
     jobRunId?: string;
     state?: string;
+    gcsUrl?: string;
+    fileName?: string;
   }) => {
+    const [isLoading, setIsLoading] = useState<boolean>(
+      data.state === 'failed' ? true : false
+    );
+    const [fileExists, setFileExists] = useState<boolean>(false);
+    const bucketName = data.gcsUrl?.split('//')[1];
+    const outPutFileExistsApi = async () => {
+      await VertexServices.outputFileExists(
+        bucketName,
+        data.jobRunId,
+        data.fileName,
+        setIsLoading,
+        setFileExists
+      );
+    };
+    useEffect(() => {
+      if (data.state === 'failed') {
+        outPutFileExistsApi();
+      }
+    }, []);
+
     return (
       <div className="action-btn-execution">
-        {jobDownloadLoading &&
-        data.jobRunId === downloadOutputVertexScheduleRunId ? (
+        {isLoading ||
+        (jobDownloadLoading &&
+          data.jobRunId === downloadOutputVertexScheduleRunId) ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -298,14 +321,14 @@ const VertexJobRuns = ({
           <div
             role="button"
             className={
-              data.state === 'succeeded'
+              data.state === 'succeeded' || fileExists
                 ? 'icon-buttons-style sub-title-heading'
                 : 'icon-buttons-style-disable sub-title-heading'
             }
             title="Download Output"
             data-dag-run-id={data}
             onClick={
-              data.state === 'succeeded'
+              data.state === 'succeeded' || fileExists
                 ? e => handleDownloadOutput(data)
                 : undefined
             }

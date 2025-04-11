@@ -30,6 +30,7 @@ import {
 } from '../scheduler/vertex/VertexInterfaces';
 import dayjs, { Dayjs } from 'dayjs';
 import { scheduleMode } from '../utils/Const';
+import { Dispatch, SetStateAction } from 'react';
 
 export class VertexServices {
   static machineTypeAPIService = async (
@@ -695,6 +696,7 @@ export class VertexServices {
               codeValue = jobRun.status.code;
               statusMessage = jobRun.status.message;
             }
+
             return {
               jobRunId: jobRun.name.split('/').pop(),
               startDate: jobRun.createTime,
@@ -716,6 +718,7 @@ export class VertexServices {
           }
         );
       }
+
       // Group data by date and state
       const groupedDataByDateStatus = transformDagRunListDataCurrent.reduce(
         (result: any, item: any) => {
@@ -783,6 +786,28 @@ export class VertexServices {
       );
     }
     setIsLoading(false);
+  };
+
+  //Funtion to check weather output file exists or not
+  static outputFileExists = async (
+    bucketName: string | undefined,
+    jobRunId: string | undefined,
+    fileName: string | undefined,
+    setIsLoading: Dispatch<SetStateAction<boolean>>,
+    setFileExists: Dispatch<SetStateAction<boolean>>
+  ) => {
+    try {
+      const formattedResponse = await requestAPI(
+        `api/storage/outputFileExists?bucket_name=${bucketName}&job_run_id=${jobRunId}&file_name=${fileName}`
+      );
+      setFileExists(formattedResponse === 'true' ? true : false);
+      setIsLoading(false);
+    } catch (lastRunError: any) {
+      SchedulerLoggingService.log(
+        'Error checking output file',
+        LOG_LEVEL.ERROR
+      );
+    }
   };
 }
 
