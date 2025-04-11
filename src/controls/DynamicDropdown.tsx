@@ -24,12 +24,18 @@ import React, {
 } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete, { AutocompleteProps } from '@mui/material/Autocomplete';
-import { ChipTypeMap, Paper, PaperProps } from '@mui/material';
+import {
+  ChipTypeMap,
+  CircularProgress,
+  Paper,
+  PaperProps
+} from '@mui/material';
 import { handleDebounce } from '../utils/Config';
 
 type Props = {
   fetchFunc: (search: string) => Promise<string[]>;
   label: string;
+  loaderProjectId?: boolean;
 };
 
 /**
@@ -41,14 +47,14 @@ export function DynamicDropdown(
       AutocompleteProps<
         string,
         undefined,
-        undefined,
+        boolean,
         undefined,
         ChipTypeMap['defaultComponent']
       >,
       'renderInput' | 'options'
     >
 ) {
-  const { value, fetchFunc, label, ...remainderProps } = props;
+  const { value, fetchFunc, label, loaderProjectId, ...remainderProps } = props;
   const [search, setSearch] = useState('');
   const [filteredList, setFilteredList] = useState<string[]>([]);
   const currentSearch = useRef(search);
@@ -100,8 +106,29 @@ export function DynamicDropdown(
       onInputChange={(_, val) => setSearch(val)}
       filterOptions={options => options}
       PaperComponent={(props: PaperProps) => <Paper elevation={8} {...props} />}
-      renderInput={params => <TextField {...params} label={label} />}
+      renderInput={params => (
+        <TextField
+          {...params}
+          label={label}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                {loaderProjectId && !value && (
+                  <CircularProgress
+                    aria-label="Loading Spinner"
+                    data-testid="loader"
+                    size={18}
+                  />
+                )}
+                {params.InputProps.endAdornment}
+              </>
+            )
+          }}
+        />
+      )}
       {...remainderProps}
+      disableClearable={loaderProjectId && !value}
     />
   );
 }
