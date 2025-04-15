@@ -32,13 +32,22 @@ type Props = {
   editMode?: boolean;
   /** Initial loading flag for region */
   loaderRegion?: boolean;
+  /** List of Regions */
+  regionsList?: Array<string>;
 };
 
 /**
  * Component to render a region selector dropdown.
  */
 export function RegionDropdown(props: Props) {
-  const { projectId, region, onRegionChange, editMode, loaderRegion } = props;
+  const {
+    projectId,
+    region,
+    onRegionChange,
+    editMode,
+    loaderRegion,
+    regionsList
+  } = props;
   const regions = useRegion(projectId);
 
   const regionStrList = useMemo(
@@ -49,7 +58,7 @@ export function RegionDropdown(props: Props) {
   return (
     <Autocomplete
       value={region}
-      options={regionStrList}
+      options={regionsList ? regionsList : regionStrList}
       onChange={(_, value) => onRegionChange(value ?? '')}
       PaperComponent={(props: PaperProps) => <Paper elevation={8} {...props} />}
       renderInput={params => (

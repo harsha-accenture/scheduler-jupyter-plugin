@@ -23,7 +23,7 @@ import { IVertexCellProps } from '../../utils/Config';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { CircularProgress, Button } from '@mui/material';
 import DeletePopup from '../../utils/DeletePopup';
-import { scheduleMode } from '../../utils/Const';
+import { scheduleMode, VERTEX_REGIONS } from '../../utils/Const';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { RegionDropdown } from '../../controls/RegionDropdown';
 import { iconDash } from '../../utils/Icons';
@@ -932,6 +932,7 @@ function ListVertexScheduler({
               projectId={projectId}
               region={region}
               onRegionChange={region => setRegion(region)}
+              regionsList={VERTEX_REGIONS}
             />
             {!isLoading && !region && (
               <ErrorMessage message="Region is required" />
