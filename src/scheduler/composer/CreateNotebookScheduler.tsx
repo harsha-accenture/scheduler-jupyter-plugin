@@ -629,7 +629,7 @@ const CreateNotebookScheduler = ({
                   }
                 }}
                 popupIcon={null}
-                className={disableEnvLocal ? 'disable-item' : ''}
+                className={disableEnvLocal || editMode ? 'disable-item' : ''}
                 loaderProjectId={loaderProjectId}
               />
             </div>
@@ -640,7 +640,7 @@ const CreateNotebookScheduler = ({
                 projectId={projectId}
                 region={region}
                 onRegionChange={region => handleRegionChange(region)}
-                editMode={disableEnvLocal}
+                editMode={disableEnvLocal || editMode}
                 loaderRegion={loaderRegion}
               />
             </div>
