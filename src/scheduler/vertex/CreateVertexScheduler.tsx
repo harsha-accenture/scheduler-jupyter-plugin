@@ -50,7 +50,8 @@ import {
   internalScheduleMode,
   KERNEL_VALUE,
   scheduleMode,
-  scheduleValueExpression
+  scheduleValueExpression,
+  VERTEX_REGIONS
 } from '../../utils/Const';
 import LabelProperties from '../../jobs/LabelProperties';
 import LearnMore from '../common/LearnMore';
@@ -744,6 +745,7 @@ const CreateVertexScheduler = ({
     } else {
       setCreateCompleted(true);
     }
+    setEditMode(false);
   };
 
   useEffect(() => {
@@ -889,6 +891,7 @@ const CreateVertexScheduler = ({
               onRegionChange={region => handleRegionChange(region)}
               editMode={editMode}
               loaderRegion={loaderRegion}
+              regionsList={VERTEX_REGIONS}
             />
           </div>
           {!region && (
