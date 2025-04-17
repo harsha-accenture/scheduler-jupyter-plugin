@@ -1181,6 +1181,7 @@ const CreateVertexScheduler = ({
                   value="networkInThisProject"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode}
                   label={
                     <Typography sx={{ fontSize: 13 }}>
                       Network in this project
@@ -1200,6 +1201,7 @@ const CreateVertexScheduler = ({
                   value="networkShared"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode}
                   label={
                     <Typography sx={{ fontSize: 13 }}>
                       Network shared from host project
