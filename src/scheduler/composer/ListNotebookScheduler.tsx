@@ -171,6 +171,7 @@ function listNotebookScheduler({
   const [isPreviewEnabled, setIsPreviewEnabled] = useState(false);
   const [projectId, setProjectId] = useState('');
   const [region, setRegion] = useState<string>('');
+  const [loaderProjectId, setLoaderProjectId] = useState<boolean>(false);
 
   const columns = React.useMemo(
     () => [
@@ -591,8 +592,10 @@ function listNotebookScheduler({
   }, [composerSelectedList]);
 
   useEffect(() => {
+    setLoaderProjectId(true);
     authApi().then(credentials => {
       if (credentials && credentials.project_id && credentials.region_id) {
+        setLoaderProjectId(false);
         setProjectId(credentials.project_id);
         setRegion(credentials.region_id);
       }
@@ -640,6 +643,7 @@ function listNotebookScheduler({
                   }
                 }}
                 popupIcon={null}
+                loaderProjectId={loaderProjectId}
               />
             </div>
             {!projectId && (

@@ -609,6 +609,14 @@
   width: 294px;
 }
 
+.execution-state {
+  margin: 5px 15px 5px 0;
+}
+
+.table-right-space {
+  padding-right: 15px;
+}
+
 .pagination-parent-view {
   display: flex;
   align-items: center;

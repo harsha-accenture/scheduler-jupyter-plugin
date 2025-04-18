@@ -32,14 +32,19 @@ class DownloadOutputController(APIHandler):
             download_result = await client.download_output(
                 bucket_name, file_name, job_run_id
             )
-            self.finish(json.dumps({"status": download_result["status"],
-                                    "downloaded_filename": download_result["downloaded_filename"]
-                                    }))
+            self.finish(
+                json.dumps(
+                    {
+                        "status": download_result["status"],
+                        "downloaded_filename": download_result["downloaded_filename"],
+                    }
+                )
+            )
         except Exception as e:
             self.log.exception({"Error in downloading output file": str(e)})
             self.finish({"Error in downloading output file": str(e)})
 
-            
+
 class CloudStorageController(APIHandler):
     @tornado.web.authenticated
     async def get(self):
@@ -51,3 +56,19 @@ class CloudStorageController(APIHandler):
         except Exception as e:
             self.log.exception(f"Error fetching cloud storage bucket: {str(e)}")
             self.finish({"error": str(e)})
+
+
+class OutputFileExistsController(APIHandler):
+    @tornado.web.authenticated
+    async def get(self):
+        """Checks output file exists or not"""
+        try:
+            bucket_name = self.get_argument("bucket_name")
+            job_run_id = self.get_argument("job_run_id")
+            file_name = self.get_argument("file_name")
+            client = storage.Client(await credentials.get_cached(), self.log)
+            result = await client.output_file_exists(bucket_name, file_name, job_run_id)
+            self.finish(json.dumps(result))
+        except Exception as e:
+            self.log.exception({"Error in checking output file": str(e)})
+            self.finish({"Error in checking output file": str(e)})

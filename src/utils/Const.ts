@@ -94,3 +94,18 @@ export const DEFAULT_PRIMARY_NETWORK = 'default';
 export const DEFAULT_CLOUD_STORAGE_BUCKET = 'default-vertex-schedules';
 export const DEFAULT_MACHINE_TYPE = 'n1-standard-2 (2 CPUs, 8.05 GB RAM)';
 export const DEFAULT_KERNEL = 'python3';
+
+export const VERTEX_REGIONS = [
+  'asia-east2',
+  'asia-northeast1',
+  'asia-northeast3',
+  'asia-south1',
+  'asia-southeast1',
+  'australia-southeast1',
+  'europe-west1',
+  'northamerica-northeast1',
+  'southamerica-east1',
+  'us-central1',
+  'us-west1',
+  'us-west4'
+];

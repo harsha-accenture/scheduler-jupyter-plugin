@@ -155,20 +155,24 @@ const VertexJobRuns = ({
         return (
           <td
             {...cell.getCellProps()}
-            className="dag-runs-table-data-state-success"
+            className="notebook-template-table-data"
             onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
-            {cell.render('Cell')}
+            <div className="dag-runs-table-data-state-success execution-state">
+              {cell.render('Cell')}
+            </div>
           </td>
         );
       } else if (cell.value === 'failed') {
         return (
           <td
             {...cell.getCellProps()}
-            className="dag-runs-table-data-state-failure"
+            className="notebook-template-table-data"
             onClick={() => handleVertexScheduleRunStateClick(cell.row.original)}
           >
-            {cell.render('Cell')}
+            <div className="dag-runs-table-data-state-failure execution-state">
+              {cell.render('Cell')}
+            </div>
           </td>
         );
       } else if (cell.value === 'running') {
@@ -176,12 +180,14 @@ const VertexJobRuns = ({
           <div>
             <td
               {...cell.getCellProps()}
-              className="dag-runs-table-data-state-running"
+              className="notebook-template-table-data"
               onClick={() =>
                 handleVertexScheduleRunStateClick(cell.row.original)
               }
             >
-              {cell.render('Cell')}
+              <div className="dag-runs-table-data-state-running execution-state">
+                {cell.render('Cell')}
+              </div>
             </td>
           </div>
         );
@@ -190,12 +196,14 @@ const VertexJobRuns = ({
           <div>
             <td
               {...cell.getCellProps()}
-              className="dag-runs-table-data-state-queued"
+              className="notebook-template-table-data"
               onClick={() =>
                 handleVertexScheduleRunStateClick(cell.row.original)
               }
             >
-              {cell.render('Cell')}
+              <div className="dag-runs-table-data-state-queued execution-state table-right-space">
+                {cell.render('Cell')}
+              </div>
             </td>
           </div>
         );
@@ -274,11 +282,34 @@ const VertexJobRuns = ({
     status?: string;
     jobRunId?: string;
     state?: string;
+    gcsUrl?: string;
+    fileName?: string;
   }) => {
+    const [isLoading, setIsLoading] = useState<boolean>(
+      data.state === 'failed' ? true : false
+    );
+    const [fileExists, setFileExists] = useState<boolean>(false);
+    const bucketName = data.gcsUrl?.split('//')[1];
+    const outPutFileExistsApi = async () => {
+      await VertexServices.outputFileExists(
+        bucketName,
+        data.jobRunId,
+        data.fileName,
+        setIsLoading,
+        setFileExists
+      );
+    };
+    useEffect(() => {
+      if (data.state === 'failed') {
+        outPutFileExistsApi();
+      }
+    }, []);
+
     return (
       <div className="action-btn-execution">
-        {jobDownloadLoading &&
-        data.jobRunId === downloadOutputVertexScheduleRunId ? (
+        {isLoading ||
+        (jobDownloadLoading &&
+          data.jobRunId === downloadOutputVertexScheduleRunId) ? (
           <div className="icon-buttons-style">
             <CircularProgress
               size={18}
@@ -290,14 +321,14 @@ const VertexJobRuns = ({
           <div
             role="button"
             className={
-              data.state === 'succeeded'
+              data.state === 'succeeded' || fileExists
                 ? 'icon-buttons-style sub-title-heading'
                 : 'icon-buttons-style-disable sub-title-heading'
             }
             title="Download Output"
             data-dag-run-id={data}
             onClick={
-              data.state === 'succeeded'
+              data.state === 'succeeded' || fileExists
                 ? e => handleDownloadOutput(data)
                 : undefined
             }

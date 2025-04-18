@@ -115,6 +115,7 @@ const NotebookSchedulerComponent = ({
       setCreateCompleted(true);
       setPackageEditFlag(false);
     }
+    setEditMode(false);
   };
 
   const handleSchedulerModeChange = (

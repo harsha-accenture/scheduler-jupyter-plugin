@@ -50,7 +50,8 @@ import {
   internalScheduleMode,
   KERNEL_VALUE,
   scheduleMode,
-  scheduleValueExpression
+  scheduleValueExpression,
+  VERTEX_REGIONS
 } from '../../utils/Const';
 import LabelProperties from '../../jobs/LabelProperties';
 import LearnMore from '../common/LearnMore';
@@ -190,6 +191,7 @@ const CreateVertexScheduler = ({
   const [endDateError, setEndDateError] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>('');
   const [gcsPath, setGcsPath] = useState('');
+  const [loaderRegion, setLoaderRegion] = useState<boolean>(false);
 
   /**
    * Changing the region value and empyting the value of machineType, accelratorType and accelratorCount
@@ -745,6 +747,7 @@ const CreateVertexScheduler = ({
     } else {
       setCreateCompleted(true);
     }
+    setEditMode(false);
   };
 
   useEffect(() => {
@@ -762,6 +765,7 @@ const CreateVertexScheduler = ({
   }, [createCompleted]);
 
   useEffect(() => {
+    setLoaderRegion(true);
     if (region !== '') {
       machineTypeAPI();
     }
@@ -775,6 +779,7 @@ const CreateVertexScheduler = ({
     authApi()
       .then(credentials => {
         if (credentials && credentials?.region_id && credentials.project_id) {
+          setLoaderRegion(false);
           setRegion(credentials.region_id);
           setProjectId(credentials.project_id);
         }
@@ -815,15 +820,17 @@ const CreateVertexScheduler = ({
     if (!editMode) {
       setSubNetworkSelected(subNetworkList[0]);
     }
-  }, [subNetworkList]);
+  }, [subNetworkList, networkSelected]);
 
   useEffect(() => {
-    const primaryNetwork = primaryNetworkList[0];
-    setPrimaryNetworkSelected(primaryNetwork);
-    if (primaryNetwork) {
-      subNetworkAPI(DEFAULT_PRIMARY_NETWORK);
+    if (!editMode) {
+      const primaryNetwork = primaryNetworkList[0];
+      setPrimaryNetworkSelected(primaryNetwork);
+      if (primaryNetwork) {
+        subNetworkAPI(DEFAULT_PRIMARY_NETWORK);
+      }
     }
-  }, [primaryNetworkList]);
+  }, [primaryNetworkList, networkSelected]);
 
   useEffect(() => {
     setCloudStorage(
@@ -888,6 +895,8 @@ const CreateVertexScheduler = ({
               region={region}
               onRegionChange={region => handleRegionChange(region)}
               editMode={editMode}
+              loaderRegion={loaderRegion}
+              regionsList={VERTEX_REGIONS}
             />
           </div>
           {!region && (
@@ -903,10 +912,28 @@ const CreateVertexScheduler = ({
               value={machineTypeSelected}
               onChange={(_event, val) => handleMachineType(val)}
               renderInput={params => (
-                <TextField {...params} label="Machine type*" />
+                <TextField
+                  {...params}
+                  label="Machine type*"
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {machineTypeLoading && !machineTypeSelected ? (
+                          <CircularProgress
+                            aria-label="Loading Spinner"
+                            data-testid="loader"
+                            size={18}
+                          />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    )
+                  }}
+                />
               )}
               clearIcon={false}
-              loading={machineTypeLoading}
+              loading={!region || machineTypeLoading}
             />
           </div>
 
@@ -1157,6 +1184,7 @@ const CreateVertexScheduler = ({
                   value="networkInThisProject"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode}
                   label={
                     <Typography sx={{ fontSize: 13 }}>
                       Network in this project
@@ -1176,6 +1204,7 @@ const CreateVertexScheduler = ({
                   value="networkShared"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode}
                   label={
                     <Typography sx={{ fontSize: 13 }}>
                       Network shared from host project
