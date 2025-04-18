@@ -97,7 +97,7 @@ const NotebookJobComponent = ({
   setPackageEditFlag: (value: boolean) => void;
   setSchedulerBtnDisable: (value: boolean) => void;
   composerSelected?: string;
-  composerPreSelectFlag:boolean;
+  composerPreSelectFlag: boolean;
 }): React.JSX.Element => {
   const [showExecutionHistory, setShowExecutionHistory] = useState(false);
   const [composerName, setComposerName] = useState('');

@@ -627,166 +627,163 @@ function listNotebookScheduler({
   }, [region]);
 
   return (
-      <div>
-        <div className="select-text-overlay-scheduler">
-          <div className="select-panel-list">
-            <div>
-              <div
-                className={
-                  importErrorEntries > 0
-                    ? 'create-scheduler-form-element select-panel-list-view-lay success_icon'
-                    : 'create-scheduler-form-element select-panel-list-view'
-                }
-              >
-                <DynamicDropdown
-                  value={projectId}
-                  onChange={(_, projectId: string | null) =>
-                    setProjectId(projectId ?? '')
-                  }
-                  fetchFunc={projectListAPI}
-                  label="Project ID*"
-                  // Always show the clear indicator and hide the dropdown arrow
-                  // make it very clear that this is an autocomplete.
-                  sx={{
-                    '& .MuiAutocomplete-clearIndicator': {
-                      visibility: 'visible'
-                    }
-                  }}
-                  popupIcon={null}
-                  loaderProjectId={loaderProjectId}
-                />
-              </div>
-              {!projectId && (
-                <ErrorMessage
-                  message="Project ID is required"
-                  showIcon={false}
-                />
-              )}
-            </div>
-
-            <div>
-              <div
-                className={
-                  importErrorEntries > 0
-                    ? 'create-scheduler-form-element select-panel-list-view-lay success_icon'
-                    : 'create-scheduler-form-element select-panel-list-view'
-                }
-              >
-                <RegionDropdown
-                  projectId={projectId}
-                  region={region}
-                  onRegionChange={region => handleRegionChange(region)}
-                />
-              </div>
-              {!region && (
-                <ErrorMessage message="Region is required" showIcon={false} />
-              )}
-            </div>
-
+    <div>
+      <div className="select-text-overlay-scheduler">
+        <div className="select-panel-list">
+          <div>
             <div
               className={
                 importErrorEntries > 0
-                  ? 'create-scheduler-form-element select-panel-list-view-lay progress-main'
+                  ? 'create-scheduler-form-element select-panel-list-view-lay success_icon'
                   : 'create-scheduler-form-element select-panel-list-view'
               }
             >
-              <Autocomplete
-                options={composerList}
-                value={composerSelectedList}
-                onChange={(_event, val) => {
-                  handleComposerSelected(val);
+              <DynamicDropdown
+                value={projectId}
+                onChange={(_, projectId: string | null) =>
+                  setProjectId(projectId ?? '')
+                }
+                fetchFunc={projectListAPI}
+                label="Project ID*"
+                // Always show the clear indicator and hide the dropdown arrow
+                // make it very clear that this is an autocomplete.
+                sx={{
+                  '& .MuiAutocomplete-clearIndicator': {
+                    visibility: 'visible'
+                  }
                 }}
-                renderInput={params => (
-                  <TextField {...params} label="Environment*" />
-                )}
+                popupIcon={null}
+                loaderProjectId={loaderProjectId}
               />
-              {!composerSelectedList && (
-                <ErrorMessage
-                  message="Environment is required"
-                  showIcon={false}
-                />
-              )}
             </div>
+            {!projectId && (
+              <ErrorMessage message="Project ID is required" showIcon={false} />
+            )}
           </div>
 
-          {importErrorEntries > 0 && (
-            <div className="import-error-parent">
-              <div
-                className="accordion-button"
-                role="button"
-                aria-label="Show Import Errors"
-                title="Show Import Errors"
-                onClick={handleImportErrorPopup}
-              >
-                Show Schedule Errors ({importErrorEntries})
-              </div>
-              {importErrorPopupOpen && (
-                <ImportErrorPopup
-                  importErrorData={importErrorData}
-                  importErrorEntries={importErrorEntries}
-                  importErrorPopupOpen={importErrorPopupOpen}
-                  onClose={handleImportErrorClosed}
-                  onDelete={(dagId: string) => handleDeleteImportError(dagId)}
-                />
-              )}
+          <div>
+            <div
+              className={
+                importErrorEntries > 0
+                  ? 'create-scheduler-form-element select-panel-list-view-lay success_icon'
+                  : 'create-scheduler-form-element select-panel-list-view'
+              }
+            >
+              <RegionDropdown
+                projectId={projectId}
+                region={region}
+                onRegionChange={region => handleRegionChange(region)}
+              />
             </div>
-          )}
+            {!region && (
+              <ErrorMessage message="Region is required" showIcon={false} />
+            )}
+          </div>
+
+          <div
+            className={
+              importErrorEntries > 0
+                ? 'create-scheduler-form-element select-panel-list-view-lay progress-main'
+                : 'create-scheduler-form-element select-panel-list-view'
+            }
+          >
+            <Autocomplete
+              options={composerList}
+              value={composerSelectedList}
+              onChange={(_event, val) => {
+                handleComposerSelected(val);
+              }}
+              renderInput={params => (
+                <TextField {...params} label="Environment*" />
+              )}
+            />
+            {!composerSelectedList && (
+              <ErrorMessage
+                message="Environment is required"
+                showIcon={false}
+              />
+            )}
+          </div>
         </div>
 
-        {dagList.length > 0 ? (
-          <div className="notebook-templates-list-table-parent">
-            <TableData
-              getTableProps={getTableProps}
-              headerGroups={headerGroups}
-              getTableBodyProps={getTableBodyProps}
-              isLoading={isLoading}
-              rows={rows}
-              page={page}
-              prepareRow={prepareRow}
-              tableDataCondition={tableDataCondition}
-              fromPage="Notebook Schedulers"
-            />
-            {dagList.length > 50 && (
-              <PaginationView
-                pageSize={pageSize}
-                setPageSize={setPageSize}
-                pageIndex={pageIndex}
-                allData={dagList}
-                previousPage={previousPage}
-                nextPage={nextPage}
-                canPreviousPage={canPreviousPage}
-                canNextPage={canNextPage}
+        {importErrorEntries > 0 && (
+          <div className="import-error-parent">
+            <div
+              className="accordion-button"
+              role="button"
+              aria-label="Show Import Errors"
+              title="Show Import Errors"
+              onClick={handleImportErrorPopup}
+            >
+              Show Schedule Errors ({importErrorEntries})
+            </div>
+            {importErrorPopupOpen && (
+              <ImportErrorPopup
+                importErrorData={importErrorData}
+                importErrorEntries={importErrorEntries}
+                importErrorPopupOpen={importErrorPopupOpen}
+                onClose={handleImportErrorClosed}
+                onDelete={(dagId: string) => handleDeleteImportError(dagId)}
               />
-            )}
-            {deletePopupOpen && (
-              <DeletePopup
-                onCancel={() => handleCancelDelete()}
-                onDelete={() => handleDeleteScheduler()}
-                deletePopupOpen={deletePopupOpen}
-                DeleteMsg={`This will delete ${selectedDagId} and cannot be undone.`}
-                deletingNotebook={deletingNotebook}
-              />
-            )}
-          </div>
-        ) : (
-          <div>
-            {isLoading && (
-              <div className="spin-loader-main">
-                <CircularProgress
-                  className="spin-loader-custom-style"
-                  size={18}
-                  aria-label="Loading Spinner"
-                  data-testid="loader"
-                />
-                Loading Notebook Schedulers
-              </div>
-            )}
-            {!isLoading && (
-              <div className="no-data-style">No rows to display</div>
             )}
           </div>
         )}
       </div>
+
+      {dagList.length > 0 ? (
+        <div className="notebook-templates-list-table-parent">
+          <TableData
+            getTableProps={getTableProps}
+            headerGroups={headerGroups}
+            getTableBodyProps={getTableBodyProps}
+            isLoading={isLoading}
+            rows={rows}
+            page={page}
+            prepareRow={prepareRow}
+            tableDataCondition={tableDataCondition}
+            fromPage="Notebook Schedulers"
+          />
+          {dagList.length > 50 && (
+            <PaginationView
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              pageIndex={pageIndex}
+              allData={dagList}
+              previousPage={previousPage}
+              nextPage={nextPage}
+              canPreviousPage={canPreviousPage}
+              canNextPage={canNextPage}
+            />
+          )}
+          {deletePopupOpen && (
+            <DeletePopup
+              onCancel={() => handleCancelDelete()}
+              onDelete={() => handleDeleteScheduler()}
+              deletePopupOpen={deletePopupOpen}
+              DeleteMsg={`This will delete ${selectedDagId} and cannot be undone.`}
+              deletingNotebook={deletingNotebook}
+            />
+          )}
+        </div>
+      ) : (
+        <div>
+          {isLoading && (
+            <div className="spin-loader-main">
+              <CircularProgress
+                className="spin-loader-custom-style"
+                size={18}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+              Loading Notebook Schedulers
+            </div>
+          )}
+          {!isLoading && (
+            <div className="no-data-style">No rows to display</div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 export default listNotebookScheduler;
