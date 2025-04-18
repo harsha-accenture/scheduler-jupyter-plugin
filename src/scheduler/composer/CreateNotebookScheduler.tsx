@@ -161,6 +161,7 @@ const CreateNotebookScheduler = ({
   const [envApiFlag, setEnvApiFlag] = useState<boolean>(false);
   const [loaderRegion, setLoaderRegion] = useState<boolean>(false);
   const [loaderProjectId, setLoaderProjectId] = useState<boolean>(false);
+  const [composerPreSelectFlag, setComposerPreSelectedFlag] = useState<boolean>(false);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -392,7 +393,7 @@ const CreateNotebookScheduler = ({
       emailError ||
       dagListCall ||
       creatingScheduler ||
-      (!checkRequiredPackagesInstalledFlag && isLocalKernel && !editMode) ||
+      (!checkRequiredPackagesInstalledFlag && isLocalKernel) ||
       jobNameSelected === '' ||
       (!jobNameValidation && !editMode) ||
       (jobNameSpecialValidation && !editMode) ||
@@ -482,6 +483,12 @@ const CreateNotebookScheduler = ({
       setParameterDetailUpdated([]);
     }
   }, []);
+
+  useEffect(() => {
+    if(editMode === true) {
+      setComposerPreSelectedFlag(true);
+    }
+  }, [editMode])
 
   useEffect(() => {
     if (projectId && region) {
@@ -609,6 +616,7 @@ const CreateNotebookScheduler = ({
           setPackageEditFlag={setPackageEditFlag}
           setSchedulerBtnDisable={setSchedulerBtnDisable}
           composerSelected={composerSelected}
+          composerPreSelectFlag={composerPreSelectFlag}
         />
       ) : (
         <div>
