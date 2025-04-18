@@ -818,15 +818,17 @@ const CreateVertexScheduler = ({
     if (!editMode) {
       setSubNetworkSelected(subNetworkList[0]);
     }
-  }, [subNetworkList]);
+  }, [subNetworkList, networkSelected]);
 
   useEffect(() => {
-    const primaryNetwork = primaryNetworkList[0];
-    setPrimaryNetworkSelected(primaryNetwork);
-    if (primaryNetwork) {
-      subNetworkAPI(DEFAULT_PRIMARY_NETWORK);
+    if (!editMode) {
+      const primaryNetwork = primaryNetworkList[0];
+      setPrimaryNetworkSelected(primaryNetwork);
+      if (primaryNetwork) {
+        subNetworkAPI(DEFAULT_PRIMARY_NETWORK);
+      }
     }
-  }, [primaryNetworkList]);
+  }, [primaryNetworkList, networkSelected]);
 
   useEffect(() => {
     setCloudStorage(
@@ -1179,6 +1181,7 @@ const CreateVertexScheduler = ({
                   value="networkInThisProject"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode}
                   label={
                     <Typography sx={{ fontSize: 13 }}>
                       Network in this project
@@ -1198,6 +1201,7 @@ const CreateVertexScheduler = ({
                   value="networkShared"
                   className="create-scheduler-label-style"
                   control={<Radio size="small" />}
+                  disabled={editMode}
                   label={
                     <Typography sx={{ fontSize: 13 }}>
                       Network shared from host project
