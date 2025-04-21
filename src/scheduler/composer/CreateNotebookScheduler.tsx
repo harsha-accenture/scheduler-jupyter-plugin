@@ -423,6 +423,7 @@ const CreateNotebookScheduler = ({
       app.shell.activeWidget?.close();
     } else {
       setCreateCompleted(true);
+      setEditMode(false);
     }
   };
 
