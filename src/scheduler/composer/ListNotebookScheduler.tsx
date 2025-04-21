@@ -110,8 +110,7 @@ function listNotebookScheduler({
   setIsLocalKernel,
   setPackageEditFlag,
   setSchedulerBtnDisable,
-  composerSelected,
-  composerPreSelectFlag
+  composerSelected
 }: {
   app: JupyterFrontEnd;
   settingRegistry: ISettingRegistry;
@@ -151,7 +150,6 @@ function listNotebookScheduler({
   setPackageEditFlag: (value: boolean) => void;
   setSchedulerBtnDisable: (value: boolean) => void;
   composerSelected?: string;
-  composerPreSelectFlag: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [composerList, setComposerList] = useState<string[]>([]);
@@ -603,23 +601,18 @@ function listNotebookScheduler({
     if (!projectId) {
       setRegion('');
       setComposerList([]);
-      if (!composerPreSelectFlag) {
-        setComposerSelectedList('');
-      }
+      setComposerSelectedList('');
+      console.log('running data project if');
     }
   }, [projectId]);
 
   useEffect(() => {
     if (!region) {
       setComposerList([]);
-      if (!composerPreSelectFlag) {
-        setComposerSelectedList('');
-      }
+      setComposerSelectedList('');
     } else {
-      if (composerPreSelectFlag) {
-        if (composerSelected) {
-          setComposerSelectedList(composerSelected);
-        }
+      if (composerSelected) {
+        setComposerSelectedList(composerSelected);
       } else {
         listComposersAPI();
       }
