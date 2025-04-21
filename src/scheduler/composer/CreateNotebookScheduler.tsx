@@ -392,7 +392,7 @@ const CreateNotebookScheduler = ({
       emailError ||
       dagListCall ||
       creatingScheduler ||
-      (!checkRequiredPackagesInstalledFlag && isLocalKernel && !editMode) ||
+      (!checkRequiredPackagesInstalledFlag && isLocalKernel) ||
       jobNameSelected === '' ||
       (!jobNameValidation && !editMode) ||
       (jobNameSpecialValidation && !editMode) ||

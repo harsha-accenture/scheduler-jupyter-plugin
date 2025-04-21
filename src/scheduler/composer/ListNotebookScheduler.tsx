@@ -153,9 +153,7 @@ function listNotebookScheduler({
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [composerList, setComposerList] = useState<string[]>([]);
-  const [composerSelectedList, setComposerSelectedList] = useState(
-    composerSelected ? composerSelected : ''
-  );
+  const [composerSelectedList, setComposerSelectedList] = useState<string>('');
   const [dagList, setDagList] = useState<IDagList[]>([]);
   const data = dagList;
   const backselectedEnvironment = backButtonComposerName;
@@ -612,7 +610,11 @@ function listNotebookScheduler({
       setComposerList([]);
       setComposerSelectedList('');
     } else {
-      listComposersAPI();
+      if (composerSelected) {
+        setComposerSelectedList(composerSelected);
+      } else {
+        listComposersAPI();
+      }
     }
   }, [region]);
 
