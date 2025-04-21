@@ -602,7 +602,6 @@ function listNotebookScheduler({
       setRegion('');
       setComposerList([]);
       setComposerSelectedList('');
-      console.log('running data project if');
     }
   }, [projectId]);
 
