@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { INotebookModel } from '@jupyterlab/notebook';
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
@@ -66,6 +66,7 @@ const NotebookSchedulerComponent = ({
   const [schedulerBtnDisable, setSchedulerBtnDisable] =
     useState<boolean>(false);
   const [packageEditFlag, setPackageEditFlag] = useState<boolean>(false);
+  const abortControllerRef = useRef<any>(null);
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -114,6 +115,10 @@ const NotebookSchedulerComponent = ({
       setPackageEditFlag(false);
     }
     setEditMode(false);
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
   };
 
   const handleSchedulerModeChange = (
@@ -267,6 +272,7 @@ const NotebookSchedulerComponent = ({
           packageEditFlag={packageEditFlag}
           setPackageEditFlag={setPackageEditFlag}
           setSchedulerBtnDisable={setSchedulerBtnDisable}
+          abortControllerRef={abortControllerRef}
         />
       ) : (
         <CreateVertexScheduler

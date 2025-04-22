@@ -986,14 +986,17 @@ export class SchedulerService {
     setPackageListFlag: (value: boolean) => void,
     setapiErrorMessage: (value: string) => void,
     setCheckRequiredPackagesInstalledFlag: (value: boolean) => void,
-    setDisabaleEnvLocal: (value: boolean) => void
+    setDisabaleEnvLocal: (value: boolean) => void,
+    signal: any,
+    abortControllerRef: any
   ) => {
     try {
       setPackageInstallationMessage(
         'Checking if required packages are installed...'
       );
       const installedPackageList: any = await requestAPI(
-        `checkRequiredPackages?composer_environment_name=${selectedComposer}`
+        `checkRequiredPackages?composer_environment_name=${selectedComposer}`,
+        { signal }
       );
 
       if (installedPackageList.length > 0) {
@@ -1015,10 +1018,18 @@ export class SchedulerService {
       setCheckRequiredPackagesInstalledFlag(true);
       setDisabaleEnvLocal(false);
     } catch (reason) {
-      toast.error(
-        `Failed to installation package list : ${reason}`,
-        toastifyCustomStyle
-      );
+      if (typeof reason === 'object' && reason !== null) {
+        if (reason instanceof TypeError) {
+          return;
+        }
+      } else {
+        toast.error(
+          `Failed to installation package list : ${reason}`,
+          toastifyCustomStyle
+        );
+      }
+    } finally {
+      abortControllerRef.current = null; // Clear the AbortController
     }
   };
 }
