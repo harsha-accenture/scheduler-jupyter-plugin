@@ -986,14 +986,15 @@ export class SchedulerService {
     setPackageListFlag: (value: boolean) => void,
     setapiErrorMessage: (value: string) => void,
     setCheckRequiredPackagesInstalledFlag: (value: boolean) => void,
-    setDisabaleEnvLocal: (value: boolean) => void
+    setDisabaleEnvLocal: (value: boolean) => void,
+    signal: AbortSignal
   ) => {
     try {
       setPackageInstallationMessage(
         'Checking if required packages are installed...'
       );
       const installedPackageList: any = await requestAPI(
-        `checkRequiredPackages?composer_environment_name=${selectedComposer}`
+        `checkRequiredPackages?composer_environment_name=${selectedComposer}`, {signal}
       );
 
       if (installedPackageList.length > 0) {

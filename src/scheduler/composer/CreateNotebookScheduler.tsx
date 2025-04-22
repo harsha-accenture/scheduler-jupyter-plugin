@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Input } from '../../controls/MuiWrappedInput';
 import {
   Autocomplete,
@@ -161,6 +161,7 @@ const CreateNotebookScheduler = ({
   const [envApiFlag, setEnvApiFlag] = useState<boolean>(false);
   const [loaderRegion, setLoaderRegion] = useState<boolean>(false);
   const [loaderProjectId, setLoaderProjectId] = useState<boolean>(false);
+  const abortControllerRef : React.MutableRefObject<object | null> = useRef(null);
 
   const listClustersAPI = async () => {
     await SchedulerService.listClustersAPIService(
@@ -192,6 +193,12 @@ const CreateNotebookScheduler = ({
     setPackageListFlag(false);
     setPackageInstalledList([]);
     setapiErrorMessage('');
+    abortControllerRef.current = new AbortController();
+    let signal
+    if(Object.hasOwn(abortControllerRef.current, 'signal')) {
+      signal = abortControllerRef.current.signal;
+    }
+    
     if (data) {
       const selectedComposer = data.toString();
       setComposerSelected(selectedComposer);
@@ -210,7 +217,8 @@ const CreateNotebookScheduler = ({
             setPackageListFlag,
             setapiErrorMessage,
             setCheckRequiredPackagesInstalledFlag,
-            setDisabaleEnvLocal
+            setDisabaleEnvLocal,
+            signal
           );
         }
       }
@@ -561,7 +569,8 @@ const CreateNotebookScheduler = ({
         setPackageListFlag,
         setapiErrorMessage,
         setCheckRequiredPackagesInstalledFlag,
-        setDisabaleEnvLocal
+        setDisabaleEnvLocal,
+        signal
       );
     };
 
