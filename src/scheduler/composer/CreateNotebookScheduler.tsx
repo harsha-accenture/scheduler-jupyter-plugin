@@ -78,7 +78,8 @@ const CreateNotebookScheduler = ({
   setIsLocalKernel,
   packageEditFlag,
   setPackageEditFlag,
-  setSchedulerBtnDisable
+  setSchedulerBtnDisable,
+  abortControllerRef
 }: {
   themeManager: IThemeManager;
   app: JupyterLab;
@@ -104,6 +105,7 @@ const CreateNotebookScheduler = ({
   packageEditFlag: boolean;
   setPackageEditFlag: React.Dispatch<React.SetStateAction<boolean>>;
   setSchedulerBtnDisable: React.Dispatch<React.SetStateAction<boolean>>;
+  abortControllerRef: any;
 }): JSX.Element => {
   const [composerList, setComposerList] = useState<string[]>([]);
   const [composerSelected, setComposerSelected] = useState<string>('');
@@ -192,6 +194,10 @@ const CreateNotebookScheduler = ({
     setPackageListFlag(false);
     setPackageInstalledList([]);
     setapiErrorMessage('');
+
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     if (data) {
       const selectedComposer = data.toString();
       setComposerSelected(selectedComposer);
@@ -210,7 +216,9 @@ const CreateNotebookScheduler = ({
             setPackageListFlag,
             setapiErrorMessage,
             setCheckRequiredPackagesInstalledFlag,
-            setDisabaleEnvLocal
+            setDisabaleEnvLocal,
+            signal,
+            abortControllerRef
           );
         }
       }
@@ -425,6 +433,10 @@ const CreateNotebookScheduler = ({
       setCreateCompleted(true);
       setEditMode(false);
     }
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
   };
 
   const getKernelDetail = async () => {
@@ -482,6 +494,12 @@ const CreateNotebookScheduler = ({
       setParameterDetail([]);
       setParameterDetailUpdated([]);
     }
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -555,6 +573,10 @@ const CreateNotebookScheduler = ({
       setPackageListFlag(false);
       setPackageInstalledList([]);
       setapiErrorMessage('');
+
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+
       await SchedulerService.checkRequiredPackagesInstalled(
         composerSelected,
         setPackageInstallationMessage,
@@ -562,7 +584,9 @@ const CreateNotebookScheduler = ({
         setPackageListFlag,
         setapiErrorMessage,
         setCheckRequiredPackagesInstalledFlag,
-        setDisabaleEnvLocal
+        setDisabaleEnvLocal,
+        signal,
+        abortControllerRef
       );
     };
 
