@@ -66,6 +66,8 @@ const NotebookSchedulerComponent = ({
   const [schedulerBtnDisable, setSchedulerBtnDisable] =
     useState<boolean>(false);
   const [packageEditFlag, setPackageEditFlag] = useState<boolean>(false);
+  const [executionPageListFlag, setExecutionPageListFlag] =
+    useState<boolean>(false);
   const abortControllerRef = useRef<any>(null);
 
   const formatTimestamp = (timestamp: number) => {
@@ -143,7 +145,13 @@ const NotebookSchedulerComponent = ({
   };
 
   return (
-    <div className="component-level">
+    <div
+      className={
+        executionPageListFlag
+          ? 'component-level container-main-page'
+          : 'component-level'
+      }
+    >
       {!createCompleted ? (
         <>
           <div className="cluster-details-header">
@@ -292,6 +300,7 @@ const NotebookSchedulerComponent = ({
           setIsApiError={setIsApiError}
           setApiError={setApiError}
           jobNameSpecialValidation={jobNameSpecialValidation}
+          setExecutionPageListFlag={setExecutionPageListFlag}
         />
       )}
     </div>

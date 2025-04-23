@@ -168,7 +168,8 @@ export class VertexServices {
     setNextPageToken: (value: string | null) => void, // function for setting the next page token
     newPageToken: string | null | undefined, // token of page to be fetched
     pageLength: number = 50, // number of items to be fetched
-    setHasNextPageToken: (value: boolean) => void // true if there are more items that were not fetched
+    setHasNextPageToken: (value: boolean) => void, // true if there are more items that were not fetched
+    abortControllers?: any
   ) => {
     setIsLoading(true);
     setIsApiError(false);
@@ -227,7 +228,12 @@ export class VertexServices {
         // Fetch Last run status asynchronously without waiting for completion
         schedules.forEach((schedule: IVertexScheduleList) => {
           // Triggering fetch asynchronously
-          fetchLastFiveRunStatus(schedule, region, setVertexScheduleList);
+          fetchLastFiveRunStatus(
+            schedule,
+            region,
+            setVertexScheduleList,
+            abortControllers
+          );
         });
 
         setIsLoading(false); // Stop loading after everything is complete
@@ -819,15 +825,22 @@ async function fetchLastFiveRunStatus(
     value:
       | IVertexScheduleList[]
       | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
-  ) => void
+  ) => void,
+  abortControllers: any
 ): Promise<any> {
+  // Controller to abort pending API call
+  const controller = new AbortController();
+  abortControllers.current.push(controller);
+  const signal = controller.signal;
+
   //Extract Schedule id from schedule name.
   const scheduleId = schedule.name.split('/').pop();
   const serviceURLLastRunResponse = 'api/vertex/listNotebookExecutionJobs';
   try {
     const jobExecutionList: any[] = await requestAPI(
       serviceURLLastRunResponse +
-        `?region_id=${region}&schedule_id=${scheduleId}&page_size=5&order_by=createTime desc`
+        `?region_id=${region}&schedule_id=${scheduleId}&page_size=5&order_by=createTime desc`,
+      { signal }
     );
 
     const lastFiveRun = jobExecutionList.map((job: any) => job.jobState);

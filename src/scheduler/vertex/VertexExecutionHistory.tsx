@@ -34,7 +34,8 @@ const VertexExecutionHistory = ({
   schedulerData,
   scheduleName,
   handleBackButton,
-  setExecutionPageFlag
+  setExecutionPageFlag,
+  setExecutionPageListFlag
 }: {
   region: string;
   setRegion: (value: string) => void;
@@ -42,6 +43,7 @@ const VertexExecutionHistory = ({
   scheduleName: string;
   handleBackButton: () => void;
   setExecutionPageFlag: (value: boolean) => void;
+  setExecutionPageListFlag: (value: boolean) => void;
 }): JSX.Element => {
   const today = dayjs();
 
@@ -77,6 +79,11 @@ const VertexExecutionHistory = ({
     setSelectedMonth(dayjs(currentDate));
     setSelectedDate(dayjs(currentDate));
     setExecutionPageFlag(false);
+    setExecutionPageListFlag(true);
+
+    return () => {
+      setExecutionPageListFlag(false);
+    };
   }, []);
 
   /**
