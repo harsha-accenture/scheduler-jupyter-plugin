@@ -32,30 +32,30 @@ export const authApi = async (checkApiEnabled: boolean = true
   return authService;
 };
 
-export const checkConfig = async (
-  setLoginState: React.Dispatch<React.SetStateAction<boolean>>,
-  setConfigError: React.Dispatch<React.SetStateAction<boolean>>,
-  setLoginError: React.Dispatch<React.SetStateAction<boolean>>
-): Promise<void> => {
-  const credentials: IAuthCredentials | undefined = await authApi();
-  if (credentials) {
-    if (credentials.access_token === '') {
-      localStorage.removeItem('loginState');
-      if (credentials.config_error === 1) {
-        setConfigError(true);
-      }
-      if (credentials.login_error === 1) {
-        setLoginError(true);
-      }
-    } 
+// export const checkConfig = async (
+//   setLoginState: React.Dispatch<React.SetStateAction<boolean>>,
+//   setConfigError: React.Dispatch<React.SetStateAction<boolean>>,
+//   setLoginError: React.Dispatch<React.SetStateAction<boolean>>
+// ): Promise<void> => {
+//   const credentials: IAuthCredentials | undefined = await authApi();
+//   if (credentials) {
+//     if (credentials.access_token === '') {
+//       localStorage.removeItem('loginState');
+//       if (credentials.config_error === 1) {
+//         setConfigError(true);
+//       }
+//       if (credentials.login_error === 1) {
+//         setLoginError(true);
+//       }
+//     } 
     
-    if (credentials.config_error === 1) {
-      setConfigError(true);
-    } else {
-      setLoginState(true);
-    }
-  }
-};
+//     if (credentials.config_error === 1) {
+//       setConfigError(true);
+//     } else {
+//       setLoginState(true);
+//     }
+//   }
+// };
 
 /**
  * Helper method that wraps fetch and logs the request uri and status codes to
