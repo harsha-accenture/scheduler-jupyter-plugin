@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTable, usePagination } from 'react-table';
 import TableData from '../../utils/TableData';
 import { PaginationComponent } from '../../utils/PaginationComponent';
@@ -152,6 +152,7 @@ function ListVertexScheduler({
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [fetchPreviousPage, setFetchPreviousPage] = useState<boolean>(false);
   const [fetchCurrentPage, setFetchCurrentPage] = useState<boolean>(false);
+  const abortControllers = useRef<any>([]); // Array of API signals to abort
 
   const columns = useMemo(
     () => [
@@ -204,7 +205,8 @@ function ListVertexScheduler({
       setNextPageToken,
       nextToken,
       scheduleListPageLength,
-      setCanNextPage
+      setCanNextPage,
+      abortControllers
     );
 
     setIsLoading(false);
@@ -298,6 +300,7 @@ function ListVertexScheduler({
    * Handles next page navigation
    */
   const handleNextPage = async () => {
+    abortApiCall(); //Abort last run execution api call
     const nextTokenToFetch =
       pageTokenList.length > 0 ? pageTokenList[pageTokenList.length - 1] : null;
     setNextPageToken(nextTokenToFetch);
@@ -311,6 +314,7 @@ function ListVertexScheduler({
    * Handles previous page navigation
    */
   const handlePreviousPage = async () => {
+    abortApiCall(); //Abort last run execution api call
     setFetchPreviousPage(true);
     if (pageTokenList.length > 0) {
       setIsLoading(true); // Indicate loading during page transition
@@ -899,6 +903,9 @@ function ListVertexScheduler({
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    return () => {
+      abortApiCall(); // Abort any ongoing requests on component unmount
+    };
   }, []);
 
   useEffect(() => {
@@ -922,6 +929,11 @@ function ListVertexScheduler({
         console.error(error);
       });
   }, [projectId]);
+
+  const abortApiCall = () => {
+    abortControllers.current.forEach((controller: any) => controller.abort());
+    abortControllers.current = [];
+  };
 
   return (
     <div>

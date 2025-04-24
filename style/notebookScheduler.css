@@ -675,3 +675,7 @@
   background-color: #eee;
   color: #ccc;
 }
+
+.container-main-page {
+  height: 100vh;
+}
