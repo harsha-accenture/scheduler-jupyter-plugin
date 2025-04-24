@@ -921,7 +921,6 @@ function ListVertexScheduler({
   };
 
   return (
-    console.log('abortconrollwr', abortControllers),
     (
       <div>
         <div className="select-text-overlay-scheduler">
