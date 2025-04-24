@@ -170,10 +170,6 @@ function ListVertexScheduler({
         accessor: 'nextRunTime'
       },
       {
-        Header: 'Created',
-        accessor: 'createTime'
-      },
-      {
         Header: 'Latest Execution Jobs',
         accessor: 'jobState'
       },
@@ -182,12 +178,17 @@ function ListVertexScheduler({
         accessor: 'status'
       },
       {
-        Header: 'Actions',
-        accessor: 'actions'
+        Header: 'Created',
+        accessor: 'createTime'
       }
+      // {
+      //   Header: 'Actions',
+      //   accessor: 'actions'
+      // }
     ],
-    [hideColumns]
+    []
   );
+  console.log(hideColumns);
 
   /**
    * Get list of schedules
@@ -525,8 +526,8 @@ function ListVertexScheduler({
       data,
       autoResetPage: false,
       initialState: {
-        pageSize: scheduleListPageLength,
-        hiddenColumns: hideColumns
+        pageSize: scheduleListPageLength
+        // hiddenColumns: hideColumns
       },
       manualPagination: true
     },
@@ -672,15 +673,26 @@ function ListVertexScheduler({
   };
 
   const tableDataCondition = (cell: IVertexCellProps) => {
-    if (cell.column.Header === 'Actions' && hoveredRow === cell.row.id) {
-      return (
-        <td
-          {...cell.getCellProps()}
-          className="clusters-table-data table-cell-overflow"
-        >
-          {renderActions(cell.row.original)}
-        </td>
-      );
+    if (cell.column.Header === 'Created') {
+      if (hoveredRow === cell.row.id) {
+        return (
+          <td
+            {...cell.getCellProps()}
+            className="clusters-table-data table-cell-overflow"
+          >
+            {renderActions(cell.row.original)}
+          </td>
+        );
+      } else {
+        return (
+          <td
+            {...cell.getCellProps()}
+            className="clusters-table-data table-cell-overflow"
+          >
+            {dayjs(cell.row.original.createTime).format('lll')}
+          </td>
+        );
+      }
     } else if (cell.column.Header === 'Schedule Name') {
       return (
         <td
@@ -691,16 +703,18 @@ function ListVertexScheduler({
           {cell.value}
         </td>
       );
-    } else if (cell.column.Header === 'Created') {
-      return (
-        <td
-          {...cell.getCellProps()}
-          className="clusters-table-data table-cell-overflow"
-        >
-          {dayjs(cell.row.original.createTime).format('lll')}
-        </td>
-      );
-    } else if (cell.column.Header === 'Next Run Date') {
+    }
+    // else if (cell.column.Header === 'Created') {
+    //   return (
+    //     <td
+    //       {...cell.getCellProps()}
+    //       className="clusters-table-data table-cell-overflow"
+    //     >
+    //       {dayjs(cell.row.original.createTime).format('lll')}
+    //     </td>
+    //   );
+    // }
+    else if (cell.column.Header === 'Next Run Date') {
       return (
         <td
           {...cell.getCellProps()}
