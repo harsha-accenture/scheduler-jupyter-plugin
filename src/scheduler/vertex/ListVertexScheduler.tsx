@@ -152,6 +152,8 @@ function ListVertexScheduler({
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [fetchPreviousPage, setFetchPreviousPage] = useState<boolean>(false);
   const [fetchCurrentPage, setFetchCurrentPage] = useState<boolean>(false);
+  const [hoveredRow, setHoveredRow] = useState(null);
+  const [hideColumns, setHideColumns] = useState(['actions']);
 
   const columns = useMemo(
     () => [
@@ -184,7 +186,7 @@ function ListVertexScheduler({
         accessor: 'actions'
       }
     ],
-    []
+    [hideColumns]
   );
 
   /**
@@ -522,7 +524,10 @@ function ListVertexScheduler({
       columns,
       data,
       autoResetPage: false,
-      initialState: { pageSize: scheduleListPageLength },
+      initialState: {
+        pageSize: scheduleListPageLength,
+        hiddenColumns: hideColumns
+      },
       manualPagination: true
     },
     usePagination
@@ -667,7 +672,7 @@ function ListVertexScheduler({
   };
 
   const tableDataCondition = (cell: IVertexCellProps) => {
-    if (cell.column.Header === 'Actions') {
+    if (cell.column.Header === 'Actions' && hoveredRow === cell.row.id) {
       return (
         <td
           {...cell.getCellProps()}
@@ -968,6 +973,8 @@ function ListVertexScheduler({
               prepareRow={prepareRow}
               tableDataCondition={tableDataCondition}
               fromPage="Vertex schedulers"
+              setHoveredRow={setHoveredRow}
+              setHideColumns={setHideColumns}
             />
             {vertexScheduleList.length > 0 && (
               <PaginationComponent

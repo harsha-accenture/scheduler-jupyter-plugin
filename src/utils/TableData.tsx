@@ -30,7 +30,8 @@ function TableData({
   prepareRow,
   tableDataCondition,
   fromPage,
-  setHoveredRow
+  setHoveredRow,
+  setHideColumns
 }: any) {
   const [listDagRunHeight, setListDagRunHeight] = useState(
     window.innerHeight - 505
@@ -99,13 +100,16 @@ function TableData({
         ) : (
           displayData.map((row: Row, index: number) => {
             prepareRow(row);
-            // console.log('row id', row.id);
             return (
               <tr
                 {...row.getRowProps()}
                 className={'cluster-list-data-parent'}
-                onMouseEnter={() => setHoveredRow(row.id)}
-                // onMouseLeave={() => setHoveredRow(null)}
+                onMouseEnter={() => {
+                  setHoveredRow(row.id), setHideColumns([]);
+                }}
+                onMouseLeave={() => {
+                  setHoveredRow(null), setHideColumns(['actions']);
+                }}
               >
                 {row.cells.map((cell: Cell) => {
                   return tableDataCondition(cell);

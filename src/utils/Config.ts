@@ -203,6 +203,7 @@ export interface IVertexCellProps {
     Header: string;
   };
   row: {
+    id: string;
     original: {
       id: string;
       status: string;
