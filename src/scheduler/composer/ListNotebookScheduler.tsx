@@ -170,6 +170,7 @@ function listNotebookScheduler({
   const [projectId, setProjectId] = useState('');
   const [region, setRegion] = useState<string>('');
   const [loaderProjectId, setLoaderProjectId] = useState<boolean>(false);
+  const [hoveredRow, setHoveredRow] = useState(null);
 
   const columns = React.useMemo(
     () => [
@@ -479,7 +480,12 @@ function listNotebookScheduler({
   };
 
   const tableDataCondition = (cell: ICellProps) => {
-    if (cell.column.Header === 'Actions') {
+    if (
+      cell.column.Header === 'Actions' &&
+      hoveredRow === cell.row.original.id
+    ) {
+      console.log(cell.row.original.id);
+      console.log('hoverd', hoveredRow);
       return (
         <td {...cell.getCellProps()} className="clusters-table-data">
           {renderActions(cell.row.original)}
@@ -734,6 +740,7 @@ function listNotebookScheduler({
             prepareRow={prepareRow}
             tableDataCondition={tableDataCondition}
             fromPage="Notebook Schedulers"
+            setHoveredRow={setHoveredRow}
           />
           {dagList.length > 50 && (
             <PaginationView
