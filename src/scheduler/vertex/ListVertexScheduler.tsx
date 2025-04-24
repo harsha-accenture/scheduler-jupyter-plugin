@@ -361,33 +361,18 @@ function ListVertexScheduler({
       await VertexServices.handleUpdateSchedulerPauseAPIService(
         scheduleId,
         region,
-        setScheduleList,
-        setIsLoading,
         displayName,
-        setResumeLoading,
-        setIsApiError,
-        setApiError,
-        setNextPageToken,
-        newPageToken,
-        scheduleListPageLength,
-        setCanNextPage
+        setResumeLoading
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
         scheduleId,
         region,
-        setScheduleList,
-        setIsLoading,
         displayName,
-        setResumeLoading,
-        setIsApiError,
-        setApiError,
-        setNextPageToken,
-        newPageToken,
-        scheduleListPageLength,
-        setCanNextPage
+        setResumeLoading
       );
     }
+    handleCurrentPageRefresh();
   };
 
   /**
@@ -936,93 +921,96 @@ function ListVertexScheduler({
   };
 
   return (
-    <div>
-      <div className="select-text-overlay-scheduler">
-        <div className="enable-text-label">
-          <div className="create-scheduler-form-element content-pd-space ">
-            <RegionDropdown
-              projectId={projectId}
-              region={region}
-              onRegionChange={region => setRegion(region)}
-              regionsList={VERTEX_REGIONS}
-            />
-            {!isLoading && !region && (
-              <ErrorMessage message="Region is required" />
-            )}
-          </div>
-        </div>
-
-        <div className="btn-refresh">
-          <Button
-            disabled={isLoading}
-            className="btn-refresh-text"
-            variant="outlined"
-            aria-label="cancel Batch"
-            onClick={() => {
-              handleCurrentPageRefresh();
-            }}
-          >
-            <div>REFRESH</div>
-          </Button>
-        </div>
-      </div>
-
-      {vertexScheduleList.length > 0 || nextPageToken ? (
-        <>
-          <div className="notebook-templates-list-table-parent">
-            <TableData
-              getTableProps={getTableProps}
-              headerGroups={headerGroups}
-              getTableBodyProps={getTableBodyProps}
-              isLoading={isLoading}
-              rows={rows}
-              page={page}
-              prepareRow={prepareRow}
-              tableDataCondition={tableDataCondition}
-              fromPage="Vertex schedulers"
-            />
-            {vertexScheduleList.length > 0 && (
-              <PaginationComponent
-                canPreviousPage={canPreviousPage}
-                canNextPage={canNextPage}
-                currentStartIndex={currentStartIndex}
-                currentLastIndex={currentLastIndex}
-                handleNextPage={handleNextPage}
-                handlePreviousPage={handlePreviousPage}
-                isLoading={isLoading}
-                totalCount={totalCount}
+    console.log('abortconrollwr', abortControllers),
+    (
+      <div>
+        <div className="select-text-overlay-scheduler">
+          <div className="enable-text-label">
+            <div className="create-scheduler-form-element content-pd-space ">
+              <RegionDropdown
+                projectId={projectId}
+                region={region}
+                onRegionChange={region => setRegion(region)}
+                regionsList={VERTEX_REGIONS}
               />
-            )}
-            {deletePopupOpen && (
-              <DeletePopup
-                onCancel={() => handleCancelDelete()}
-                onDelete={() => handleDeleteScheduler(null)}
-                deletePopupOpen={deletePopupOpen}
-                DeleteMsg={`This will delete ${scheduleDisplayName} and cannot be undone.`}
-                deletingSchedule={deletingSchedule}
-              />
-            )}
-          </div>
-        </>
-      ) : (
-        <div>
-          {isLoading && (
-            <div className="spin-loader-main">
-              <CircularProgress
-                className="spin-loader-custom-style"
-                size={18}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-              />
-              Loading Vertex Schedules
+              {!isLoading && !region && (
+                <ErrorMessage message="Region is required" />
+              )}
             </div>
-          )}
-          {!isLoading && (
-            <div className="no-data-style">No schedules available</div>
-          )}
+          </div>
+
+          <div className="btn-refresh">
+            <Button
+              disabled={isLoading}
+              className="btn-refresh-text"
+              variant="outlined"
+              aria-label="cancel Batch"
+              onClick={() => {
+                handleCurrentPageRefresh();
+              }}
+            >
+              <div>REFRESH</div>
+            </Button>
+          </div>
         </div>
-      )}
-    </div>
+
+        {vertexScheduleList.length > 0 || nextPageToken ? (
+          <>
+            <div className="notebook-templates-list-table-parent">
+              <TableData
+                getTableProps={getTableProps}
+                headerGroups={headerGroups}
+                getTableBodyProps={getTableBodyProps}
+                isLoading={isLoading}
+                rows={rows}
+                page={page}
+                prepareRow={prepareRow}
+                tableDataCondition={tableDataCondition}
+                fromPage="Vertex schedulers"
+              />
+              {vertexScheduleList.length > 0 && (
+                <PaginationComponent
+                  canPreviousPage={canPreviousPage}
+                  canNextPage={canNextPage}
+                  currentStartIndex={currentStartIndex}
+                  currentLastIndex={currentLastIndex}
+                  handleNextPage={handleNextPage}
+                  handlePreviousPage={handlePreviousPage}
+                  isLoading={isLoading}
+                  totalCount={totalCount}
+                />
+              )}
+              {deletePopupOpen && (
+                <DeletePopup
+                  onCancel={() => handleCancelDelete()}
+                  onDelete={() => handleDeleteScheduler(null)}
+                  deletePopupOpen={deletePopupOpen}
+                  DeleteMsg={`This will delete ${scheduleDisplayName} and cannot be undone.`}
+                  deletingSchedule={deletingSchedule}
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          <div>
+            {isLoading && (
+              <div className="spin-loader-main">
+                <CircularProgress
+                  className="spin-loader-custom-style"
+                  size={18}
+                  aria-label="Loading Spinner"
+                  data-testid="loader"
+                />
+                Loading Vertex Schedules
+              </div>
+            )}
+            {!isLoading && (
+              <div className="no-data-style">No schedules available</div>
+            )}
+          </div>
+        )}
+      </div>
+    )
   );
 
   function resetPaginationVariables() {
