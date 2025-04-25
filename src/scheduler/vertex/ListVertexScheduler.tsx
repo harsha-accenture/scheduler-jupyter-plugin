@@ -361,33 +361,18 @@ function ListVertexScheduler({
       await VertexServices.handleUpdateSchedulerPauseAPIService(
         scheduleId,
         region,
-        setScheduleList,
-        setIsLoading,
         displayName,
-        setResumeLoading,
-        setIsApiError,
-        setApiError,
-        setNextPageToken,
-        newPageToken,
-        scheduleListPageLength,
-        setCanNextPage
+        setResumeLoading
       );
     } else {
       await VertexServices.handleUpdateSchedulerResumeAPIService(
         scheduleId,
         region,
-        setScheduleList,
-        setIsLoading,
         displayName,
-        setResumeLoading,
-        setIsApiError,
-        setApiError,
-        setNextPageToken,
-        newPageToken,
-        scheduleListPageLength,
-        setCanNextPage
+        setResumeLoading
       );
     }
+    handleCurrentPageRefresh();
   };
 
   /**

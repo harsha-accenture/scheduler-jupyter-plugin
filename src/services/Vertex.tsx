@@ -262,20 +262,8 @@ export class VertexServices {
   static handleUpdateSchedulerPauseAPIService = async (
     scheduleId: string,
     region: string,
-    setVertexScheduleList: (
-      value:
-        | IVertexScheduleList[]
-        | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
-    ) => void,
-    setIsLoading: (value: boolean) => void,
     displayName: string,
-    setResumeLoading: (value: string) => void,
-    setIsApiError: (value: boolean) => void,
-    setApiError: (value: string) => void,
-    setNextPageToken: (value: string | null) => void,
-    newPageToken: string | null | undefined,
-    pageLength: number = 50,
-    hasNextPage: (value: boolean) => void
+    setResumeLoading: (value: string) => void
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -287,17 +275,6 @@ export class VertexServices {
         toast.success(
           `Schedule ${displayName} updated successfully`,
           toastifyCustomStyle
-        );
-        await VertexServices.listVertexSchedules(
-          setVertexScheduleList,
-          region,
-          setIsLoading,
-          setIsApiError,
-          setApiError,
-          setNextPageToken,
-          newPageToken,
-          pageLength,
-          hasNextPage
         );
         setResumeLoading('');
       } else {
@@ -315,20 +292,8 @@ export class VertexServices {
   static handleUpdateSchedulerResumeAPIService = async (
     scheduleId: string,
     region: string,
-    setVertexScheduleList: (
-      value:
-        | IVertexScheduleList[]
-        | ((prevItems: IVertexScheduleList[]) => IVertexScheduleList[])
-    ) => void,
-    setIsLoading: (value: boolean) => void,
     displayName: string,
-    setResumeLoading: (value: string) => void,
-    setIsApiError: (value: boolean) => void,
-    setApiError: (value: string) => void,
-    setNextPageToken: (value: string | null) => void,
-    newPageToken: string | null | undefined,
-    pageLength: number = 50,
-    hasNextPage: (value: boolean) => void
+    setResumeLoading: (value: string) => void
   ) => {
     setResumeLoading(scheduleId);
     try {
@@ -340,17 +305,6 @@ export class VertexServices {
         toast.success(
           `Schedule ${displayName} updated successfully`,
           toastifyCustomStyle
-        );
-        await VertexServices.listVertexSchedules(
-          setVertexScheduleList,
-          region,
-          setIsLoading,
-          setIsApiError,
-          setApiError,
-          setNextPageToken,
-          newPageToken,
-          pageLength,
-          hasNextPage
         );
         setResumeLoading('');
       } else {
